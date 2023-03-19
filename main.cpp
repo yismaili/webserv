@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/29 19:21:09 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/19 11:35:09 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/19 11:49:52 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,6 @@ const int PORT = 8080;
 
 int main() {
     int sockfd, newsockfd, n;
-    char buffer[4096];
     struct sockaddr_in serv_addr, cli_addr;
     socklen_t clilen;
 
