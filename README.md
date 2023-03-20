@@ -22,3 +22,6 @@ Here’s how my server works in summary:
   - Writing the response back to the client
   - Closing the connection
  
+# What is a Socket ?
+
+ .  software endpoint that establishes a communication link between two applications running on a network. whenever there is a need for inter process communication within the same machine, we use mechanism like signals or pipes(named or unnamed). Similarly, when we desire a communication between two applications possibly running on different machines, we need sockets
