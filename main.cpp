@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/01/29 19:21:09 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/21 11:33:56 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/21 22:17:40 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,11 @@ public:
             close(newsockfd);
             continue;
         }else{
-            write(1, &buffer[0], 1);
+            int i = 0;
+            while (buffer[i]){
+                 write(1, &buffer[i++], 1);
+            }
+            
         }
 
         // Parse incoming request data
@@ -98,7 +102,7 @@ public:
         std::string response_str = response.str();
 
         // Send response to client
-        int n = write(newsockfd, response_str.c_str(), response_str.length());
+        int n = send(newsockfd, response_str.c_str(), response_str.length(), 0);
         if (n < 0) {
             std::cerr << "Error writing to socket" << std::endl;
         }
@@ -106,7 +110,6 @@ public:
         close(newsockfd);
     }
 }
-
 
 private:
     int sockfd;
