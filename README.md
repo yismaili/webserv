@@ -8,7 +8,8 @@ such as HTML documents.
 
 # What is HTTP ?
 
-HTTP or Hypertext Transfer Protocol is a protocol for distributed systems to communicate and transfer data.
+HTTP is a request-response protocol that allows users to communicate data on the World Wide Web (WWW) and transfer hypertext.
+
 
 # How It Works ?
 
