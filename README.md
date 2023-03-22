@@ -26,3 +26,8 @@ Here’s how my server works in summary:
 # What is a Socket ?
 
  .  software endpoint that establishes a communication link between two applications running on a network. whenever there is a need for inter process communication within the same machine, we use mechanism like signals or pipes(named or unnamed). Similarly, when we desire a communication between two applications possibly running on different machines, we need sockets
+
+# What is TCP?
+
+TCP, short for Transmission Control Protocol, a TCP server is a program that listens for incoming connections from TCP clients and provides services to them. An HTTP server is a type of TCP server that specifically handles HTTP requests and responses.
+
