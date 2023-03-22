@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/22 19:43:32 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/22 19:51:02 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,15 +50,13 @@ namespace http{
             appropriate protocol based on the socket type and domain.*/
             
             if (sockfd < 0) {
-                exitWithError("opening socket");
                 return false;
             }  
     // Bind System Call
             //associate a socket with a specific address and port number
             if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
                 //the second is a pointer to a struct sockaddr structure that contains the address
-               // exitWithError("Cannot connect socket to address");
-                return true;
+                return false;
             }
             return true;
     }
@@ -72,7 +70,7 @@ namespace http{
     }
     
     std::string build_response(){
-         // Insert html page
+         // Insert html page or ...
             std::ostringstream response;
             response << "HTTP/1.1 200 OK\r\n";
             response << "Content-Type: text/html; charset=UTF-8\r\n";
@@ -86,7 +84,8 @@ namespace http{
     
     void send_response(){
         long byte_send;
-        byte_send = send(newsockfd, build_response().c_str(), build_response().length(), 0);
+         std::string response = build_response();
+        byte_send = send(newsockfd, response.c_str(), response.length(), 0);
         if (byte_send > 0){
             printmessage("Server Response sent to client");
         }else{
@@ -103,13 +102,11 @@ namespace http{
         }
         printmessage(" Listening on adress ... ");
         while (true) {
-
             printmessage("Waiting for a new connection ...");
             accept_connection();
             read_request();
             send_response();
             close(newsockfd);
-          
         }
     }
     
@@ -120,20 +117,16 @@ namespace http{
         if (bytes_received == -1) {
             exitWithError("Failed to read from socket");
             close(newsockfd);
-        }else{
-            int i = 0;
-            while (buffer[i]){
-                write(1, &buffer[i++], 1);
-            }
-                
         }
         // Parse incoming request data
         std::string request_str(buffer, bytes_received);
+        std::cout<<request_str<<std::endl;
     }
     
     void printmessage(const std::string &message){
             std::cout << message << std::endl;
-        }
+    }
+        
     void exitWithError(const std::string &errormessage){
         printmessage("ERROR: " + errormessage);
         exit(1);
