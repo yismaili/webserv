@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/22 19:32:44 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/22 19:43:32 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,10 +63,10 @@ namespace http{
             return true;
     }
     
-    void accept_connection(int new_socket){
+    void accept_connection(){
         // Accepts a connection on a socket.
-       new_socket = accept(sockfd, (struct sockaddr *) &serv_addr, &sock_addr_len);
-        if (new_socket < 0) {
+       newsockfd = accept(sockfd, (struct sockaddr *) &serv_addr, &sock_addr_len);
+        if (newsockfd < 0) {
             exitWithError(" accepting connection");
         }
     }
@@ -105,21 +105,21 @@ namespace http{
         while (true) {
 
             printmessage("Waiting for a new connection ...");
-            accept_connection(newsockfd);
-           // read_request(newsockfd);
+            accept_connection();
+            read_request();
             send_response();
             close(newsockfd);
           
         }
     }
     
-    void read_request(int new_socket){
+    void read_request(){
         // Read incoming request data
         char buffer[1024];
-        int  bytes_received = read(new_socket, buffer, sizeof(buffer));
+        int  bytes_received = read(newsockfd, buffer, sizeof(buffer));
         if (bytes_received == -1) {
             exitWithError("Failed to read from socket");
-            close(new_socket);
+            close(newsockfd);
         }else{
             int i = 0;
             while (buffer[i]){
