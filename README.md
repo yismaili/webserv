@@ -8,7 +8,8 @@ such as HTML documents.
 
 # What is HTTP ?
 
-HTTP or Hypertext Transfer Protocol is a protocol for distributed systems to communicate and transfer data.
+HTTP is a request-response protocol that allows users to communicate data on the World Wide Web (WWW) and transfer hypertext.
+
 
 # How It Works ?
 
@@ -22,3 +23,11 @@ Here’s how my server works in summary:
   - Writing the response back to the client
   - Closing the connection
  
+# What is a Socket ?
+
+ .  software endpoint that establishes a communication link between two applications running on a network. whenever there is a need for inter process communication within the same machine, we use mechanism like signals or pipes(named or unnamed). Similarly, when we desire a communication between two applications possibly running on different machines, we need sockets
+
+# What is TCP?
+
+TCP, short for Transmission Control Protocol, a TCP server is a program that listens for incoming connections from TCP clients and provides services to them. An HTTP server is a type of TCP server that specifically handles HTTP requests and responses.
+
