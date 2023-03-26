@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   httpTcpServer.hpp                                  :+:      :+:    :+:   */
+/*   http_server.hpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/22 22:53:53 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/26 17:15:09 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ namespace http{
         while (true) {
             print_message("Waiting for a new connection ...");
             accept_connection();
+            
             read_request();
             send_response();
             close(newsockfd);
@@ -161,3 +162,4 @@ namespace http{
 }
 
 #endif
+
