@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/26 15:32:56 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/26 17:15:09 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,6 +115,7 @@ namespace http{
         while (true) {
             print_message("Waiting for a new connection ...");
             accept_connection();
+            
             read_request();
             send_response();
             close(newsockfd);
@@ -140,13 +141,13 @@ namespace http{
         
     void exit_withError(const std::string &errormessage){
         print_message("ERROR: " + errormessage);
-        //exit(1);
+        exit(1);
     }
 
     void closeServer(){
         close(sockfd);
         close(newsockfd);
-        //exit(1);
+        exit(1);
     }
     
     private:
@@ -161,3 +162,4 @@ namespace http{
 }
 
 #endif
+

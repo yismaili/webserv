@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:16:17 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/26 13:36:15 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/26 22:29:26 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,54 +17,61 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <string.h>
+#include <vector>
+#include <iterator>
 
 int main() {
-    int sockfd1, sockfd2;
+    std::vector<int> sockfd;
     struct sockaddr_in server1, server2;
     char buffer[1024];
 
     // Create the first socket
-    sockfd1 = socket(AF_INET, SOCK_STREAM, 0);
+    sockfd.push_back(socket(AF_INET, SOCK_STREAM, 0));
     memset(&server1, 0, sizeof(server1));
     server1.sin_family = AF_INET;
     server1.sin_port = htons(8080);
     server1.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     // Create the second socket
-    sockfd2 = socket(AF_INET, SOCK_STREAM, 0);
+    sockfd.push_back(socket(AF_INET, SOCK_STREAM, 0));
     memset(&server2, 0, sizeof(server2));
     server2.sin_family = AF_INET;
     server2.sin_port = htons(8081);
     server2.sin_addr.s_addr = inet_addr("127.0.0.1");
 
     // Connect to the servers
-    connect(sockfd1, (struct sockaddr*)&server1, sizeof(server1));
-    connect(sockfd2, (struct sockaddr*)&server2, sizeof(server2));
+    connect(*sockfd.begin(), (struct sockaddr*)&server1, sizeof(server1));
+    connect(*(sockfd.begin()+1), (struct sockaddr*)&server2, sizeof(server2));
 
     // Monitor the sockets for input
     fd_set readfds;
+    int i = 0;
     int maxfd;
-    while (1) {
-        FD_ZERO(&readfds);
-        FD_SET(sockfd1, &readfds);
-        FD_SET(sockfd2, &readfds);
-        maxfd = (sockfd1 > sockfd2) ? sockfd1 : sockfd2;
+    std::vector<int>::iterator it = sockfd.begin();
+     while (i < sockfd.size()) {
+        while (1) {
+                FD_ZERO(&readfds);
+                FD_SET(*it, &readfds);
+                FD_SET(*(it+i), &readfds);
+                maxfd = (*it > *(it+i)) ? *it : *(it+i);
 
-        // Wait for input
-        select(maxfd + 1, &readfds, NULL, NULL, NULL);
+                // Wait for input
+                select(maxfd + i, &readfds, NULL, NULL, NULL);
 
-        // Check which socket has input
-        if (FD_ISSET(sockfd1, &readfds)) {
-            // Read from sockfd1
-            read(sockfd1, buffer, sizeof(buffer));
-            printf("Received from sockfd1: %s", buffer);
-        }
+                // Check which socket has input
+                if (FD_ISSET(*it, &readfds)) {
+                    // Read from it
+                    read(*it, buffer, sizeof(buffer));
+                    printf("\nReceived from it: %s", buffer);
+                }
 
-        if (FD_ISSET(sockfd2, &readfds)) {
-            // Read from sockfd2
-            read(sockfd2, buffer, sizeof(buffer));
-            printf("Received from sockfd2: %s", buffer);
-        }
+                if (FD_ISSET(*(it+i), &readfds)) {
+                    // Read from *(it+i)
+                    read(*(it+i), buffer, sizeof(buffer));
+                    printf("\nReceived from *(it+1): %s", buffer);
+                }
+            }
+      i++;
     }
 
     return 0;
@@ -129,3 +136,5 @@ int main() {
 
 //     return 0;
 // }
+
+
