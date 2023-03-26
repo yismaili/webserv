@@ -1,0 +1,10 @@
+version: "3"
+services:
+  http-server:
+    image: gcc:4.9
+    build: .
+    volumes:
+      - .:/http-server
+    ports:
+      - "8080:8080"
+    command: "./build/"
