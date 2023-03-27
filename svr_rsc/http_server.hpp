@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/26 17:15:09 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/27 17:53:53 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,49 +22,22 @@
 #include <unistd.h>
 #include<fstream>
 #include <arpa/inet.h>
+#include <vector>
+#include "tcpServer.hpp"
 
 #define num_of_req 20;
 namespace http{
-    class tcpServer{
+    class http_sever{
         public:
-         tcpServer(int port_, std::string ip_add) : sockfd(-1), port(port_),  newsockfd(),sock_addr_len(0), ip_addr(ip_add){
-            // AF stands for Address Family and PF stands for Protocol Family
-            // This construct holds the information about the address family, port number, Internet address
-            serv_addr.sin_family = AF_INET; // Address family // IPv4 Internet protocols    
-            serv_addr.sin_addr.s_addr = inet_addr(ip_addr.c_str());  // Internet "address inet_addr(ip_addr.c_str());"
-            serv_addr.sin_port = htons(port); // Port number // Network to Host Shor
-            if(start_server() == false){
-                print_message("Failed to start server ");
-            }
+         http_sever(int port_, std::string ip_add) :port(port_), ip_addr(ip_add){
+            tcp.init_data(port, ip_addr);
          }
-         ~tcpServer(){
+         ~http_sever(){
             closeServer();
          }
-        
-        bool start_server() {
-    // Socket System Call
-            //Creates a socket and returns a Socket Descriptor (like file descriptor) which is an integer value
-            sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-            //domain: specifies the communication domain, such as AF_INET for IPv4 or AF_INET6 for IPv6.
-            //type: specifies the type of socket, such as SOCK_STREAM for a TCP socket or SOCK_DGRAM for a UDP socket.
-            /*protocol: specifies the protocol to be used with the socket, such as IPPROTO_TCP for TCP or IPPROTO_UDP for UDP. 
-            This argument is usually set to 0,which allows the operating system to choose the 
-            appropriate protocol based on the socket type and domain.*/
-            if (sockfd < 0) {
-                return (false);
-            }  
-    // Bind System Call
-            //associate a socket with a specific address and port number
-            if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-                //the second is a pointer to a struct sockaddr structure that contains the address
-                return (false);
-            }
-            return true;
-    }
-    
     void accept_connection(){
         // Accepts a connection on a socket.
-       newsockfd = accept(sockfd, (struct sockaddr *) &serv_addr, &sock_addr_len);
+       newsockfd = accept(tcp.git_sockfd(), (struct sockaddr *) &tcp.git_serv_addr(), &tcp.get_sock_addr_len());
         if (newsockfd < 0) {
             exit_withError(" accepting connection");
         }
@@ -107,7 +80,7 @@ namespace http{
     void run() {
      //Listen() System Call
         //prepares a connection-oriented server to accept client connections.
-        if (listen(sockfd, 5) < 0){
+        if (listen(tcp.git_sockfd(), 5) < 0){
         //The second parameter specifies the number of requests that the system queues before it executes the accept()
             exit_withError("Socket listen failed");
         }
@@ -145,19 +118,17 @@ namespace http{
     }
 
     void closeServer(){
-        close(sockfd);
+        close(tcp.git_sockfd());
         close(newsockfd);
         exit(1);
     }
     
     private:
-        int sockfd;
-        int port;
         int newsockfd;
-        struct sockaddr_in serv_addr;
-        std::string serv_message;
-        unsigned int sock_addr_len;
-        std::string ip_addr;   
+        int port;
+        std::string ip_addr;
+        http::tcpServer tcp;
+        
     };
 }
 
