@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 18:00:51 by aoumad            #+#    #+#             */
-/*   Updated: 2023/03/26 23:05:07 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/03/27 14:20:09 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,13 @@ class request
         std::map<std::string, std::string> get_headers() const;
         
         void parse_request(std::string request);
+
+        typedef void (request::*encoding_handler)(std::string &body);
+
+        void handle_chunked_encoding(std::string &body);
+        void handle_compress_encoding(std::string &body);
+        void handle_deflate_encoding(std::string &body);
+        void handle_gzip_encoding(std::string &body);
 };
 
 #endif

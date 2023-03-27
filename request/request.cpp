@@ -6,11 +6,29 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/03/27 01:47:20 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/03/27 14:57:55 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "request.hpp"
+
+typedef void (request::*encoding_handler)(std::string &body);
+
+encoding_handler    handlers[] = 
+{
+    &request::handle_chunked_encoding,
+    &request::handle_compress_encoding,
+    &request::handle_deflate_encoding,
+    &request::handle_gzip_encoding
+};
+
+const std::string  supported_encodings[] = 
+{
+    "chunked",
+    "compress",
+    "deflate",
+    "gzip"
+};
 
 request::request()
 {
@@ -135,9 +153,43 @@ void request::parse_request(std::string request)
         size_t content_len = std::stoi(content_len_str);
         this->_body = lines.back().substr(0, content_len);
     }
-    else if (this->get_header("Transfer-Encoding") == "chunked")
+    else
     {
-        
+        std::string transfer_encoding = this->get_header("Transfer-Encoding");
+        if (!transfer_encoding.empty())
+        {
+            // using pointers to member functions to call the functions handlers
+            std::vector<std::string> encoding_types;
+            size_t startPos = 0;
+            size_t endPos = transfer_encoding.find(',');
+            while (endPos != std::string::npos)
+            {
+                encoding_types.push_back(transfer_encoding.substr(startPos, endPos - startPos));
+                startPos = endPos + 1;
+                endPos = transfer_encoding.find(',', startPos);
+            }
+            encoding_types.push_back(transfer_encoding.substr(startPos, endPos - startPos));
+            for (std::vector<std::string>::const_iterator it = encoding_types.begin(); it != encoding_types.end(); ++it)
+            {
+                std::string type_tmp = *it;
+                // Trim leading and trailing whitespaces from the value
+                type_tmp.erase(0, type_tmp.find_first_not_of(" \t"));
+                type_tmp.erase(type_tmp.find_first_not_of(" \t") + 1);
+                bool supported = false;
+                for (size_t i = 0; i < sizeof(handlers) / sizeof(handlers[0]); ++i)
+                {
+                    if (type_tmp == supported_encodings[i])
+                    {
+                        (this->*handlers[i])(this->_body);
+                        supported = true;
+                        break;
+                    }
+                }
+                if (!supported)
+                    std::cerr << "Unsupported encoding type: " << type_tmp << std::endl;
+            }
+            
+        }
     }
 }
 
