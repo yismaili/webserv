@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/03/27 14:57:55 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/03/27 17:25:22 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -152,9 +152,6 @@ void request::parse_request(std::string request)
     {
         size_t content_len = std::stoi(content_len_str);
         this->_body = lines.back().substr(0, content_len);
-    }
-    else
-    {
         std::string transfer_encoding = this->get_header("Transfer-Encoding");
         if (!transfer_encoding.empty())
         {
@@ -205,3 +202,26 @@ Connection: keep-alive
 
 This is the request body.
 */
+
+void    request::handle_chunked_encoding(std::string &body)
+{
+    std::stringstream ss(body);
+    std::string line;
+    std::stringstream decoded;
+    while (std::getline(ss, line))
+    {
+        std::stringstream size_ss(line);
+        int chunk_size;
+        size_ss >> std::hex >> chunk_size;
+        if (chunk_size == 0) // end of chunks
+            break;
+        std::string chunk(chunk_size, ' ');
+        ss.read(&chunk[0], chunk_size);
+        decoded << chunk;
+    }
+    body = decoded.str();
+}
+
+void    request::handle_gzip_encoding(std::string &body)
+{
+}
