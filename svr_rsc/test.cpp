@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:16:17 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/26 22:29:26 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/28 17:42:43 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ int main() {
                     read(*it, buffer, sizeof(buffer));
                     printf("\nReceived from it: %s", buffer);
                 }
-
                 if (FD_ISSET(*(it+i), &readfds)) {
                     // Read from *(it+i)
                     read(*(it+i), buffer, sizeof(buffer));

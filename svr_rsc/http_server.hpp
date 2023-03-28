@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/26 17:15:09 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/28 17:49:49 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,49 +22,38 @@
 #include <unistd.h>
 #include<fstream>
 #include <arpa/inet.h>
+#include <map>
+#include <vector>
+#include "tcpServer.hpp"
+#include <iterator>
 
 #define num_of_req 20;
 namespace http{
-    class tcpServer{
+    class http_sever{
         public:
-         tcpServer(int port_, std::string ip_add) : sockfd(-1), port(port_),  newsockfd(),sock_addr_len(0), ip_addr(ip_add){
-            // AF stands for Address Family and PF stands for Protocol Family
-            // This construct holds the information about the address family, port number, Internet address
-            serv_addr.sin_family = AF_INET; // Address family // IPv4 Internet protocols    
-            serv_addr.sin_addr.s_addr = inet_addr(ip_addr.c_str());  // Internet "address inet_addr(ip_addr.c_str());"
-            serv_addr.sin_port = htons(port); // Port number // Network to Host Shor
-            if(start_server() == false){
-                print_message("Failed to start server ");
-            }
+         http_sever(std::vector<int> port_, std::string ip_add) :tcp(){
+            int i = 0;
+            std::vector<int>::iterator it = port_.begin();
+           while (it < port_.end()){
+                std::cout<<"*-*-***-**"<<i<<std::endl;
+                other_sock.push_back(tcp.init_data(*it, ip_add));
+                it++;
+            } 
          }
-         ~tcpServer(){
-            closeServer();
+         
+         ~http_sever(){
+           std::map<int, http::tcpServer>::iterator it = sock_inf.begin();
+           while (it != sock_inf.end()){
+                closeServer(it->first);
+                it++;
+           }
          }
-        
-        bool start_server() {
-    // Socket System Call
-            //Creates a socket and returns a Socket Descriptor (like file descriptor) which is an integer value
-            sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-            //domain: specifies the communication domain, such as AF_INET for IPv4 or AF_INET6 for IPv6.
-            //type: specifies the type of socket, such as SOCK_STREAM for a TCP socket or SOCK_DGRAM for a UDP socket.
-            /*protocol: specifies the protocol to be used with the socket, such as IPPROTO_TCP for TCP or IPPROTO_UDP for UDP. 
-            This argument is usually set to 0,which allows the operating system to choose the 
-            appropriate protocol based on the socket type and domain.*/
-            if (sockfd < 0) {
-                return (false);
-            }  
-    // Bind System Call
-            //associate a socket with a specific address and port number
-            if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
-                //the second is a pointer to a struct sockaddr structure that contains the address
-                return (false);
-            }
-            return true;
-    }
-    
-    void accept_connection(){
+         
+    void accept_connection(int sockfd){
         // Accepts a connection on a socket.
-       newsockfd = accept(sockfd, (struct sockaddr *) &serv_addr, &sock_addr_len);
+        int newsockfd;
+        newsockfd = accept(sockfd, (struct sockaddr *) &tcp.serv_addr, &tcp.sock_addr_len);
+        sock_inf.insert(std::make_pair(newsockfd, tcp));
         if (newsockfd < 0) {
             exit_withError(" accepting connection");
         }
@@ -93,7 +82,7 @@ namespace http{
             return (response_str);
     }
     
-    void send_response(){
+    void send_response(int newsockfd){
         long byte_send;
          std::string response = build_response();
         byte_send = send(newsockfd, response.c_str(), response.length(), 0);
@@ -106,23 +95,33 @@ namespace http{
     
     void run() {
      //Listen() System Call
-        //prepares a connection-oriented server to accept client connections.
-        if (listen(sockfd, 5) < 0){
-        //The second parameter specifies the number of requests that the system queues before it executes the accept()
-            exit_withError("Socket listen failed");
+        std::vector<http::tcpServer>::iterator it = other_sock.begin();
+        while (it < other_sock.end()){
+            //prepares a connection-oriented server to accept client connections.
+            if (listen(it->sockfd, 5) < 0){
+            //The second parameter specifies the number of requests that the system queues before it executes the accept()
+                exit_withError("Socket listen failed");
+            }
+            print_message(" Listening on adress ... ");
+            print_message(" ............... ");
+            it++;
         }
-        print_message(" Listening on adress ... ");
-        while (true) {
-            print_message("Waiting for a new connection ...");
-            accept_connection();
-            
-            read_request();
-            send_response();
-            close(newsockfd);
-        }
+            while (true) {
+                it = other_sock.begin();
+                 while (it < other_sock.end()){
+                    print_message("Waiting for a new connection ...");
+                    accept_connection(it->sockfd);
+                    read_request(sock_inf.begin()->first);
+                    send_response(sock_inf.begin()->first);
+                    close(sock_inf.begin()->first);
+                    it++;
+                 }
+            }
+        //    it++;
+        // }
     }
     
-    void read_request(){
+    void read_request(int newsockfd){
         // Read incoming request data
         char buffer[1024];
         int  bytes_received = read(newsockfd, buffer, sizeof(buffer));
@@ -144,20 +143,17 @@ namespace http{
         exit(1);
     }
 
-    void closeServer(){
-        close(sockfd);
+    void closeServer(int newsockfd){
+        close(tcp.sockfd);
         close(newsockfd);
         exit(1);
     }
     
     private:
-        int sockfd;
-        int port;
-        int newsockfd;
-        struct sockaddr_in serv_addr;
-        std::string serv_message;
-        unsigned int sock_addr_len;
-        std::string ip_addr;   
+        http::tcpServer tcp;
+        std::map<int, http::tcpServer> sock_inf;
+        std::vector<http::tcpServer> other_sock;
+        
     };
 }
 
