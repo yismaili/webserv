@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/03/27 17:25:22 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/03/27 22:22:36 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -224,4 +224,5 @@ void    request::handle_chunked_encoding(std::string &body)
 
 void    request::handle_gzip_encoding(std::string &body)
 {
+    
 }
