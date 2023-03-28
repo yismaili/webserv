@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/27 17:50:00 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/28 00:45:37 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,21 +24,11 @@
 namespace http{
  class tcpServer{
         public:
-            tcpServer(){
-                
-            }
-         tcpServer(int port_, std::string ip_add) : sockfd(-1), port(port_),  newsockfd(),sock_addr_len(0), ip_addr(ip_add){
-            // AF stands for Address Family and PF stands for Protocol Family
-            // This construct holds the information about the address family, port number, Internet address
-            serv_addr.sin_family = AF_INET; // Address family // IPv4 Internet protocols    
-            serv_addr.sin_addr.s_addr = inet_addr(ip_addr.c_str());  // Internet "address inet_addr(ip_addr.c_str());"
-            serv_addr.sin_port = htons(port); // Port number // Network to Host Shor
-            if(start_server() == false){
-               std::cout<<"Failed to start server "<<std::endl;
-               exit(1);
-            }
+          
+         tcpServer() {
+
          }
-        void init_data(int port_, std::string ip_add){
+       tcpServer &init_data(int port_, std::string ip_add){
            sockfd =  -1;
            port = port_;
            newsockfd = 0;
@@ -53,6 +43,7 @@ namespace http{
                std::cout<<"Failed to start server "<<std::endl;
                exit(1);
             }
+            return (*this);
          }
          ~tcpServer(){}
         int git_sockfd()const{

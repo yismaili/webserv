@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/27 17:53:53 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/28 17:49:49 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,22 +22,38 @@
 #include <unistd.h>
 #include<fstream>
 #include <arpa/inet.h>
+#include <map>
 #include <vector>
 #include "tcpServer.hpp"
+#include <iterator>
 
 #define num_of_req 20;
 namespace http{
     class http_sever{
         public:
-         http_sever(int port_, std::string ip_add) :port(port_), ip_addr(ip_add){
-            tcp.init_data(port, ip_addr);
+         http_sever(std::vector<int> port_, std::string ip_add) :tcp(){
+            int i = 0;
+            std::vector<int>::iterator it = port_.begin();
+           while (it < port_.end()){
+                std::cout<<"*-*-***-**"<<i<<std::endl;
+                other_sock.push_back(tcp.init_data(*it, ip_add));
+                it++;
+            } 
          }
+         
          ~http_sever(){
-            closeServer();
+           std::map<int, http::tcpServer>::iterator it = sock_inf.begin();
+           while (it != sock_inf.end()){
+                closeServer(it->first);
+                it++;
+           }
          }
-    void accept_connection(){
+         
+    void accept_connection(int sockfd){
         // Accepts a connection on a socket.
-       newsockfd = accept(tcp.git_sockfd(), (struct sockaddr *) &tcp.git_serv_addr(), &tcp.get_sock_addr_len());
+        int newsockfd;
+        newsockfd = accept(sockfd, (struct sockaddr *) &tcp.serv_addr, &tcp.sock_addr_len);
+        sock_inf.insert(std::make_pair(newsockfd, tcp));
         if (newsockfd < 0) {
             exit_withError(" accepting connection");
         }
@@ -66,7 +82,7 @@ namespace http{
             return (response_str);
     }
     
-    void send_response(){
+    void send_response(int newsockfd){
         long byte_send;
          std::string response = build_response();
         byte_send = send(newsockfd, response.c_str(), response.length(), 0);
@@ -79,23 +95,33 @@ namespace http{
     
     void run() {
      //Listen() System Call
-        //prepares a connection-oriented server to accept client connections.
-        if (listen(tcp.git_sockfd(), 5) < 0){
-        //The second parameter specifies the number of requests that the system queues before it executes the accept()
-            exit_withError("Socket listen failed");
+        std::vector<http::tcpServer>::iterator it = other_sock.begin();
+        while (it < other_sock.end()){
+            //prepares a connection-oriented server to accept client connections.
+            if (listen(it->sockfd, 5) < 0){
+            //The second parameter specifies the number of requests that the system queues before it executes the accept()
+                exit_withError("Socket listen failed");
+            }
+            print_message(" Listening on adress ... ");
+            print_message(" ............... ");
+            it++;
         }
-        print_message(" Listening on adress ... ");
-        while (true) {
-            print_message("Waiting for a new connection ...");
-            accept_connection();
-            
-            read_request();
-            send_response();
-            close(newsockfd);
-        }
+            while (true) {
+                it = other_sock.begin();
+                 while (it < other_sock.end()){
+                    print_message("Waiting for a new connection ...");
+                    accept_connection(it->sockfd);
+                    read_request(sock_inf.begin()->first);
+                    send_response(sock_inf.begin()->first);
+                    close(sock_inf.begin()->first);
+                    it++;
+                 }
+            }
+        //    it++;
+        // }
     }
     
-    void read_request(){
+    void read_request(int newsockfd){
         // Read incoming request data
         char buffer[1024];
         int  bytes_received = read(newsockfd, buffer, sizeof(buffer));
@@ -117,17 +143,16 @@ namespace http{
         exit(1);
     }
 
-    void closeServer(){
-        close(tcp.git_sockfd());
+    void closeServer(int newsockfd){
+        close(tcp.sockfd);
         close(newsockfd);
         exit(1);
     }
     
     private:
-        int newsockfd;
-        int port;
-        std::string ip_addr;
         http::tcpServer tcp;
+        std::map<int, http::tcpServer> sock_inf;
+        std::vector<http::tcpServer> other_sock;
         
     };
 }
