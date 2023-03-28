@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/28 17:49:49 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/28 22:56:58 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <vector>
 #include "tcpServer.hpp"
 #include <iterator>
+ #include <sys/select.h>
 
 #define num_of_req 20;
 namespace http{
@@ -35,7 +36,6 @@ namespace http{
             int i = 0;
             std::vector<int>::iterator it = port_.begin();
            while (it < port_.end()){
-                std::cout<<"*-*-***-**"<<i<<std::endl;
                 other_sock.push_back(tcp.init_data(*it, ip_add));
                 it++;
             } 
@@ -68,16 +68,6 @@ namespace http{
             response << "<html><body><h1>Hello younes </h1>";
             response << "<h1>from HTTP server!</h4>";
             response << "</body></html>";
-            // std::ifstream file("index.html"); // open the HTML file
-            // if (file) { // check if the file is open
-            //     response << file.rdbuf(); // copy the file contents to the string stream
-            //     file.close(); // close the file
-            // } else {
-            //     std::cerr << "Failed to open file." << std::endl;
-            //     return (response.str()); // exit the program with an error status
-            // }
-            // print the contents of the string stream to the console
-            // std::cout << response.str() << std::endl;
             std::string response_str = response.str();
             return (response_str);
     }
@@ -93,34 +83,62 @@ namespace http{
         }
     }
     
-    void run() {
-     //Listen() System Call
-        std::vector<http::tcpServer>::iterator it = other_sock.begin();
-        while (it < other_sock.end()){
-            //prepares a connection-oriented server to accept client connections.
-            if (listen(it->sockfd, 5) < 0){
-            //The second parameter specifies the number of requests that the system queues before it executes the accept()
-                exit_withError("Socket listen failed");
-            }
-            print_message(" Listening on adress ... ");
-            print_message(" ............... ");
-            it++;
-        }
-            while (true) {
-                it = other_sock.begin();
-                 while (it < other_sock.end()){
-                    print_message("Waiting for a new connection ...");
-                    accept_connection(it->sockfd);
-                    read_request(sock_inf.begin()->first);
-                    send_response(sock_inf.begin()->first);
-                    close(sock_inf.begin()->first);
-                    it++;
-                 }
-            }
-        //    it++;
-        // }
+    // void run() {
+    //  //Listen() System Call
+    //     std::vector<http::tcpServer>::iterator it = other_sock.begin();
+    //         while (true) {
+    //             it = other_sock.begin();
+    //              while (it < other_sock.end()){
+    //                 print_message("Waiting for a new connection ...");
+    //                 accept_connection(it->sockfd);
+    //                 read_request(sock_inf.begin()->first);
+    //                 send_response(sock_inf.begin()->first);
+    //                 close(sock_inf.begin()->first);
+    //                 it++;
+    //              }
+    //         }
+    // }
+
+void run() {
+// Create a set of file descriptors to monitor with select
+    fd_set master_fds;
+    FD_ZERO(&master_fds);
+   for(std::vector<http::tcpServer>::iterator it = other_sock.begin(); it != other_sock.end(); ++it) {
+      http::tcpServer& sock = *it;
+        FD_SET(sock.sockfd, &master_fds);
     }
-    
+// Main server loop
+    while (true) {
+        // Create a copy of the master set to pass to select
+        fd_set read_fds = master_fds;
+        
+        // Wait for activity on any of the monitored sockets
+        int activity = select(FD_SETSIZE, &read_fds, NULL, NULL, NULL);
+        if (activity < 0) {
+            exit_withError("select");
+        }
+        
+        // Check each socket for activity
+         for(std::vector<http::tcpServer>::iterator it = other_sock.begin(); it != other_sock.end(); ++it) {
+            http::tcpServer& sock = *it;
+            if (FD_ISSET(sock.sockfd, &read_fds)) {
+                if (sock.sockfd == other_sock[0].sockfd) {
+                    // Accept a new connection and add the new socket to the master set
+                    accept_connection(other_sock[0].sockfd);
+                    FD_SET(sock_inf.begin()->first, &master_fds);
+                } else {
+                    // Read the client request and send a response
+                    read_request(sock.sockfd);
+                    send_response(sock.sockfd);
+                    close(sock.sockfd);
+                    FD_CLR(sock.sockfd, &master_fds);
+                }
+            }
+        }
+    }
+}
+
+
     void read_request(int newsockfd){
         // Read incoming request data
         char buffer[1024];
@@ -134,23 +152,66 @@ namespace http{
         std::cout<<request_str<<std::endl;
     }
     
-    void print_message(const std::string &message){
-            std::cout << message << std::endl;
-    }
-        
-    void exit_withError(const std::string &errormessage){
-        print_message("ERROR: " + errormessage);
-        exit(1);
-    }
+        //     void read_request(int sockfd) {
+        //             http::tcpServer sock;
+        //             char buffer[256];
+        //             int n = read(sockfd, buffer, 255);
+        //             if (n < 0) {
+        //                 exit_withError(" reading from socket");
+        //             }
+        //             if (n == 0) {
+        //                 close(sockfd);
+        //                 sock_inf.erase(sockfd);
+        //                 return;
+        //             }
+        //             buffer[n] = '\0';
+        //             std::string request(buffer);
+        //             print_message("Received request from client:");
+        //             std::cout << request << std::endl;
 
-    void closeServer(int newsockfd){
-        close(tcp.sockfd);
-        close(newsockfd);
-        exit(1);
-    }
-    
-    private:
-        http::tcpServer tcp;
+        //             // check if request is a GET request
+        //             std::istringstream iss(request);
+        //             std::string method;
+        //             std::string path;
+        //             std::string version;
+        //             iss >> method >> path >> version;
+        //             if (method != "GET") {
+        //                 print_message("Error: unsupported HTTP method");
+        //                 return;
+        //             }
+
+        //             // check if path is a valid file path
+        //             path = path.substr(1); // remove leading slash
+        //             if (path == "") {
+        //                 path = "index.html"; // default file
+        //             }
+        //             std::ifstream file(path);
+        //             if (!file.good()) {
+        //                 print_message("Error: invalid file path");
+        //                 return;
+        //             }
+
+        //             // send response to client
+        //             send_response(sockfd);
+        // }
+
+            void print_message(const std::string &message){
+                    std::cout << message << std::endl;
+            }
+                
+            void exit_withError(const std::string &errormessage){
+                print_message("ERROR: " + errormessage);
+                exit(1);
+            }
+
+            void closeServer(int newsockfd){
+                close(tcp.sockfd);
+                close(newsockfd);
+                exit(1);
+            }
+            
+            private:
+                http::tcpServer tcp;
         std::map<int, http::tcpServer> sock_inf;
         std::vector<http::tcpServer> other_sock;
         
@@ -159,3 +220,4 @@ namespace http{
 
 #endif
 
+    
