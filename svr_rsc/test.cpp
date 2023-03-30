@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:16:17 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/28 17:42:43 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/28 23:40:04 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,6 @@ int main() {
                 FD_SET(*it, &readfds);
                 FD_SET(*(it+i), &readfds);
                 maxfd = (*it > *(it+i)) ? *it : *(it+i);
-
                 // Wait for input
                 select(maxfd + i, &readfds, NULL, NULL, NULL);
 
