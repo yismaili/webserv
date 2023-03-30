@@ -30,7 +30,9 @@ private:
 public:
     server(Data_config data);
     ~server();
+    void display_sever();
 };
 
+int search_char(std::string str, char c);
 
 #endif

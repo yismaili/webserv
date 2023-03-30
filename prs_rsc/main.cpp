@@ -44,17 +44,7 @@ int is_world(std::string str, std::string tmp)
     return(0);
 }
 
-int search_char(std::string str, char c)
-{
-    int i = 0;
-    while (str[i])
-    {
-        if(str[i] == c)
-            return (1);
-        i++;
-    }
-    return (0);
-}
+
 
 int main(int ac, char **av)
 {
