@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/28 22:05:19 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/30 16:04:35 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,11 +66,19 @@ namespace http{
             appropriate protocol based on the socket type and domain.*/
             if (sockfd < 0) {
                 return (false);
-            }  
+            }
+            int optval = 1;
+            if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0) {
+                //SOL_SOCKET: specifies the level at which the option is defined. In this case, it is the socket level.
+                //SO_REUSEADDR: the option name. It is used to enable reuse of local addresses.
+               //&optval: a pointer to the buffer that contains the value of the option you want to set
+                perror("setsockopt failed");
+                exit(EXIT_FAILURE);
+            }
             sock_addr_len = sizeof(serv_addr);
     // Bind System Call
             //associate a socket with a specific address and port number
-            if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0) {
+            if (bind(sockfd, (struct sockaddr *) &serv_addr, sock_addr_len) < 0) {
                 //the second is a pointer to a struct sockaddr structure that contains the address
                 return (false);
             }
