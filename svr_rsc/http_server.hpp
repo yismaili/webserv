@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/28 22:56:58 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/03/30 00:47:26 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,7 @@ namespace http{
             std::vector<int>::iterator it = port_.begin();
            while (it < port_.end()){
                 other_sock.push_back(tcp.init_data(*it, ip_add));
+                std::cout<<other_sock.begin()->sockfd<<std::endl;
                 it++;
             } 
          }
@@ -49,7 +50,7 @@ namespace http{
            }
          }
          
-    void accept_connection(int sockfd){
+    int accept_connection(int sockfd){
         // Accepts a connection on a socket.
         int newsockfd;
         newsockfd = accept(sockfd, (struct sockaddr *) &tcp.serv_addr, &tcp.sock_addr_len);
@@ -57,6 +58,7 @@ namespace http{
         if (newsockfd < 0) {
             exit_withError(" accepting connection");
         }
+        return (newsockfd);
     }
     
     std::string build_response(){
@@ -83,59 +85,45 @@ namespace http{
         }
     }
     
-    // void run() {
-    //  //Listen() System Call
-    //     std::vector<http::tcpServer>::iterator it = other_sock.begin();
-    //         while (true) {
-    //             it = other_sock.begin();
-    //              while (it < other_sock.end()){
-    //                 print_message("Waiting for a new connection ...");
-    //                 accept_connection(it->sockfd);
-    //                 read_request(sock_inf.begin()->first);
-    //                 send_response(sock_inf.begin()->first);
-    //                 close(sock_inf.begin()->first);
-    //                 it++;
-    //              }
-    //         }
-    // }
-
-void run() {
-// Create a set of file descriptors to monitor with select
-    fd_set master_fds;
-    FD_ZERO(&master_fds);
-   for(std::vector<http::tcpServer>::iterator it = other_sock.begin(); it != other_sock.end(); ++it) {
-      http::tcpServer& sock = *it;
-        FD_SET(sock.sockfd, &master_fds);
-    }
-// Main server loop
-    while (true) {
-        // Create a copy of the master set to pass to select
-        fd_set read_fds = master_fds;
-        
-        // Wait for activity on any of the monitored sockets
-        int activity = select(FD_SETSIZE, &read_fds, NULL, NULL, NULL);
-        if (activity < 0) {
-            exit_withError("select");
-        }
-        
-        // Check each socket for activity
-         for(std::vector<http::tcpServer>::iterator it = other_sock.begin(); it != other_sock.end(); ++it) {
+    void run() {
+    // Create a set of file descriptors to monitor with select
+        fd_set master_fds;
+        FD_ZERO(&master_fds);
+        std::vector<http::tcpServer>::iterator it = other_sock.begin();
+        while (it != other_sock.end()){
             http::tcpServer& sock = *it;
-            if (FD_ISSET(sock.sockfd, &read_fds)) {
-                if (sock.sockfd == other_sock[0].sockfd) {
-                    // Accept a new connection and add the new socket to the master set
-                    accept_connection(other_sock[0].sockfd);
-                    FD_SET(sock_inf.begin()->first, &master_fds);
-                } else {
-                    // Read the client request and send a response
-                    read_request(sock.sockfd);
-                    send_response(sock.sockfd);
-                    close(sock.sockfd);
-                    FD_CLR(sock.sockfd, &master_fds);
+            FD_SET(sock.sockfd, &master_fds);
+            it++;
+        }
+    // Main server loop
+        while (true) {
+            // Create a copy of the master set to pass to select
+            fd_set read_fds = master_fds;
+            
+            // Wait for activity on any of the monitored sockets
+            int activity = select(FD_SETSIZE, &read_fds, NULL, NULL, NULL);
+            if (activity < 0) {
+                exit_withError("select");
+            }
+            // Check each socket for activity
+            std::vector<http::tcpServer>::iterator it_ = other_sock.begin();
+            while( it_ != other_sock.end()) {
+                if (FD_ISSET(it_->sockfd, &read_fds)) {
+                        // Accept a new connection and add the new socket to the master set
+                        int clint = accept_connection(it_->sockfd);
+                        std::map<int, http::tcpServer>::iterator it_map = sock_inf.find(it_->sockfd);
+                std::cout<<"-----"<<it_map->first<<"-----"<<std::endl;
+                         
+                        FD_SET(clint, &read_fds);
+                        // Read the client request and send a response  
+                        send_response(clint);
+                        // // read_request(it_->sockfd);
+                        close(it_->sockfd);
+                        FD_CLR(it_->sockfd, &master_fds);
                 }
+                it_++;
             }
         }
-    }
 }
 
 
