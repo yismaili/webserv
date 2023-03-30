@@ -1,14 +1,4 @@
-#include <vector>
-#include <iostream>
-#include <fstream>
-#include <iostream>
-#include <map>
-
-struct Data_config
-{
-    std::string data_server;
-    std::map<std::string, std::string> location;
-};
+#include "server.hpp"
 
 int skip_spaces(std::string str)
 {
@@ -23,12 +13,26 @@ int skip_spaces(std::string str)
     return (i);
 }
 
+
+std::string trimString(const std::string& str)
+{
+  std::string trimmedStr = str;
+
+  std::string::iterator it = trimmedStr.begin();
+  while (it != trimmedStr.end() && std::isspace(*it)) 
+    ++it;
+  trimmedStr.erase(trimmedStr.begin(), it);
+  it = trimmedStr.end();
+  while (it != trimmedStr.begin() && std::isspace(*(it - 1)))
+    --it;
+  trimmedStr.erase(it, trimmedStr.end());
+  return trimmedStr;
+}
+
 int is_world(std::string str, std::string tmp)
 {
     int i = 0;
 
-    // std::string tmp = "location";
-    //std::cout << str << "\n";
     while (str[i] && !isspace(str[i]))
     {
         if(tmp[i] != str[i])
@@ -60,6 +64,7 @@ int main(int ac, char **av)
         return (1);
     }
 
+    std::vector<server> server;
     std::string config_file;
     std::ifstream file;
     std::string line;
@@ -75,15 +80,12 @@ int main(int ac, char **av)
     {
         while (!file.eof())
         {
-             std::cout << c << "\n";
              std::getline(file, line);
-             //std::cout << line << "\n";
             if (search_char(line, '{'))
                 c++;
             else if (search_char(line, '}'))
                 c--;
             i = skip_spaces(line);
-            map.clear();
 
              if (is_world(&line[i], "server"))
                  j = 1;
@@ -95,19 +97,27 @@ int main(int ac, char **av)
                     std::getline(file, line);
                     if (search_char(line, '{'))
                         c++;
-                    else if (search_char(line, '}'))
-                        c--;
                     map += line + '\n';
                     if (search_char (line, '}'))
                     {
+                        c--; 
                         data.location.insert(std::make_pair(key, map));
+                        map.clear();
                         break;
                     }
                 }
             }
-            else
-                data.data_server += line + '\n';
-             if(!c && j)
+            else if (!j && i != line.size())
+            {
+                std::cerr << "error something outside of server\n";
+                return (1);
+            }
+            else if (i != line.size())
+            {
+                line = trimString(line);
+                data.data_server += line + "\n";
+            }
+             if (!c && j)
              {
                 j = 0;
                  v.push_back(data);
@@ -123,14 +133,14 @@ int main(int ac, char **av)
     }
     std::cout << v.size() << "\n";
     for (int i = 0; i < v.size(); i++) 
-    {
-        std::cout << "++++++++++++++++++++++\n";
-        std::cout << v[i].data_server << " ";
-        puts("------------------------------");
-        for(auto it = v[i].location.begin(); it != v[i].location.end(); ++it)
-        {
-            std::cout << it->first << it->second<< "\n";
-        }
-        std::cout << "++++++++++++++++++++++\n";
-    }
+        server.push_back(v[i]);
+        // std::cout << "++++++++++++++++++++++\n";
+        // std::cout << v[i].data_server << " ";
+        // puts("------------------------------");
+        // for(auto it = v[i].location.begin(); it != v[i].location.end(); ++it)
+        // {
+        //     std::cout << it->first << it->second<< "\n";
+        // }
+        // std::cout << "++++++++++++++++++++++\n";
+   // }
 }

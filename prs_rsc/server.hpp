@@ -1,6 +1,7 @@
 #ifndef SERVER_HPP
 #define SERVER_HPP
 
+#include "Data_config.hpp"
 #include <iostream>
 #include <vector>
 #include <map>
@@ -14,9 +15,9 @@ private:
     std::string _host;
     std::string _root;
     std::string _client_max_body_size;
-    std::vector<std::string> _error_page;
+    std::map<int, std::string> _error_page;
     std::vector<std::string> _allow_methods;
-    std::string _autoindex;
+    bool _autoindex;
     // std::vector<std::string> _access_log;
     // std::vector<std::string> _error_log;
     std::vector<std::string> _meme_types;
@@ -27,17 +28,9 @@ private:
     // std::string _ssl_ciphers;
     //std::vector<location> location
 public:
-    server();
+    server(Data_config data);
     ~server();
 };
-
-// server::server(/* args */)
-// {
-// }
-
-// server::~server()
-// {
-// }
 
 
 #endif
