@@ -2,14 +2,16 @@
 #include <sstream>
 #include <string>
 
-
-
-
-
-std::string toLower(std::string str) {
-  for (std::string::iterator it = str.begin(); it != str.end(); ++it) {
+std::string toLower(std::string str)
+{
+  for (std::string::iterator it = str.begin(); it != str.end(); ++it)
     *it = std::tolower(*it);
-  }
+  return str;
+}
+
+std::string toUpper(std::string str) {
+  for (std::string::iterator it = str.begin(); it != str.end(); ++it) 
+    *it = std::toupper(*it);
   return str;
 }
 
@@ -53,10 +55,13 @@ int isDomainName(const std::string& domainName)
 
     if (domainName.empty())
         return 0;
-    for (char c : domainName) 
+    int i = 0;
+    while (domainName[i]) 
     {
+        char c =  domainName[i];
         if (!std::isalnum(c) && c != '-' && c != '.') 
             return 0;
+        i++;
     }
 
     if (domainName.front() == '-' || domainName.back() == '-')
@@ -167,6 +172,36 @@ int ft_non_alphabetic(std::string value)
     return (0);
 }
 
+void ft_check_index(std::string index_file, std::string line)
+{
+    size_t i = index_file.find_last_of(".");
+    if (i == -1)
+        ft_error(line, "Error");
+    std::string filedot = index_file.substr(i + 1);
+    if (filedot != "html" && filedot != "php" && filedot != "htm" && filedot != "css"
+        && filedot != "js" && filedot != "jpg" && filedot != "jpeg" && filedot != "png" && filedot != "gif"
+        && filedot != "txt" && filedot != "xml" && filedot != "json") 
+            ft_error(line, "Error");
+}
+
+void check_methods(std::string method, std::string line)
+{
+    if (method != "get" && method != "post" && method != "put" && method != "delete" && method != "head"
+        && method != "options" && method != "connect" && method != "trace")
+            ft_error(line, "Error is not method");
+}
+
+std::string ft_method(std::string value, std::string line, std::vector<std::string> v)
+{
+    value = toLower(value);
+    check_methods(value, line);
+    value = toUpper(value);
+    std::vector<std::string>::iterator it = std::find(v.begin(), v.end(), value);
+    if(it != v.end())
+        ft_error(line, "error duplicate index");
+    return (value);
+}
+
 server::server(Data_config data)
 {
     std::istringstream ss(data.data_server);
@@ -175,6 +210,7 @@ server::server(Data_config data)
     int c_host = 0;
     int c_root = 0;
     int c_client_max_body_size = 0;
+    int c_autoindex = 0;
     while (getline(ss, line))
     {
         if(line.empty() || line[0] == '#')
@@ -234,7 +270,6 @@ server::server(Data_config data)
                 _listen.push_back(port);
             }
         }
-
         else if (key == "root")
         {
             if(c_root)
@@ -245,7 +280,6 @@ server::server(Data_config data)
             c_root++;
             _root = value;
         }
-
         else if (key == "client_max_body_size")
         {
             is_empty_value(value, line);
@@ -260,6 +294,8 @@ server::server(Data_config data)
         else if (key == "error_page")
         {
             int error_code = ft_number(value, line);
+            if (error_code < 100 || error_code > 599)
+                ft_error(line, "Error");
             is_empty_value(value, line);
             iss >> value;
             is_empty_value(value, line);
@@ -269,22 +305,41 @@ server::server(Data_config data)
         }
         else if (key == "index")
         {
+            is_empty_value(value, line);
+            ft_check_index(value, line);
             _index.push_back(value);
             while (iss >> value)
+            {
+                ft_check_index(value, line);
                 _index.push_back(value);
+            }
         }
         else if (key == "allow_methods")
         {
+            is_empty_value(value, line);
+            value = ft_method(value, line, _allow_methods);
             _allow_methods.push_back(value);
             while (iss >> value)
+            {
+                value = ft_method(value, line, _allow_methods);
                 _allow_methods.push_back(value);
+            }
         }
         else if (key == "autoindex")
         {
+            if (c_autoindex)
+                ft_error(line, "Erro duplicated");
+            is_empty_value(value, line);
+            value = toLower(value);
             if (value == "on")
                 _autoindex = true;
-            else if (value == "of")
+            else if (value == "off")
                 _autoindex = false;
+            else
+                ft_error(line, "Error");
+            if (ft_numbers_value(iss))
+                ft_error(line, "Error");
+            c_autoindex++;
         }
         else if (!search_char(line, '}') && !search_char(line, '{'))
         {

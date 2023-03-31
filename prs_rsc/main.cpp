@@ -121,7 +121,7 @@ int main(int ac, char **av)
         std::cerr << "No such file\n";
         return (1);
     }
-    //std::cout << v.size() << "\n";
+    std::cout << v.size() << "\n";
     for (int i = 0; i < v.size(); i++) 
         server.push_back(v[i]);
         // std::cout << "++++++++++++++++++++++\n";
