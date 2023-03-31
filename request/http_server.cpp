@@ -82,7 +82,6 @@ int main(int argc, char *argv[]) {
                 cerr << "Error: could not send response to client" << endl;
             }
         }
-
         close(client_socket);
     }
 

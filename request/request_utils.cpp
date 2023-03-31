@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 21:18:13 by aoumad            #+#    #+#             */
-/*   Updated: 2023/03/30 02:32:27 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/03/31 18:05:55 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,16 +65,13 @@ int request::ft_check_content_type()
 
 int request::ft_check_connexion()
 {
-    if (this->_headers.find("Connection") != this->_headers.end())
-    {
-        if (this->_headers["Connection"] == "close")
-            return (0);
-    }
-    
+    // if (this->_headers.find("Connection") != this->_headers.end())
+    //     return (0);
     std::string connection_value = this->get_header("Connection");
-    if (connection_value != "close" || connection_value != "Keep-Alive")
+    if (connection_value == "")
+        return (0);
+    if (connection_value != "close" && connection_value != "keep-alive")
         return (2);
-    
     return (1);
 }
 

@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 18:00:51 by aoumad            #+#    #+#             */
-/*   Updated: 2023/03/30 02:33:35 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/03/31 15:58:41 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,7 +36,7 @@ class request
         std::string _version; // stores the http version of the request (e.g "HTTP/1.1")
         std::map<std::string, std::string> _headers; // stores the HTTP headers of the request. Each header is stored as a key-value as the value.
         std::string _body; // stores the body of the request
-        std::map<std::string, std::string> _language;
+        std::map<std::string, std::pair<std::string, std::string> > _language;
         std::map<std::string, std::string> _charset;
         int         _port;
         std::string _query;
