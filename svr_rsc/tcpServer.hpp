@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/03/30 18:47:19 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/01 00:15:06 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ namespace http{
                     std::cout<<"Socket listen failed"<<std::endl;
                     exit(1);
                 }
-                std::cout<<" Listening on adress ... "<<std::endl;
+                // std::cout<<" Listening on adress ... "<<std::endl;
                 return true;
         }
         public:
