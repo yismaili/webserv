@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/01 00:38:17 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/01 01:05:53 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -114,20 +114,24 @@ namespace http{
                     std::vector<http::tcpServer>::iterator it_ = other_sock.begin();
                     while( it_ != other_sock.end()) {
                         if (FD_ISSET(it_->sockfd, &read_fds)) {
+                            if (!is_server(it_->sockfd)){
+                                // Accept a new connection and add the new socket to the master set
+                                read_request(clint);
+                                send_response(clint);
+                                close(clint);
+                                FD_CLR(clint, &master_fds);
+                            }
                             if (is_server(it_->sockfd)){
                                 // Accept a new connection and add the new socket to the master set
                                 clint = accept_connection(it_->sockfd);
                                 std::cout<<"-------->"<<clint<<std::endl;
                                 FD_SET(clint, &read_fds);
                             }
-                            else {
-                                 std::cout<<"-------->"<<clint<<std::endl;
-                                // Read the client request and send a response  
-                                read_request(it_->sockfd);
-                                send_response(it_->sockfd);
-                                close(it_->sockfd);
-                                FD_CLR(it_->sockfd, &master_fds);
-                             }
+                            // Read the client request and send a response  
+                            read_request(clint);
+                            send_response(clint);
+                            close(clint);
+                            FD_CLR(clint, &master_fds);
                         }
                         it_++;
                     }
