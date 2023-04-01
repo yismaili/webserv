@@ -71,10 +71,8 @@ int main(int ac, char **av)
         while (!file.eof())
         {
              std::getline(file, line);
-            if (search_char(line, '{'))
-                c++;
-            else if (search_char(line, '}'))
-                c--;
+            c  += search_char(line, '{');
+            c -= search_char(line, '}');
             i = skip_spaces(line);
 
              if (is_world(&line[i], "server"))
@@ -85,12 +83,11 @@ int main(int ac, char **av)
                 while (!file.eof())
                 {
                     std::getline(file, line);
-                    if (search_char(line, '{'))
-                        c++;
+                    c  += search_char(line, '{');
                     map += line + '\n';
                     if (search_char (line, '}'))
                     {
-                        c--; 
+                        c -= search_char(line, '}'); 
                         data.location.insert(std::make_pair(key, map));
                         map.clear();
                         break;
@@ -107,18 +104,23 @@ int main(int ac, char **av)
                 line = trimString(line);
                 data.data_server += line + "\n";
             }
-             if (!c && j)
-             {
+            if (!c && j)
+            {
                 j = 0;
-                 v.push_back(data);
-                 data.data_server.clear();
-                 data.location.clear();
-             }
+                v.push_back(data);
+                data.data_server.clear();
+                data.location.clear();
+            }
         }        
     }
     else
     {
         std::cerr << "No such file\n";
+        return (1);
+    }
+    if (c)
+    {
+        std::cerr << "Error : not closed" << std::endl;
         return (1);
     }
     std::cout << v.size() << "\n";
@@ -131,6 +133,10 @@ int main(int ac, char **av)
         // {
         //     std::cout << it->first << it->second<< "\n";
         // }
-        // std::cout << "++++++++++++++++++++++\n";
    // }
+   for (int i = 0; i < server.size(); i++)
+   {
+        server[i].display_sever();
+        std::cout << "++++++++++++++++++++++\n";
+   }
 }

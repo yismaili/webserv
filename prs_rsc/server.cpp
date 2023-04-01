@@ -74,13 +74,14 @@ int isDomainName(const std::string& domainName)
 int search_char(std::string str, char c)
 {
     int i = 0;
+    int k = 0;
     while (str[i])
     {
         if(str[i] == c)
-            return (1);
+            k++;
         i++;
     }
-    return (0);
+    return (k);
 }
 
 int is_number(const std::string& str)
@@ -244,7 +245,7 @@ server::server(Data_config data)
             if(c_host)
                 ft_error(line, "Duplicated");
             is_empty_value(value, line);
-            if (ft_numbers_value(iss) || (!isDomainName(value) && !isIpAddress(value)))
+            if (ft_numbers_value(iss) || !isIpAddress(value))
                 ft_error(line, "Error");
             c_host++;
             _host = value;
@@ -347,6 +348,38 @@ server::server(Data_config data)
             exit (1);
         }
     }
+}
+
+void server::display_sever()
+{
+    std::cout << "listen : "; 
+    for (int i = 0; i < _listen.size(); i++) 
+        std::cout << _listen[i] << " ";
+    std::cout << std::endl;
+    std::cout << "Server name : "; 
+    for (int i = 0; i < _server_name.size(); i++) 
+        std::cout << _server_name[i] << " ";
+    std::cout << std::endl;
+    std::cout << "Index : "; 
+    for (int i = 0; i < _index.size(); i++) 
+        std::cout << _index[i] << " ";
+    std::cout << std::endl;
+    std::cout << "hostname : " << _host << std::endl;
+    std::cout << "root : " << _root << std::endl;
+    std::cout << "client max body size : " << _client_max_body_size << std::endl;
+    std::cout << "error pages : \n"; 
+    for(auto it = _error_page.begin(); it != _error_page.end(); ++it)
+        std::cout << it->first << "  "<< it->second<< "\n";
+    std::cout << "allow methods : "; 
+    for (int i = 0; i < _allow_methods.size(); i++) 
+        std::cout << _allow_methods[i] << " ";
+    std::cout << std::endl;
+    std::cout << "autoindex : ";
+    if (_autoindex)
+        std::cout << "on\n";
+    else
+         std::cout << "of\n";
+    
 }
 
 server::~server()
