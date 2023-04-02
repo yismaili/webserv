@@ -1,3 +1,4 @@
+#include "location.hpp"
 #include "server.hpp"
 #include <sstream>
 #include <string>
@@ -273,6 +274,8 @@ server::server(Data_config data)
         }
         else if (key == "root")
         {
+            std::cout << _root << "\n";
+            std::cout << c_root << "\n";        
             if(c_root)
                 ft_error(line, "Duplicated");
             is_empty_value(value, line);
@@ -348,6 +351,29 @@ server::server(Data_config data)
             exit (1);
         }
     }
+    if(data.location.size())
+    {
+        puts("heeeeere");
+        Data_config location_data;
+        std::string location_name;
+        std::ostringstream oss;
+        for (std::map<std::string, std::string>::const_iterator it = data.location.begin(); it != data.location.end(); ++it) 
+        {
+            //puts("heeeeere1");
+            // std::cout << "----------------\n";
+            //oss << it->second;
+            location_data.data_server = it->second;
+            location_name = it->first;
+            std::cout << location_name;
+            location *l = new location(location_data, location_name);
+            l->fill_rest(*this);
+            _location.push_back(*l);
+            delete(l);
+            // std::cout << it->first << location.data_server << std::endl;
+            // std::cout << "----------------\n";
+            // oss.str("");
+        }
+    }
 }
 
 void server::display_sever()
@@ -382,6 +408,30 @@ void server::display_sever()
     
 }
 
+    std::vector<std::string> server::get_index() const
+    {
+        return (_index);
+    }
+    std::string server::get_root() const
+    {
+        return (_root);
+    }
+    std::map<int, std::string> server::get_error_page() const
+    {
+        return (_error_page);
+    }
+    std::vector<std::string> server::get_allow_methods() const
+    {
+        return (_allow_methods);
+    }
+    bool server::get_autoindex () const
+    {
+        return (_autoindex);
+    }
+
 server::~server()
+{
+}
+server::server()
 {
 }

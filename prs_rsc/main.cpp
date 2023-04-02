@@ -1,4 +1,5 @@
-#include "server.hpp"
+#include "location.hpp"
+
 
 int skip_spaces(std::string str)
 {
@@ -83,6 +84,7 @@ int main(int ac, char **av)
                 while (!file.eof())
                 {
                     std::getline(file, line);
+                    line = trimString(line);
                     c  += search_char(line, '{');
                     map += line + '\n';
                     if (search_char (line, '}'))
@@ -94,7 +96,7 @@ int main(int ac, char **av)
                     }
                 }
             }
-            else if (!j && i != line.size())
+            else if ((!j && i != line.size()))
             {
                 std::cerr << "error something outside of server\n";
                 return (1);
@@ -137,6 +139,12 @@ int main(int ac, char **av)
    for (int i = 0; i < server.size(); i++)
    {
         server[i].display_sever();
+        std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
+        for (int j = 0; j < server[i]._location.size(); j++)
+        {
+            std::cout << "location : " << server[i]._location[j].location_name << std::endl;
+            server[i]._location[j].display_sever();
+        }
         std::cout << "++++++++++++++++++++++\n";
    }
 }

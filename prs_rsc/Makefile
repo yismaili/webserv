@@ -1,4 +1,4 @@
-SRC = main.cpp server.cpp
+SRC = main.cpp server.cpp location.cpp
 CC = c++
 FLAGS = 
 RM = rm  -rf
