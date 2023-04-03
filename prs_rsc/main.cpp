@@ -30,20 +30,6 @@ std::string trimString(const std::string& str)
   return trimmedStr;
 }
 
-int is_world(std::string str, std::string tmp)
-{
-    int i = 0;
-
-    while (str[i] && !isspace(str[i]))
-    {
-        if(tmp[i] != str[i])
-            return (0);
-        i++;
-    }
-    if(isspace(str[i]))
-        return (1);
-    return(0);
-}
 
 
 
@@ -55,7 +41,7 @@ int main(int ac, char **av)
         return (1);
     }
 
-    std::vector<server> server;
+    std::vector<server> servers;
     std::string config_file;
     std::ifstream file;
     std::string line;
@@ -65,6 +51,7 @@ int main(int ac, char **av)
     std::vector<Data_config> v;
     int c = 0;
     int i = 0, j = 0;
+    int flag = 0;
     config_file = av[1];
     file.open(config_file);
     if(file.is_open())
@@ -80,6 +67,12 @@ int main(int ac, char **av)
                  j = 1;
             if (is_world(&line[i], "location"))
             {
+                if(!j)
+                {
+                    std::cerr << "error something outside of server\n";
+                    return (1);
+                }
+                line = trimString(line);
                 std::string key = line + '\n';
                 while (!file.eof())
                 {
@@ -96,10 +89,14 @@ int main(int ac, char **av)
                     }
                 }
             }
-            else if ((!j && i != line.size()))
+            else if (!j)
             {
-                std::cerr << "error something outside of server\n";
-                return (1);
+                i = skip_spaces(line);
+                if (i != line.size())
+                {
+                    std::cerr << "error something outside of server\n";
+                    return (1);
+                }
             }
             else if (i != line.size())
             {
@@ -108,11 +105,23 @@ int main(int ac, char **av)
             }
             if (!c && j)
             {
+                // if(!j)
+                // {
+                //     std::cerr << "error something outside of server\n";
+                //     return (1);
+                // }
+                // flag = 0;
                 j = 0;
                 v.push_back(data);
                 data.data_server.clear();
                 data.location.clear();
             }
+            // else if (!j)
+            // {
+            //     std::cerr << "error something outside of server\n";
+            //     return (1);
+            // }
+            flag++;
         }        
     }
     else
@@ -126,8 +135,12 @@ int main(int ac, char **av)
         return (1);
     }
     std::cout << v.size() << "\n";
-    for (int i = 0; i < v.size(); i++) 
-        server.push_back(v[i]);
+    for (int i = 0; i < v.size(); i++)
+    {
+        server *s = new server(v[i], 1);
+        servers.push_back(*s);
+        delete (s);
+    }
         // std::cout << "++++++++++++++++++++++\n";
         // std::cout << v[i].data_server << " ";
         // puts("------------------------------");
@@ -136,14 +149,14 @@ int main(int ac, char **av)
         //     std::cout << it->first << it->second<< "\n";
         // }
    // }
-   for (int i = 0; i < server.size(); i++)
+   for (int i = 0; i < servers.size(); i++)
    {
-        server[i].display_sever();
+        servers[i].display_sever();
         std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
-        for (int j = 0; j < server[i]._location.size(); j++)
+        for (int j = 0; j < servers[i]._location.size(); j++)
         {
-            std::cout << "location : " << server[i]._location[j].location_name << std::endl;
-            server[i]._location[j].display_sever();
+            std::cout << "location : " << servers[i]._location[j].location_name << std::endl;
+            servers[i]._location[j].display_sever();
         }
         std::cout << "++++++++++++++++++++++\n";
    }

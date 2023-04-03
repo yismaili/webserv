@@ -204,7 +204,22 @@ std::string ft_method(std::string value, std::string line, std::vector<std::stri
     return (value);
 }
 
-server::server(Data_config data)
+int is_world(std::string str, std::string tmp)
+{
+    int i = 0;
+
+    while (str[i] && !isspace(str[i]))
+    {
+        if(tmp[i] != str[i])
+            return (0);
+        i++;
+    }
+    if(isspace(str[i]))
+        return (1);
+    return(0);
+}
+
+server::server(Data_config data, bool check_location) : _client_max_body_size(1048576) , _autoindex(false), _root("/var/www")
 {
     std::istringstream ss(data.data_server);
     std::string line;
@@ -213,13 +228,17 @@ server::server(Data_config data)
     int c_root = 0;
     int c_client_max_body_size = 0;
     int c_autoindex = 0;
+    int c_allow_method = 0;
+    int c_listen = 0;
+    int c_index = 0;
+    int c_error_page = 0;
     while (getline(ss, line))
     {
         if(line.empty() || line[0] == '#')
             continue;
         if (!search_char(line, '}') && !search_char(line, '{'))
         {
-            if (line[line.size() - 1] != ';')
+            if (line.find(';') != line.size() - 1)
             {
                 std::cerr << "missing ; in " << line << std::endl;
                 exit (1);
@@ -229,7 +248,6 @@ server::server(Data_config data)
         std::string key, value;
         std::istringstream iss(line);
         iss >> key >> value;
-        //std::cout << key << "|" << "\n";
         key = toLower(key);
         if (key == "server_name")
         {
@@ -256,26 +274,18 @@ server::server(Data_config data)
             is_empty_value(value, line);
             int port = ft_number(value, line);
             if (port < 1 || port > 65535)
-            {
-                std::cerr << " ERROOR : " << line << std::endl;
-                exit (1);
-            }
+                ft_error(line, "Error");
             _listen.push_back(port);
             while (iss >> value)
             {
                 int port = ft_number(value, line);
                 if (port < 1024 || port > 65535)
-                {
-                    std::cerr << " ERROOR : " << line << std::endl;
-                    exit (1);
-                }
+                    ft_error(line, "Error");
                 _listen.push_back(port);
             }
         }
         else if (key == "root")
-        {
-            std::cout << _root << "\n";
-            std::cout << c_root << "\n";        
+        {   
             if(c_root)
                 ft_error(line, "Duplicated");
             is_empty_value(value, line);
@@ -306,6 +316,7 @@ server::server(Data_config data)
             if (ft_numbers_value(iss) )
                 ft_error(line, "Error");
             _error_page[error_code] = value;
+            c_error_page++;
         }
         else if (key == "index")
         {
@@ -317,6 +328,7 @@ server::server(Data_config data)
                 ft_check_index(value, line);
                 _index.push_back(value);
             }
+            c_index++;
         }
         else if (key == "allow_methods")
         {
@@ -328,6 +340,7 @@ server::server(Data_config data)
                 value = ft_method(value, line, _allow_methods);
                 _allow_methods.push_back(value);
             }
+            c_allow_method++;
         }
         else if (key == "autoindex")
         {
@@ -345,11 +358,35 @@ server::server(Data_config data)
                 ft_error(line, "Error");
             c_autoindex++;
         }
-        else if (!search_char(line, '}') && !search_char(line, '{'))
+        else if ((search_char(line, '}') || search_char(line, '{') ))
         {
-            std::cerr << " ERROOR : " << line << std::endl;
-            exit (1);
+            if (line.size() > 1)
+            {
+                if (!is_world(line, "server") && !is_world(line, "location"))
+                    ft_error(line, "Error");
+            }
         }
+        else
+            ft_error(line, "Error");
+    }
+    if(!c_allow_method && check_location)
+    {
+        _allow_methods.push_back("GET");
+        _allow_methods.push_back("POST");
+        _allow_methods.push_back("DELETE");
+    }
+    if (!c_listen && check_location)
+        _listen.push_back(80);
+    if (!c_index && check_location)
+        _index.push_back("index.html");
+    if(!c_error_page && check_location)
+    {
+        _error_page[400] = "/400.html";
+        _error_page[401] = "/401.html";
+        _error_page[403] = "/403.html";
+        _error_page[404] = "/404.html";
+        _error_page[405] = "/405.html";
+        _error_page[500] = "/500.html";
     }
     if(data.location.size())
     {
@@ -359,19 +396,12 @@ server::server(Data_config data)
         std::ostringstream oss;
         for (std::map<std::string, std::string>::const_iterator it = data.location.begin(); it != data.location.end(); ++it) 
         {
-            //puts("heeeeere1");
-            // std::cout << "----------------\n";
-            //oss << it->second;
             location_data.data_server = it->second;
             location_name = it->first;
-            std::cout << location_name;
             location *l = new location(location_data, location_name);
             l->fill_rest(*this);
             _location.push_back(*l);
             delete(l);
-            // std::cout << it->first << location.data_server << std::endl;
-            // std::cout << "----------------\n";
-            // oss.str("");
         }
     }
 }
@@ -394,7 +424,7 @@ void server::display_sever()
     std::cout << "root : " << _root << std::endl;
     std::cout << "client max body size : " << _client_max_body_size << std::endl;
     std::cout << "error pages : \n"; 
-    for(auto it = _error_page.begin(); it != _error_page.end(); ++it)
+    for(std::map<int, std::string>::const_iterator it = _error_page.begin(); it != _error_page.end(); ++it)
         std::cout << it->first << "  "<< it->second<< "\n";
     std::cout << "allow methods : "; 
     for (int i = 0; i < _allow_methods.size(); i++) 
@@ -405,7 +435,6 @@ void server::display_sever()
         std::cout << "on\n";
     else
          std::cout << "of\n";
-    
 }
 
     std::vector<std::string> server::get_index() const

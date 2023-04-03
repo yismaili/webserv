@@ -29,7 +29,7 @@ protected:
     // std::string _ssl_ciphers;
 public:
     std::vector<location> _location;
-    server(Data_config data);
+    server(Data_config data, bool check_location);
     server();
      virtual ~server();
     void display_sever();
@@ -40,6 +40,7 @@ public:
     bool get_autoindex () const;
 };
 
+int is_world(std::string str, std::string tmp);
 int search_char(std::string str, char c);
 
 #endif

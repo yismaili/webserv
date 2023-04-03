@@ -1,8 +1,8 @@
 #include "location.hpp"
 
-location::location(Data_config data, std::string location_name) : server(data)
+location::location(Data_config data, std::string location_name) : server(data, 0)
 {
-    this->location_name = location_name;
+    this->location_name = location_name.substr(9, location_name.find('{') - 10);
 
 }
 
