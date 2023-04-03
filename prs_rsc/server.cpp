@@ -238,12 +238,23 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
             continue;
         if (!search_char(line, '}') && !search_char(line, '{'))
         {
+            
             if (line.find(';') != line.size() - 1)
             {
                 std::cerr << "missing ; in " << line << std::endl;
                 exit (1);
             }
             line.erase(line.size() - 1);
+        }
+        else if ((search_char(line, '}') || search_char(line, '{') ))
+        {
+            if (line.size() > 1)
+            {
+                if (!is_world(line, "server") && !is_world(line, "location"))
+                    ft_error(line, "Error");
+            }
+            if(search_char(line, '{') > 1)
+                ft_error(line, "Error");
         }
         std::string key, value;
         std::istringstream iss(line);
@@ -353,13 +364,14 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
             else if (value == "off")
                 _autoindex = false;
             else
-                ft_error(line, "Error");
+                ft_error(line, "Error"); 
             if (ft_numbers_value(iss))
                 ft_error(line, "Error");
             c_autoindex++;
         }
         else if ((search_char(line, '}') || search_char(line, '{') ))
         {
+            std::cout << "-----------------> : "<< line << "\n";
             if (line.size() > 1)
             {
                 if (!is_world(line, "server") && !is_world(line, "location"))
