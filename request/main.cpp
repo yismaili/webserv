@@ -1,4 +1,5 @@
 #include "request.hpp"
+#include "../respond/respond.hpp"
 
 int main(void)
 {
@@ -19,5 +20,13 @@ s = "POST /api/v1/login HTTP/1.1\r\n"
     "{\"username\": \"user\", \"password\": \"pass\"}";
 
     request r(s);
+    Respond resp;
+
+    resp.set_status_code("200");
+    resp.set_status_message("OK");
+
+    resp.set_response_body(r);
+    resp->set_header("Content-Length", std::to_string(resp->_response_body.length()));
+
     return (0);
 }
