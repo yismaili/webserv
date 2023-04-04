@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/04 00:14:43 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/04 14:00:19 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,7 +131,7 @@ namespace http{
                             // Read the client request and send a response  
                             read_request(clint);
                             send_response(clint);
-                            //close(clint);
+                            close(clint);
                             FD_CLR(clint, &readmaster_fds);
                         }
                         it_++;
@@ -153,17 +153,18 @@ namespace http{
                 
                 void read_request(int newsockfd){
                     // Read incoming request data
-                    char buffer[1024] = {0};
-                    int bytes_received = recv(newsockfd, buffer, 1024, 0);
+                    char buffer[1048576] = {0};
+                    int bytes_received;
+                    bytes_received = recv(newsockfd, buffer, 1048576, 0);
                     if (bytes_received == -1) {
                         close(newsockfd);
                         exit_withError("Failed to read from socket");
                     }
-                     //std::cout<<buffer<<std::endl; 
+                    //std::cout<<buffer<<std::endl; 
                     char encoding[] = "POST";
                     if (check_encoding(buffer, encoding)){
                         unchunk(buffer);
-                    }
+                    }       
                 }
                 
                int	ft_strncmp(const char *s1, const char *s2, size_t n)
