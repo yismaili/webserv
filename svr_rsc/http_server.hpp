@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/01 01:05:53 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/04 00:14:43 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,6 +27,7 @@
 #include "tcpServer.hpp"
 #include <iterator>
 #include <sys/select.h>
+#include <ctype.h>
 
 namespace http{
     class http_sever{
@@ -82,31 +83,32 @@ namespace http{
                 std::string response = build_response();
                 
                 byte_send = send(newsockfd, response.c_str(), response.length(), 0);
-                if (byte_send > 0){
-                    print_message("Server Response sent to client");
-                }else{
+                if (byte_send < 0){
                     print_message("Error: sending response to client");
                 }
             }
     
             void run() {
             // Create a set of file descriptors to monitor with select
-                fd_set master_fds;
+                fd_set readmaster_fds;
+                fd_set writemaster_fds;
                 std::vector<http::tcpServer>::iterator it = other_sock.begin();
         
-                FD_ZERO(&master_fds);
+                FD_ZERO(&readmaster_fds);
+                FD_ZERO(&writemaster_fds);
                 while (it != other_sock.end()){
                     http::tcpServer& sock = *it;
-                    FD_SET(sock.sockfd, &master_fds);
+                    FD_SET(sock.sockfd, &readmaster_fds);
+                    FD_SET(sock.sockfd, &writemaster_fds);
                     it++;
                 }
             // Main server loop
                 while (true) {
                     // Create a copy of the master set to pass to select
-                    fd_set read_fds = master_fds;
+                    fd_set read_fds = readmaster_fds;
+                    fd_set wirte_fds = writemaster_fds;
                     // Wait for activity on any of the monitored sockets
-                    int activity = select(FD_SETSIZE, &read_fds, NULL, NULL, NULL);
-                    
+                    int activity = select(FD_SETSIZE, &read_fds, &wirte_fds, NULL, NULL);
                     if (activity < 0) {
                         exit_withError("select");
                     }
@@ -119,19 +121,18 @@ namespace http{
                                 read_request(clint);
                                 send_response(clint);
                                 close(clint);
-                                FD_CLR(clint, &master_fds);
+                                FD_CLR(clint, &readmaster_fds);
                             }
-                            if (is_server(it_->sockfd)){
+                            else if (is_server(it_->sockfd)){
                                 // Accept a new connection and add the new socket to the master set
                                 clint = accept_connection(it_->sockfd);
-                                std::cout<<"-------->"<<clint<<std::endl;
                                 FD_SET(clint, &read_fds);
                             }
                             // Read the client request and send a response  
                             read_request(clint);
                             send_response(clint);
-                            close(clint);
-                            FD_CLR(clint, &master_fds);
+                            //close(clint);
+                            FD_CLR(clint, &readmaster_fds);
                         }
                         it_++;
                     }
@@ -143,7 +144,6 @@ namespace http{
                     while (it != other_sock.end()){
                         // std::cout << it->sockfd << " != " << sock << std::endl;
                         if (it->sockfd == sock){
-                            std::cout << "is server" << std::endl;
                             return (1);
                         }
                         it++;
@@ -153,16 +153,59 @@ namespace http{
                 
                 void read_request(int newsockfd){
                     // Read incoming request data
-                    char buffer[1024];
-                    int  bytes_received = read(newsockfd, buffer, sizeof(buffer));
-                    
+                    char buffer[1024] = {0};
+                    int bytes_received = recv(newsockfd, buffer, 1024, 0);
                     if (bytes_received == -1) {
                         close(newsockfd);
                         exit_withError("Failed to read from socket");
                     }
-                    // Parse incoming request data
-                    std::string request_str(buffer, bytes_received);
-                    std::cout<<request_str<<std::endl;
+                     //std::cout<<buffer<<std::endl; 
+                    char encoding[] = "POST";
+                    if (check_encoding(buffer, encoding)){
+                        unchunk(buffer);
+                    }
+                }
+                
+               int	ft_strncmp(const char *s1, const char *s2, size_t n)
+                {
+                    size_t	i;
+
+                    i = 0;
+                    while (s1[i] && i < n)
+                    {
+                        if (s1[i] != s2[i])
+                        {
+                            return ((unsigned char)s1[i] - (unsigned char)s2[i]);
+                        }
+                        i ++;
+                    }
+                    if (s2[i] == '\0' || i == n)
+                        return (0);
+                    else
+                        return (-s2[i]);
+                }
+                
+                int str_len(char *str){
+                    int i = 0;
+                    while (str[i]){
+                        i++;
+                    }
+                    return (i);
+                }
+                
+                int check_encoding(char *requiste, char *encoding){
+                   // std::cout<<requiste<<std::endl;
+                    if (!ft_strncmp(requiste, encoding, str_len(encoding))){
+                        return (1);
+                    }
+                    else{
+                        return (0);
+                    }
+                }
+                
+                std::string unchunk(const char *chunck) {
+                    std::cout<<chunck<<std::endl;
+                    return(chunck);
                 }
                 
                 void print_message(const std::string &message){
@@ -185,6 +228,9 @@ namespace http{
                 http::tcpServer tcp;
                 std::map<int, http::tcpServer> sock_inf;
                 std::vector<http::tcpServer> other_sock;
+                std::string request_mssg;
+                std::string request_str;
+                 std::stringstream ss;
             
         };
 }
