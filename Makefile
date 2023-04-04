@@ -1,8 +1,8 @@
 NAME = webserv
 CC = c++
 CFLAGS = -Wall -Wextra -Werror -std=c++98 
-SRCS = svr_rsc/main.cpp 
-HDR = svr_rsc/httpTcpServer.hpp 
+SRCS = server/main.cpp server/tcp_server.cpp server/http_server.cpp
+HDR = include/httpTcpServer.hpp include/tcp_server.hpp
 OBJS = $(SRCS:.cpp=.o)
 
 all : $(NAME)
