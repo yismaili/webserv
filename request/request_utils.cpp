@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 21:18:13 by aoumad            #+#    #+#             */
-/*   Updated: 2023/03/31 18:05:55 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/05 02:29:07 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,7 @@ void    request::ft_find_query()
     if (pos != std::string::npos)
     {
         this->_query = this->_uri.substr(pos + 1);
-        // this->_uri = this->_uri.substr(0, pos);
+        this->_uri = this->_uri.substr(0, pos);
     }
 }
 
@@ -148,4 +148,9 @@ void request::ft_parse_language_charset()
         this->_charset[key] = qvalue;
         l = m + 1;
     }
+}
+
+std::string request::get_query() const
+{
+    return (this->_query);
 }

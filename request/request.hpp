@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 18:00:51 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/03 01:18:33 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/05 02:28:47 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ class request
         std::string get_uri() const;
         std::string get_version() const;
         std::string get_body() const;
+        std::string get_query() const;
         // int     ft_get_port() const;
 
         void set_method(std::string method);
@@ -63,7 +64,6 @@ class request
         void add_header(std::string key, std::string value);
         std::string get_header(std::string key) const;
         std::map<std::string, std::string> get_headers() const;
-        
         void parse_request(std::string request);
 
         typedef void (request::*encoding_handler)(std::string &body);
