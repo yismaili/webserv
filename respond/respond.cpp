@@ -31,7 +31,7 @@ void    Respond::set_http_version(std::string http_version)
     _http_version = http_version;
 }
 
-void    Respond::set_status_code(std::string status_code)
+void    Respond::set_status_code(int status_code)
 {
     _status_code = status_code;
 }
@@ -196,7 +196,7 @@ std::string Respond::response_root(request &r)
     // step 1 :check the location
     ft_parse_location(r);
     // step 2 : check the redirectation
-    ft_parse_redirection();
+    ft_parse_url_forwarding();
 
 }
 
@@ -275,7 +275,94 @@ void  Respond::ft_parse_location(request &r)
     // step 8 : check the return
 */
 
-void    Respond::ft_parse_redirection()
-{
+// void    Respond::ft_parse_url_forwarding()
+// {
+//     // parse url forwarding based on the confige file
+//     // 1: redirect
+//     // 2: rewrite
+//     // 3: proxy_pass
+//     // 4: return
 
+//     // redirect body code
+//     for (int i = 0; i < server.size(); i++)
+//     {
+//         for (int j = 0; j < server._location.size(); j++)
+//         {
+//             if (server[i]._location[j].redirect_code != 0)
+//             {
+//                 _redirect_code = server[i]._location[j].redirect_code;
+//                 _redirect_url = server[i]._location[j].redirect_url;
+//             }
+//         }
+//     }
+
+//     // rewrite body code
+//     for (int i = 0; i < server.size(); i++)
+//     {
+//         for (int j = 0; j < server._location.size(); j++)
+//         {
+//             if (server[i]._location[j].rewrite_flag == true)
+//             {
+//                 _rewrite_flag = server[i]._location[j].rewrite_flag;
+//                 _rewrite_regex = server[i]._location[j].rewrite_regex;
+//                 _rewrite_replace = server[i]._location[j].rewrite_replace;
+//             }
+//         }
+//     }
+
+//     // proxy_pass body code
+//     for (int i = 0; i < server.size(); i++)
+//     {
+//         for (int j = 0; j < server._location.size(); j++)
+//         {
+//             if (server[i]._location[j].proxy_pass_flag == true)
+//             {
+//                 _proxy_pass_flag = server[i]._location[j].proxy_pass_flag;
+//                 _proxy_pass_url = server[i]._location[j].proxy_pass_url;
+//             }
+//         }
+//     }
+
+//     // return body code
+//     for (int i = 0; i < server.size(); i++)
+//     {
+//         for (int j = 0; j < server._location.size(); j++)
+//         {
+//             if (server[i]._location[j].return_code != 0)
+//             {
+//                 _return_code = server[i]._location[j].return_code;
+//                 _return_url = server[i]._location[j].return_url;
+//             }
+//         }
+//     }
+// }
+
+void    Respond::ft_parse_url_forwarding()
+{
+    for (int i = 0; i < server.size(); i++)
+    {
+        for (int j = 0; server._location.size(); j++)
+        {
+            if (_path_found == server[i]._location[j].location_name)
+            {
+                // check for redirection ===== where redirection is make_pair
+                if (!server[i]._location[j].redirection.first.empty())
+                {
+                    int status_code = server[i]._location[j].redirection.second;
+                    // search for message of the status_code
+                    std::string message = get_response_status(status_code);
+                    set_status_code(status_code);
+                    set_status_message(message);
+                    set_header("Location", server[i]._location[j].redirection.first);
+                    return ;
+                }
+            }
+            else
+            {
+                set_status_code(200);
+                set_status_message("OK");
+                return ;
+            }
+        }
+    }
 }

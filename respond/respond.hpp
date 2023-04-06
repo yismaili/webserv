@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/06 00:20:14 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/06 17:41:37 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,7 @@ class Respond
         std::string get_respond(std::string request, std::string body);
 
         void set_http_version(std::string http_version);
-        void set_status_code(std::string status_code);
+        void set_status_code(int status_code);
         void set_status_message(std::string status_message);
         void set_header(std::string key, std::string value);
         void set_response_body(request &r);
@@ -86,7 +86,7 @@ class Respond
         std::string response_autoindex(request &r);
         std::string response_cgi(request &r);
         void        ft_parse_location();
-        void        ft_parse_redirection();
+        void        ft_parse_url_forwarding();
 };
 
 #endif
