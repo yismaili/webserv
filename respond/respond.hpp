@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/04 23:54:57 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/06 00:20:14 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,8 @@
 # include <fcntl.h>
 # include <dirent.h>
 # include <errno.h>
+# include "../request/request.hpp"
+# include "../prs_rsc/server.hpp"
 
 class Respond
 {
@@ -35,6 +37,8 @@ class Respond
         std::string _status_code;
         std::string _status_message;
         std::string _document_root;
+        size_t      _location;
+        std::string _path_found;
         
         std::string handle_get_response(request &r);
         std::string handle_post_response(request &r);
@@ -48,6 +52,8 @@ class Respond
         std::string get_error_content(std::string error_code);
         std::string get_error_content(std::string error_code, std::string error_message);
         
+        request& r;
+        server& s;
     public:
         Respond();
         ~Respond();
@@ -73,6 +79,11 @@ class Respond
         std::string get_document_root();
         
         void print_respond();
+
+        std::string response_root(request &r);
+        std::string response_autoindex(request &r);
+        std::string response_cgi(request &r);
+        size_t      ft_parse_location();
 };
 
 #endif

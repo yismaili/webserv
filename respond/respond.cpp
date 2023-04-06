@@ -137,6 +137,27 @@ std::string Respond::handle_get_response(request &r)
 
     // generate HTTP response
     std::string response_body = content_file;
+    if (!r.get_query().empty())
+    {
+        // if there is a query string, search the content file for the query term
+        std::string query_term = r.get_query().substr(2); // remove "q="
+        std::string::size_type pos = content_file.find(query_term);
+        if (pos != std::string::npos)
+        {
+            // if the query term is found, return the content file from the query term to the end of the file
+            response_body = content_file.substr(pos);
+        }
+        else
+        {
+            // if the query term is not found, return an empty string
+            response_body = "Query term not found: " + query_term;
+        }
+    }
+    else
+    {
+        // if there is no query string, return the entire content file
+        response_body = content_file;
+    }
     /*
         std::string status_line = "HTTP/1.1 200 OK\r\n";
     std::string content_type_header = "Content-Type: text/plain\r\n"; // Change this based on the file type
@@ -164,10 +185,59 @@ std::string Respond::get_document_root()
 
 std::string Respond::handle_post_response(request &r)
 {
-    std::string requested_path = r.get_uri();
-    if (!is_path_safe(requested_path))
-        return (get_error_content("400")); // or 403
 
-    // contrust the full file path by appending the reequested path to the document root directory  
-    
 }
+
+std::string Respond::response_root(request &r)
+{
+    // step 1 :check the location
+    _location = ft_parse_location(r);
+}
+
+size_t  Respond::ft_parse_location(request &r)
+{
+    // parse location based on the confige file
+    // 1: exact location
+    // 2: prefix location
+    // 3: regex location
+    // 4: default location
+
+    // exact location body code
+    std::string path = r.get_uri();
+    for (int i = 0; i < server.size(); i++)
+    {
+        for (int j = 0; j < server._location.size(); j++)
+        {
+            if (server[i]._location[j].location_name == path)
+            {
+                _path_found = server[i]._location[j].location_name;
+            }
+        }
+    }
+
+    // prefix location body code
+    for (int i = 0; i < server.size(); i++)
+    {
+        for (int j = 0; j < server._location.size(); j++)
+        {
+            if (path.find(server[i]._location.location_name) == 0)
+            {
+                _path_found = server[i]._location[j].location_name;
+            }
+        }
+    }
+
+    // regex location body code
+    r
+}
+
+/*
+    // step 1 : check the location
+    // step 2 : check the root
+    // step 3 : check the index
+    // step 4 : check the autoindex
+    // step 5 : check the error_page
+    // step 6 : check the limit_except
+    // step 7 : check the cgi
+    // step 8 : check the return
+*/
