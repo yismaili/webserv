@@ -40,6 +40,8 @@ class Respond
         size_t      _location;
         std::string _path_found;
         
+        bool    is_cgi;
+        
         std::string handle_get_response(request &r);
         std::string handle_post_response(request &r);
         std::string handle_put_response(request &r);
@@ -83,7 +85,8 @@ class Respond
         std::string response_root(request &r);
         std::string response_autoindex(request &r);
         std::string response_cgi(request &r);
-        size_t      ft_parse_location();
+        void        ft_parse_location();
+        void        ft_parse_redirection();
 };
 
 #endif

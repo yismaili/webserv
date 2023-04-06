@@ -17,6 +17,9 @@ Respond::Respond()
     _status_code = "200";
     _status_message = "OK";
     // _document_root = "./www";
+    _location = 0;
+    _path_found = "";
+    is_cgi = false;
 }
 
 Respond::~Respond()
@@ -191,10 +194,13 @@ std::string Respond::handle_post_response(request &r)
 std::string Respond::response_root(request &r)
 {
     // step 1 :check the location
-    _location = ft_parse_location(r);
+    ft_parse_location(r);
+    // step 2 : check the redirectation
+    ft_parse_redirection();
+
 }
 
-size_t  Respond::ft_parse_location(request &r)
+void  Respond::ft_parse_location(request &r)
 {
     // parse location based on the confige file
     // 1: exact location
@@ -228,7 +234,34 @@ size_t  Respond::ft_parse_location(request &r)
     }
 
     // regex location body code
-    r
+    std::string::size_type pos = path.find(".");
+    if (pos != std::string::npos)
+    {
+        std::string extension = "*" + path.substr(pos);
+        for (int i = 0; i < server.size(); i++)
+        {
+            for (int j = 0; j < server._location.size(); j++)
+            {
+                if (server[i]._location[j].location_name == extension)
+                {
+                    _path_found = server[i]._location[j].location_name;
+                    is_cgi = true;
+                }
+            }
+        }
+    }
+
+    // root location
+    for (int i = 0; i < server.size(); i++)
+    {
+        for (int j = 0; j < server._location.size(); j++)
+        {
+            if (server[i]._location[j].location_name == "/")
+            {
+                _path_found = server[i]._location[j].location_name;
+            }
+        }
+    }
 }
 
 /*
@@ -241,3 +274,8 @@ size_t  Respond::ft_parse_location(request &r)
     // step 7 : check the cgi
     // step 8 : check the return
 */
+
+void    Respond::ft_parse_redirection()
+{
+
+}
