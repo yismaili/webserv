@@ -19,7 +19,10 @@ Respond::Respond()
     // _document_root = "./www";
     _location = 0;
     _path_found = "";
-    is_cgi = false;
+    _is_cgi = false;
+    _is_allowed_method = false;
+    _rooted_path = "";
+    _is_autoindex = false;
 }
 
 Respond::~Respond()
@@ -245,7 +248,7 @@ void  Respond::ft_parse_location(request &r)
                 if (server[i]._location[j].location_name == extension)
                 {
                     _path_found = server[i]._location[j].location_name;
-                    is_cgi = true;
+                    _is_cgi = true;
                 }
             }
         }
@@ -365,4 +368,56 @@ void    Respond::ft_parse_url_forwarding()
             }
         }
     }
+}
+
+void    Respond::ft_check_allowed_methods()
+{
+    for (int i = 0; i < server.size(); i++)
+    {
+        for (int j = 0; server._location.size(); j++)
+        {
+            if (_path_found == server[i]._location[j].location_name)
+            {
+                // check for allowed methods
+                std::vector<std::string> allowed_methods = server[i]._location[j].allowed_methods;
+                for (int k = 0; k < allowed_methods.size(); k++)
+                {
+                    if (allowed_methods[k] == r.get_method())
+                    {
+                        _is_allowed_method = true;
+                        return ;
+                    }
+                }
+                set_status_code(405);
+                set_status_message("Method Not Allowed");
+                return ;
+            }
+        }
+    }
+}
+
+void    Respond::ft_check_autoindex()
+{
+    for (int i = 0; i < server.size(); i++)
+    {
+        for (int j = 0; server._location.size(); j++)
+        {
+            if (_path_found == server[i]._location[j].location_name)
+            {
+                // check for autoindex
+                if (server[i]._location[j].autoindex == true)
+                {
+                    _is_autoindex = true;
+                    return ;
+                }
+            }
+        }
+    }
+}
+
+void    Respond::ft_parse_root_path()
+{
+    _rooted_path = server.get_root() + _path_found;
+
+    
 }

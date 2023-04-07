@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/06 17:41:37 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/07 02:40:48 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,8 +39,11 @@ class Respond
         std::string _document_root;
         size_t      _location;
         std::string _path_found;
+        std::string _rooted_path;
         
-        bool    is_cgi;
+        bool    _is_cgi;
+        bool    _is_allowed_method;
+        bool    _is_autoindex;
         
         std::string handle_get_response(request &r);
         std::string handle_post_response(request &r);
@@ -55,7 +58,7 @@ class Respond
         std::string get_error_content(std::string error_code, std::string error_message);
         
         request& r;
-        server& s;
+        server& server;
     public:
         Respond();
         ~Respond();
@@ -87,6 +90,9 @@ class Respond
         std::string response_cgi(request &r);
         void        ft_parse_location();
         void        ft_parse_url_forwarding();
+        void        ft_check_allowed_methods();
+        void        ft_check_autoindex();
+        void        ft_parse_root_path();
 };
 
 #endif
