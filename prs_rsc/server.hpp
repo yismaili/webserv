@@ -4,6 +4,7 @@
 #include "Data_config.hpp"
 #include <iostream>
 #include <vector>
+#include <utility>
 #include <map>
 
 class location;
@@ -18,6 +19,7 @@ protected:
     int _client_max_body_size; /*l*/
     std::map<int, std::string> _error_page;
     std::vector<std::string> _allow_methods;
+    std::pair <int , std::string> _rederiction;
     bool _autoindex;
     // std::vector<std::string> _access_log;
     // std::vector<std::string> _error_log;
@@ -33,6 +35,10 @@ public:
     server();
      virtual ~server();
     void display_sever();
+    std::vector<int> get_listen() const;
+    std::vector<std::string> get_server_name() const;
+    std::string get_host() const;
+    int get_client_max_body_size() const;
     std::vector<std::string> get_index() const;
     std::string get_root() const;
     std::map<int, std::string> get_error_page() const;

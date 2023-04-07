@@ -1,6 +1,6 @@
 #include "location.hpp"
 
-
+std::vector<server> servers;
 int skip_spaces(std::string str)
 {
     int i = 0;
@@ -30,6 +30,10 @@ std::string trimString(const std::string& str)
   return trimmedStr;
 }
 
+// std::vector<server> get_data()
+// {
+
+// }
 
 
 
@@ -83,6 +87,12 @@ int main(int ac, char **av)
                     if (search_char (line, '}'))
                     {
                         c -= search_char(line, '}'); 
+                        std::map<std::string, std::string>::const_iterator it = data.location.find(key);
+                        if (it != data.location.end())
+                        {
+                            std::cerr << "Error dupplicate location\n";
+                            return (1);
+                        }
                         data.location.insert(std::make_pair(key, map));
                         map.clear();
                         break;
@@ -105,22 +115,11 @@ int main(int ac, char **av)
             }
             if (!c && j)
             {
-                // if(!j)
-                // {
-                //     std::cerr << "error something outside of server\n";
-                //     return (1);
-                // }
-                // flag = 0;
                 j = 0;
                 v.push_back(data);
                 data.data_server.clear();
                 data.location.clear();
             }
-            // else if (!j)
-            // {
-            //     std::cerr << "error something outside of server\n";
-            //     return (1);
-            // }
             flag++;
         }        
     }
@@ -134,21 +133,15 @@ int main(int ac, char **av)
         std::cerr << "Error : not closed" << std::endl;
         return (1);
     }
-    std::cout << v.size() << "\n";
+    //std::cout << v.size() << "\n";
+
     for (int i = 0; i < v.size(); i++)
     {
         server *s = new server(v[i], 1);
         servers.push_back(*s);
         delete (s);
     }
-        // std::cout << "++++++++++++++++++++++\n";
-        // std::cout << v[i].data_server << " ";
-        // puts("------------------------------");
-        // for(auto it = v[i].location.begin(); it != v[i].location.end(); ++it)
-        // {
-        //     std::cout << it->first << it->second<< "\n";
-        // }
-   // }
+
    for (int i = 0; i < servers.size(); i++)
    {
         servers[i].display_sever();

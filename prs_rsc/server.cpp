@@ -232,6 +232,7 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
     int c_listen = 0;
     int c_index = 0;
     int c_error_page = 0;
+    int c_rederiction = 0;
     while (getline(ss, line))
     {
         if(line.empty() || line[0] == '#')
@@ -326,6 +327,9 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
             is_empty_value(value, line);
             if (ft_numbers_value(iss) )
                 ft_error(line, "Error");
+            std::map<int, std::string>::const_iterator it = _error_page.find(error_code);
+             if (it != _error_page.end())
+                ft_error(line, "Error");
             _error_page[error_code] = value;
             c_error_page++;
         }
@@ -341,7 +345,7 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
             }
             c_index++;
         }
-        else if (key == "allow_methods")
+        else if (key == "allow_methods" && !check_location)
         {
             is_empty_value(value, line);
             value = ft_method(value, line, _allow_methods);
@@ -356,7 +360,7 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
         else if (key == "autoindex")
         {
             if (c_autoindex)
-                ft_error(line, "Erro duplicated");
+                ft_error(line, "Error duplicated");
             is_empty_value(value, line);
             value = toLower(value);
             if (value == "on")
@@ -369,9 +373,24 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
                 ft_error(line, "Error");
             c_autoindex++;
         }
+        else if (key == "return" && !check_location)
+        {
+            if (c_rederiction)
+                ft_error(line, "Error duplicated rederiction");
+            is_empty_value(value, line);
+            int status = ft_number(value, line);
+            if (status < 300 || status > 400)
+                ft_error(line, "Error");    
+            iss >> value;
+            is_empty_value(value, line);
+            if (ft_numbers_value(iss) )
+                ft_error(line, "Error");
+            _rederiction = std::make_pair(status, value);
+            c_rederiction++;
+        }
         else if ((search_char(line, '}') || search_char(line, '{') ))
         {
-            std::cout << "-----------------> : "<< line << "\n";
+            //std::cout << "-----------------> : "<< line << "\n";
             if (line.size() > 1)
             {
                 if (!is_world(line, "server") && !is_world(line, "location"))
@@ -381,11 +400,12 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
         else
             ft_error(line, "Error");
     }
-    if(!c_allow_method && check_location)
+
+    if(!c_allow_method && !check_location)
     {
         _allow_methods.push_back("GET");
-        _allow_methods.push_back("POST");
-        _allow_methods.push_back("DELETE");
+        // _allow_methods.push_back("POST");
+        // _allow_methods.push_back("DELETE");
     }
     if (!c_listen && check_location)
         _listen.push_back(80);
@@ -400,9 +420,10 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
         _error_page[405] = "/405.html";
         _error_page[500] = "/500.html";
     }
+
     if(data.location.size())
     {
-        puts("heeeeere");
+        // puts("heeeeere");
         Data_config location_data;
         std::string location_name;
         std::ostringstream oss;
@@ -419,7 +440,7 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
 }
 
 void server::display_sever()
-{
+{ 
     std::cout << "listen : "; 
     for (int i = 0; i < _listen.size(); i++) 
         std::cout << _listen[i] << " ";
@@ -447,32 +468,58 @@ void server::display_sever()
         std::cout << "on\n";
     else
          std::cout << "of\n";
+    std::cout << "rederiction : " << _rederiction.first << ", " << _rederiction.second << '\n';; 
 }
 
-    std::vector<std::string> server::get_index() const
-    {
-        return (_index);
-    }
-    std::string server::get_root() const
-    {
-        return (_root);
-    }
-    std::map<int, std::string> server::get_error_page() const
-    {
-        return (_error_page);
-    }
-    std::vector<std::string> server::get_allow_methods() const
-    {
-        return (_allow_methods);
-    }
-    bool server::get_autoindex () const
-    {
-        return (_autoindex);
-    }
+std::vector<std::string> server::get_index() const
+{
+    return (_index);
+}
+
+std::string server::get_root() const
+{
+    return (_root);
+}
+
+std::map<int, std::string> server::get_error_page() const
+{
+    return (_error_page);
+}
+
+std::vector<std::string> server::get_allow_methods() const
+{
+    return (_allow_methods);
+}
+bool server::get_autoindex () const
+{
+    return (_autoindex);
+}
+
+std::vector<int> server::get_listen() const
+{
+    return(_listen);
+}
+std::vector<std::string> server::get_server_name() const
+{
+    return(_server_name);
+}
+
+std::string server::get_host() const
+{
+    return(_host);
+}
+
+int server::get_client_max_body_size() const
+{
+    return(_client_max_body_size);
+}
 
 server::~server()
 {
+
 }
+
 server::server()
 {
+
 }

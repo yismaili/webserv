@@ -3,7 +3,6 @@
 location::location(Data_config data, std::string location_name) : server(data, 0)
 {
     this->location_name = location_name.substr(9, location_name.find('{') - 10);
-
 }
 
 location::~location()
