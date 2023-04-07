@@ -6,42 +6,42 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:16:17 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/04 20:54:12 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/06 15:05:07 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <iterator>
-#include <string>
-#include <iostream>
-#include <sstream> 
-#include <vector>
-#include <curl/curl.h>
-#include <cstring>
+// #include <sys/types.h>
+// #include <sys/socket.h>
+// #include <netinet/in.h>
+// #include <arpa/inet.h>
+// #include <unistd.h>
+// #include <stdio.h>
+// #include <string.h>
+// #include <iterator>
+// #include <string>
+// #include <iostream>
+// #include <sstream> 
+// #include <vector>
+// #include <curl/curl.h>
+// #include <cstring>
 
- std::string build_requist(){
-    //Insert html page or ...
-    std::ostringstream requist; //create the output string stream
-    requist << "HTTP/1.1 200 OK";
-    requist << "Content-Type: text/plain";
-    requist << "Transfer-Encoding: chunked";
-    requist << "7\r\n";
-    requist << "Mozilla\r\n";
-    requist << "9\r\n";
-    requist << "Developer\r\n";
-    requist << "7\r\n";
-    requist << "Network\r\n";
-    requist << "0\r\n";
-    requist << "\r\n";
-    std::string str_t(requist.str());
-    return (str_t);
-}
+//  std::string build_requist(){
+//     //Insert html page or ...
+//     std::ostringstream requist; //create the output string stream
+//     requist << "HTTP/1.1 200 OK";
+//     requist << "Content-Type: text/plain";
+//     requist << "Transfer-Encoding: chunked";
+//     requist << "7\r\n";
+//     requist << "Mozilla\r\n";
+//     requist << "9\r\n";
+//     requist << "Developer\r\n";
+//     requist << "7\r\n";
+//     requist << "Network\r\n";
+//     requist << "0\r\n";
+//     requist << "\r\n";
+//     std::string str_t(requist.str());
+//     return (str_t);
+// }
 
 // std::string unchunk(const std::string &chunked) {
 //     std::stringstream ss(chunked);
@@ -56,44 +56,45 @@
 //      }   
 //     return (result);
 // }
-#include <string>
-#include <sstream>
-// template <typename T>
-bool fromHex(const std::string& hexValue, int & result)
-{
-    std::stringstream ss;
-    ss << std::hex << hexValue;
-    ss >> result;
+// #include <string>
+// #include <sstream>
+// // template <typename T>
+// bool fromHex(const std::string& hexValue, int & result)
+// {
+//     std::stringstream ss;
+//     ss << std::hex << hexValue;
+//     ss >> result;
 
-    return !ss.fail();
-}
+//     return !ss.fail();
+// }
 
-std::string unchunk(const std::string& chunked) {
-  std::stringstream ss(chunked);
-  std::string result;
-  while (ss.good()) {
-    std::string size_str;
-    std::getline(ss, size_str, '\r');
-    ss.ignore();  // skip '\n'
-    if (size_str.empty()) {
-      break;
-    }
-   // exit(1);
-    int size ;
-    size = 7;
-    std::string chunk(size, ' ');
-    ss.read(&chunk[0], size);
-    result += chunk;
-    ss.ignore(2);  // skip '\r\n'
-  }
-  return result;
-}
+// std::string unchunk(const std::string& chunked) {
+//   std::stringstream ss(chunked);
+//   std::string result;
+//   while (ss.good()) {
+//     std::string size_str;
+//     std::getline(ss, size_str, '\n');
+//     std::cout<<size_str<<std::endl;
+//     ss.ignore();  // skip '\n'
+//     if (size_str.empty()) {
+//       break;
+//     }
+//    // exit(1);
+//     int size ;
+//     size = 7;
+//     std::string chunk(size, ' ');
+//     ss.read(&chunk[0], size);
+//     result += chunk;
+//     ss.ignore(2);  // skip '\r\n'
+//   }
+//   return result;
+// }
 
-int main() {
-    std::string response_body = unchunk(build_requist());
-    std::cout << response_body << std::endl;
-    return 0;
-}
+// int main() {
+//     std::string response_body = unchunk(build_requist());
+//     std::cout << response_body << std::endl;
+//     return 0;
+// }
 
 // HTTP/1.1 200 OK Content-Type: text/plainTransfer-Encoding: chunked7\r\nMozilla\r\n9\r\nDeveloper\r\n7\r\nNetwork\r\n0\r\n\r\n
 
@@ -128,3 +129,56 @@ int main() {
 //     return 0;
 // }
 
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <sys/ioctl.h>
+
+int main() {
+    int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+    if (sock < 0) {
+        perror("socket");
+        return -1;
+    }
+
+    struct sockaddr_in addr;
+    memset(&addr, 0, sizeof(addr));
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    addr.sin_port = htons(1234);
+
+    if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
+        perror("bind");
+        close(sock);
+        return -1;
+    }
+
+    int bufsize = 4096;
+    if (ioctl(sock, FIONBIO, &bufsize) < 0) {
+        perror("ioctl");
+        close(sock);
+        return -1;
+    }
+
+    char buf[bufsize];
+    struct sockaddr_in client_addr;
+    socklen_t addrlen = sizeof(client_addr);
+    int nbytes = recvfrom(sock, buf, sizeof(buf), 0,
+                          (struct sockaddr *)&client_addr, &addrlen);
+    if (nbytes < 0) {
+        perror("recvfrom");
+        close(sock);
+        return -1;
+    }
+
+    printf("Received %d bytes from %s:%d\n", nbytes,
+           inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+
+    close(sock);
+    return 0;
+}

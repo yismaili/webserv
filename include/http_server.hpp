@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/04 22:17:47 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/06 00:53:05 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,25 +36,26 @@ namespace http{
             ~http_sever();
             int accept_connection(int sockfd);
             std::string build_response();
-            void send_response(int newsockfd);
+            int send_data(int newsockfd);
             void run();
             int is_server(int sock);
-            void read_request(int newsockfd);
+            int recv_data(int newsockfd);
             int	ft_strncmp(const char *s1, const char *s2, size_t n);
             int check_encoding(char *requiste, char *encoding);
-            std::string unchunk(const char *chunck); 
+            std::string unchunk(std::string chuncked); 
             void print_message(const std::string &message);
             void exit_withError(const std::string &errormessage);
             void closeServer(int newsockfd);
-            int str_len(char *str);  
+            int str_len(char *str); 
+            void read_data(int sock);
+            void read_databychunck(int sock);
+            int	end_requiest(const std::string& str, const std::string& end);
         private:
-                int clint;
-                http::tcp_server tcp;
-                std::map<int, http::tcp_server> sock_inf;
-                std::vector<http::tcp_server> other_sock;
-                std::string request_mssg;
-                std::string request_str;
-                std::stringstream ss;
+            int clint;
+            http::tcp_server tcp;
+            std::map<int, http::tcp_server> server_info;
+            std::vector<http::tcp_server> socket_id;
+            std::map<int, std::string> requist_info;
     };
 }
 #endif
