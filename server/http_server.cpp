@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/07 01:55:03 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/08 00:20:44 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -130,7 +130,7 @@ namespace http{
                     }
                     // Read the client request and send a response  
                     recv_data(clint);
-                    std::cout<<requist_info[clint]<<std::endl;
+                    // std::cout<<requist_info[clint]<<std::endl;
                     send_data(clint);
                     close(clint);
                     FD_CLR(clint, &readmaster_fds);
@@ -156,6 +156,21 @@ namespace http{
         return (0);
     }
     
+     int	http_sever::end_requiest(const std::string& str, const std::string& end)
+    {
+        size_t	i = str.size();
+        size_t	j = end.size();
+
+        while (j > 0)
+        {
+            i--;
+            j--;
+            if (i < 0 || str[i] != end[j])
+                return (1);
+        }
+        return (0);
+    }  
+    
    int http_sever::recv_data(int newsockfd)
     {
         char buffer[1048576];
@@ -169,6 +184,25 @@ namespace http{
         }
         requist_info[newsockfd] += std::string(buffer);
         std::size_t found = requist_info[newsockfd].find("\r\n\r\n");
+        if (requist_info[newsockfd].find("Content-Length: "))
+        {
+            if (requist_info[newsockfd].find("Transfer-Encoding: chunked"))
+            {
+                if (end_requiest(requist_info[newsockfd], "0\r\n\r\n") == 0)
+                {
+                    return (0);
+                }
+                else
+                {
+                std::cout<<"hey boy"<<std::endl;
+                    read_databychunck(newsockfd);
+                }
+            }
+            else
+            {
+                return(0);
+            }
+        }
         std::size_t lenOf_chunck = std::atoi(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 10).c_str());
         if (requist_info[newsockfd].size() < (lenOf_chunck + found)){
             read_databychunck(newsockfd);
@@ -179,8 +213,8 @@ namespace http{
     void	http_sever::read_databychunck(int sock)
     {
         std::string	head = requist_info[sock].substr(0, requist_info[sock].find("\r\n\r\n"));
-        std::string	chunks = requist_info[sock].substr(requist_info[sock].find("\r\n\r\n"), requist_info[sock].size());
-        std::string	subchunk = chunks.substr(29, 20);
+        std::string	chunks = requist_info[sock].substr(requist_info[sock].find("\r\n\r\n") + 4, requist_info[sock].size() - 1);
+        std::string	subchunk = chunks.substr(0, 100);
         std::string	body = "";
         int			chunksize = strtol(subchunk.c_str(), NULL, 16);
         size_t		i = 0;
@@ -190,7 +224,8 @@ namespace http{
             i = chunks.find("\r\n", i) + 2;
             body += chunks.substr(i, chunksize);
             i += chunksize + 2;
-            subchunk = chunks.substr(i, 29);
+            subchunk = chunks.substr(i, 100);
+    
             chunksize = strtol(subchunk.c_str(), NULL, 16);
         }
         requist_info[sock] = head + "\r\n\r\n" + body + "\r\n\r\n";
