@@ -43,3 +43,4 @@ TCP, short for Transmission Control Protocol, a TCP server is a program that lis
  - HTTP headers:
  
         
+![1680902384854](https://user-images.githubusercontent.com/69278312/230799535-1c251fed-9171-4cf9-a17e-8b69533985c3.jpg)
