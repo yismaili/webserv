@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:16:17 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/09 14:08:32 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/09 21:05:08 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -249,7 +249,7 @@ std::string join_chunked(const std::string& chunked_msg) {
 
 int main() {
     // Example usage
-    std::string chunked_msg = "POST / HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\nTransfer-Encoding: chunked\r\n\r\n9\r\n\nfoofffff=\r\n3\r\nbar\r\n0\r\n\r\n";
+    std::string chunked_msg = "POST / HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\nTransfer-Encoding: chunked\r\n\r\n9\r\n\nfooffffdfhdfhdfhf=\r\n3\r\nbar\r\n0\r\n\r\n";
     std::string joined_msg = join_chunked(chunked_msg);
    // std::cout << "Chunked message: " << chunked_msg << std::endl;
     std::cout << "Joined message: " << joined_msg << std::endl;
