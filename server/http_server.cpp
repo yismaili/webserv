@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/10 01:11:57 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/10 01:46:42 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ namespace http{
        // }
 
         // Send the data to the client
-        std::string data_to_send = response;//requist_info[socket].substr(sent_data[socket], 65536);
+        std::string data_to_send = response;//requist_info[socket].substr(sent_data[socket], 1024);
         long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
 
         // Check for errors while sending data
@@ -168,10 +168,12 @@ namespace http{
                     // Read the client request and send a response  
                     recv_data(clint);
                      std::cout<<requist_info[clint]<<std::endl;
-                   // if (readed)
+                    if (read_info[clint] == true)
+                    {
                         send_data(clint);
-                   // close(clint);
-                    FD_CLR(clint, &readmaster_fds);
+                        close(clint);
+                        FD_CLR(clint, &readmaster_fds);  
+                    }
              }
                 it_++;
             }
@@ -196,7 +198,6 @@ namespace http{
     int http_sever::is_server(int sock)
     {
         std::vector<http::tcp_server>::iterator it = socket_id.begin();
-        
         while (it != socket_id.end())
         {
             if (it->sockfd == sock)
@@ -211,9 +212,9 @@ namespace http{
     
    int http_sever::recv_data(int newsockfd)
     {
-        char buffer[65536];
+        char buffer[1024];
         int bytes_received;
-        bytes_received = recv(newsockfd, buffer, 65535, 0);
+        bytes_received = recv(newsockfd, buffer, 1024, 0);
         //  std::cout<<buffer<<std::endl;
         if (bytes_received <= 0)
         {
@@ -222,12 +223,21 @@ namespace http{
         }
         requist_info[newsockfd] += std::string(buffer);
         std::size_t content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
-        // std::cout<<content_len<<std::endl;
-        requist_info[newsockfd] = join_chunked(requist_info[newsockfd]);
+        std::size_t Transfer_encoding = requist_info[newsockfd].find("Transfer-Encoding: chunked");
+        std::cout<<Transfer_encoding<<std::endl;
+        read_info.insert(std::make_pair(newsockfd, 0));
+        if (Transfer_encoding != std::string::npos)
+        {
+            requist_info[newsockfd] = join_chunked(requist_info[newsockfd], newsockfd); 
+        }
+        if (content_len < requist_info[newsockfd].size())
+        {
+            read_info[newsockfd] = true;
+        }
         return (0);
     }
 
-    std::string http_sever::join_chunked(const std::string& chunked_msg)
+    std::string http_sever::join_chunked(const std::string& chunked_msg, int sockfd)
     {
         std::string result = "";
         std::size_t pos = 0;
@@ -252,6 +262,7 @@ namespace http{
             long len = strtol(len_str.c_str(), nullptr, 16);
             // If the length is 0, we're done
             if (len == 0) {
+                read_info[sockfd] = true;
                 break;
             }
 

@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/10 01:12:06 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/10 01:43:35 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,7 @@ namespace http{
             void read_databychunck(int sock);
             int	end_requiest(const std::string& str, const std::string& end);
             int send_data(int socket);
-            std::string join_chunked(const std::string& chunked_msg);
+            std::string join_chunked(const std::string& chunked_msg, int sockfd);
             int ckeck_close(std::string &str);
         private:
             int clint;
@@ -58,7 +58,7 @@ namespace http{
             std::vector<http::tcp_server> socket_id;
             std::map<int, std::string> requist_info;
             std::map<int, std::string> response_info;
-            std::map<int, int> read_info;
+            std::map<int, bool> read_info;
     };
 }
 #endif
