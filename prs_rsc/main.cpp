@@ -54,7 +54,7 @@ int main(int ac, char **av)
     Data_config data;
     std::vector<Data_config> v;
     int c = 0;
-    int i = 0, j = 0;
+    size_t i = 0, j = 0;
     int flag = 0;
     config_file = av[1];
     file.open(config_file);
@@ -62,7 +62,10 @@ int main(int ac, char **av)
     {
         while (!file.eof())
         {
-             std::getline(file, line);
+            std::getline(file, line);
+            line = trimString(line);
+            if(line.empty() || line[0] == '#')
+                continue;
             c  += search_char(line, '{');
             c -= search_char(line, '}');
             i = skip_spaces(line);
@@ -81,7 +84,6 @@ int main(int ac, char **av)
                 while (!file.eof())
                 {
                     std::getline(file, line);
-                    line = trimString(line);
                     c  += search_char(line, '{');
                     map += line + '\n';
                     if (search_char (line, '}'))
@@ -133,20 +135,20 @@ int main(int ac, char **av)
         std::cerr << "Error : not closed" << std::endl;
         return (1);
     }
-    //std::cout << v.size() << "\n";
+    std::cout << v.size() << "\n";
 
-    for (int i = 0; i < v.size(); i++)
+    for (size_t i = 0; i < v.size(); i++)
     {
         server *s = new server(v[i], 1);
         servers.push_back(*s);
         delete (s);
     }
 
-   for (int i = 0; i < servers.size(); i++)
+   for (size_t i = 0; i < servers.size(); i++)
    {
         servers[i].display_sever();
         std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
-        for (int j = 0; j < servers[i]._location.size(); j++)
+        for (size_t j = 0; j < servers[i]._location.size(); j++)
         {
             std::cout << "location : " << servers[i]._location[j].location_name << std::endl;
             servers[i]._location[j].display_sever();

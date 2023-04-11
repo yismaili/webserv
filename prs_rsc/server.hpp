@@ -20,7 +20,9 @@ protected:
     std::map<int, std::string> _error_page;
     std::vector<std::string> _allow_methods;
     std::pair <int , std::string> _rederiction;
+    std::map<std::string ,std::string> _path_info; 
     bool _autoindex;
+    bool _upload;
     // std::vector<std::string> _access_log;
     // std::vector<std::string> _error_log;
     //std::vector<std::string> _meme_types;
