@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/10 01:46:42 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/11 01:53:59 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,8 @@ namespace http{
 
         // Send the data to the client
         std::string data_to_send = response;//requist_info[socket].substr(sent_data[socket], 1024);
-        long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
-
+        long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0); 
+        read_info.insert(std::make_pair(socket, 0));
         // Check for errors while sending data
         if (bytes_sent == -1)
         {
@@ -117,69 +117,72 @@ namespace http{
         }
     }
 
-    void http_sever::run() 
-    {
-    // Create a set of file descriptors to monitor with select
+    void http_sever::run() {
+        // Create a set of file descriptors to monitor with select
         fd_set readmaster_fds;
         fd_set writemaster_fds;
         std::vector<http::tcp_server>::iterator it = socket_id.begin();
         
         FD_ZERO(&readmaster_fds);
         FD_ZERO(&writemaster_fds);
-        while (it != socket_id.end())
-        {
+        while (it != socket_id.end()) {
             http::tcp_server& sock = *it;
             FD_SET(sock.sockfd, &readmaster_fds);
             FD_SET(sock.sockfd, &writemaster_fds);
             it++;
         }
-    // Main server loop
-        while (true) 
-        {
+        
+        // Main server loop
+        while (true) {
             // Create a copy of the master set to pass to select
             fd_set read_fds = readmaster_fds;
-            fd_set wirte_fds = writemaster_fds;
+            fd_set write_fds = writemaster_fds;
             // Wait for activity on any of the monitored sockets
-            int activity = select(FD_SETSIZE, &read_fds, &wirte_fds, NULL, NULL);
-            if (activity < 0)
-            {
+            int activity = select(FD_SETSIZE, &read_fds, &write_fds, NULL, NULL);
+            if (activity < 0) {
                 exit_withError("select");
             }
+            
             // Check each socket for activity
             std::vector<http::tcp_server>::iterator it_ = socket_id.begin();
-            while( it_ != socket_id.end()) 
-            {
-                if (FD_ISSET(it_->sockfd, &read_fds)) 
-                {
-                    if (!is_server(it_->sockfd))
-                    {
+            while (it_ != socket_id.end()) {
+                if (FD_ISSET(it_->sockfd, &read_fds)) {
+                    if (!is_server(it_->sockfd)) {
                         // Accept a new connection and add the new socket to the master set
                         recv_data(clint);
                         send_data(clint);
                         close(clint);
                         FD_CLR(clint, &readmaster_fds);
                     }
-                    else if (is_server(it_->sockfd)){
+                    if (is_server(it_->sockfd)) {
                         // Accept a new connection and add the new socket to the master set
                         clint = accept_connection(it_->sockfd);
                         requist_info.insert(std::make_pair(clint, ""));
                         FD_SET(clint, &read_fds);
                     }
-                    // Read the client request and send a response  
+                    // Read the client request and send a response 
                     recv_data(clint);
-                     std::cout<<requist_info[clint]<<std::endl;
-                    if (read_info[clint] == true)
-                    {
+                    std::cout << requist_info[clint] << std::endl;
+                    if (read_info[clint] == true) {
+                        // Add the client socket to the set of sockets to write to
+                        write_info[clint] = true;
+                        FD_SET(clint, &write_fds);
+                        FD_CLR(clint, &readmaster_fds);
+                    }
+                }
+                
+                if (FD_ISSET(it_->sockfd, &write_fds)) {
+                    if (write_info[clint] == true) {
                         send_data(clint);
                         close(clint);
-                        FD_CLR(clint, &readmaster_fds);  
+                        FD_CLR(clint, &writemaster_fds);
                     }
-             }
+                }
                 it_++;
             }
         }
     }
-    
+
     int http_sever::ckeck_close(std::string &requist)
     {
         std::string endOfstr("0\r\n\r\n");
@@ -212,7 +215,7 @@ namespace http{
     
    int http_sever::recv_data(int newsockfd)
     {
-        char buffer[1024];
+        char buffer[1024] = {0};
         int bytes_received;
         bytes_received = recv(newsockfd, buffer, 1024, 0);
         //  std::cout<<buffer<<std::endl;
@@ -222,15 +225,15 @@ namespace http{
             exit_withError("Failed to read from socket");
         }
         requist_info[newsockfd] += std::string(buffer);
+        std::size_t header_end = requist_info[newsockfd].find("0\r\n\r\n");//used this string ::nops check the end!!!!!!
         std::size_t content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
         std::size_t Transfer_encoding = requist_info[newsockfd].find("Transfer-Encoding: chunked");
-        std::cout<<Transfer_encoding<<std::endl;
         read_info.insert(std::make_pair(newsockfd, 0));
         if (Transfer_encoding != std::string::npos)
         {
             requist_info[newsockfd] = join_chunked(requist_info[newsockfd], newsockfd); 
         }
-        if (content_len < requist_info[newsockfd].size())
+        if ((content_len +  header_end) <= requist_info[newsockfd].size())
         {
             read_info[newsockfd] = true;
         }
@@ -246,8 +249,8 @@ namespace http{
         std::size_t header_end = chunked_msg.find("\r\n\r\n");
         if (header_end == std::string::npos) {
             // No headers found, return an empty string
-            return "";
-        }
+           return "";
+       }
 
         // Append the headers to the result
         result += chunked_msg.substr(0, header_end);
@@ -292,3 +295,16 @@ namespace http{
         exit(1);
     }
 }
+
+
+/*  HTTP/1.1 200 OK
+Content-Type: text/plain
+Transfer-Encoding: chunked
+7\r\n
+Mozilla\r\n
+11\r\n
+Developer Network\r\n
+0\r\n
+\r\n 
+
+ */

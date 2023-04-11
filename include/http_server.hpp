@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/10 01:43:35 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/11 01:21:06 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,8 +59,10 @@ namespace http{
             std::map<int, std::string> requist_info;
             std::map<int, std::string> response_info;
             std::map<int, bool> read_info;
+            std::map<int, bool> write_info;
+             fd_set readmaster_fds;
+        fd_set writemaster_fds;
     };
 }
 #endif
 
-    
