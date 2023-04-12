@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/12 01:56:19 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/12 15:52:29 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,21 +163,23 @@ namespace http{
                     }
                     // Read the client request and send a response 
                     recv_data(clint);
-                    // std::cout << requist_info[clint] << std::endl;
-                    if (read_info[clint] == true) {
-                        // Add the client socket to the set of sockets to write to
-                        write_info[clint] = true;
-                        FD_SET(clint, &write_fds);
-                        FD_CLR(clint, &readmaster_fds);
-                    }
+                    std::cout << requist_info[clint] << std::endl;
+                    send_data(clint);
+                    close(clint);
+                    // if (read_info[clint] == true) {
+                    //     // Add the client socket to the set of sockets to write to
+                    //     write_info[clint] = true;
+                    //     FD_SET(clint, &write_fds);
+                    //     FD_CLR(clint, &readmaster_fds);
+                    // }
                 }
-                if (FD_ISSET(it_->sockfd, &write_fds)) {
-                    if (write_info[clint] == true) {
-                        send_data(clint);
-                        close(clint);
-                        FD_CLR(clint, &writemaster_fds);
-                    }
-                }
+                // if (FD_ISSET(it_->sockfd, &write_fds)) {
+                //     if (write_info[clint] == true) {
+                //         send_data(clint);
+                //         close(clint);
+                //         FD_CLR(clint, &writemaster_fds);
+                //     }
+                // }
                 it_++;
             }
         }
@@ -222,8 +224,10 @@ namespace http{
         requist_info[newsockfd] += std::string(buffer);
         std::size_t header_end = requist_info[newsockfd].find("0\r\n\r\n");//used this string ::nops check the end!!!!!!
         std::size_t content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
-        // std::cout<<content_len +  header_end<<std::endl;
-        // std::cout<<requist_info[newsockfd].size()<<std::endl;
+        if (requist_info[newsockfd].find("GET") != std::string::npos)
+        {
+            return (0);
+        }
         int check = 0;
         while (true)
         {
@@ -239,18 +243,12 @@ namespace http{
                     break;
              }    
         }
-        std::cout<<requist_info[newsockfd]<<std::endl;
         std::size_t Transfer_encoding = requist_info[newsockfd].find("Transfer-Encoding: chunked");
         read_info.insert(std::make_pair(newsockfd, 0));
         if (Transfer_encoding != std::string::npos)
         {
             requist_info[newsockfd] = join_chunked(requist_info[newsockfd], newsockfd); 
         }
-        // if ((content_len +  header_end) == requist_info[newsockfd].size())
-        // {
-        //       std::cout<<"hjfgahjsfg"<<std::endl;
-        //     read_info[newsockfd] = true;
-        // }
         return (0);
     }
 
