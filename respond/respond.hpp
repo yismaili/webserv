@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/11 18:07:47 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/12 18:03:01 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,9 +104,10 @@ class Respond
         int         ft_check_file();
         void        ft_handle_index();
         void        ft_handle_index_2();
+        void        ft_show_autoindex();
         
         // ERROR RESPONSE
-        std::string handle_error(int error_code);
+        void        ft_handle_error(int error_code);
         std::string handle_error(int error_code, std::string error_message);
 };
 
