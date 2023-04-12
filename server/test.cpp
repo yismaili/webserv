@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:16:17 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/11 00:09:54 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/11 23:01:42 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,50 +208,51 @@
 //     return 0;
 // }
 
-#include <iostream>
-#include <string>
+// #include <iostream>
+// #include <string>
 
-std::string join_chunked(const std::string& chunked_msg) {
-    std::string result = "";
-    std::size_t pos = 0;
+// std::string join_chunked(const std::string& chunked_msg) {
+//     std::string result = "";
+//     std::size_t pos = 0;
 
-    // Find the end of the headers
-    std::size_t header_end = chunked_msg.find("\r\n\r\n");
-    if (header_end == std::string::npos) {
-        // No headers found, return an empty string
-        return "";
-    }
+//     // Find the end of the headers
+//     std::size_t header_end = chunked_msg.find("\r\n\r\n");
+//     if (header_end == std::string::npos) {
+//         // No headers found, return an empty string
+//         return "";
+//     }
 
-    // Append the headers to the result
-    result += chunked_msg.substr(0, header_end);
+//     // Append the headers to the result
+//     result += chunked_msg.substr(0, header_end);
 
-    // Find the start of the first chunk
-    pos = header_end + 4;
+//     // Find the start of the first chunk
+//     pos = header_end + 4;
 
-    while (true) {
-        // Find the next chunk size
-        std::size_t len_pos = chunked_msg.find("\r\n", pos);
-        std::string len_str = chunked_msg.substr(pos, len_pos - pos);
-        int len = std::stoi(len_str, nullptr, 16);
+//     while (true) {
+//         // Find the next chunk size
+//         std::size_t len_pos = chunked_msg.find("\r\n", pos);
+//         std::string len_str = chunked_msg.substr(pos, len_pos - pos);
+//         int len = std::stoi(len_str, nullptr, 16);
 
-        // If the length is 0, we're done
-        if (len == 0) {
-            break;
-        }
+//         // If the length is 0, we're done
+//         if (len == 0) {
+//             break;
+//         }
 
-        // Append the chunk data to the result
-        result += chunked_msg.substr(len_pos + 2, len);
-        pos = len_pos + 2 + len + 2;
-    }
+//         // Append the chunk data to the result
+//         result += chunked_msg.substr(len_pos + 2, len);
+//         pos = len_pos + 2 + len + 2;
+//     }
 
-    return result;
-}
+//     return result;
+// }
 
-int main() {
-    // Example usage
-    std::string chunked_msg = "POST / HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\nTransfer-Encoding: chunked\r\n\r\n4\r\n\nfoo=\r\n3\r\nbar\r\n0\r\n\r\n";
-    std::string joined_msg = join_chunked(chunked_msg);
-   // std::cout << "Chunked message: " << chunked_msg << std::endl;
-    std::cout << "Joined message: " << joined_msg << std::endl;
-    return 0;
-}
+// int main() {
+//     // Example usage
+//     std::string chunked_msg = "POST / HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\nTransfer-Encoding: chunked\r\n\r\n4\r\n\nfoo=\r\n3\r\nbar\r\n0\r\n\r\n";
+//     std::string joined_msg = join_chunked(chunked_msg);
+//    // std::cout << "Chunked message: " << chunked_msg << std::endl;
+//     std::cout << "Joined message: " << joined_msg << std::endl;
+//     return 0;
+// }
+

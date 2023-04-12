@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/11 01:53:59 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/12 01:56:19 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,20 +121,20 @@ namespace http{
         // Create a set of file descriptors to monitor with select
         fd_set readmaster_fds;
         fd_set writemaster_fds;
-        std::vector<http::tcp_server>::iterator it = socket_id.begin();
         
         FD_ZERO(&readmaster_fds);
         FD_ZERO(&writemaster_fds);
+        
+        // Main server loop
+        while (true) {
+            // Create a copy of the master set to pass to select
+        std::vector<http::tcp_server>::iterator it = socket_id.begin();
         while (it != socket_id.end()) {
             http::tcp_server& sock = *it;
             FD_SET(sock.sockfd, &readmaster_fds);
             FD_SET(sock.sockfd, &writemaster_fds);
             it++;
         }
-        
-        // Main server loop
-        while (true) {
-            // Create a copy of the master set to pass to select
             fd_set read_fds = readmaster_fds;
             fd_set write_fds = writemaster_fds;
             // Wait for activity on any of the monitored sockets
@@ -143,17 +143,18 @@ namespace http{
                 exit_withError("select");
             }
             
-            // Check each socket for activity
             std::vector<http::tcp_server>::iterator it_ = socket_id.begin();
-            while (it_ != socket_id.end()) {
+            // Check each socket for activity
+            while (it_ != socket_id.end())
+            {
                 if (FD_ISSET(it_->sockfd, &read_fds)) {
-                    if (!is_server(it_->sockfd)) {
-                        // Accept a new connection and add the new socket to the master set
-                        recv_data(clint);
-                        send_data(clint);
-                        close(clint);
-                        FD_CLR(clint, &readmaster_fds);
-                    }
+                    // if (!is_server(it_->sockfd)) {
+                    //     // Accept a new connection and add the new socket to the master set
+                    //     recv_data(clint);
+                    //     send_data(clint);
+                    //     close(clint);
+                    //     FD_CLR(clint, &readmaster_fds);
+                    // }
                     if (is_server(it_->sockfd)) {
                         // Accept a new connection and add the new socket to the master set
                         clint = accept_connection(it_->sockfd);
@@ -162,7 +163,7 @@ namespace http{
                     }
                     // Read the client request and send a response 
                     recv_data(clint);
-                    std::cout << requist_info[clint] << std::endl;
+                    // std::cout << requist_info[clint] << std::endl;
                     if (read_info[clint] == true) {
                         // Add the client socket to the set of sockets to write to
                         write_info[clint] = true;
@@ -170,7 +171,6 @@ namespace http{
                         FD_CLR(clint, &readmaster_fds);
                     }
                 }
-                
                 if (FD_ISSET(it_->sockfd, &write_fds)) {
                     if (write_info[clint] == true) {
                         send_data(clint);
@@ -217,26 +217,40 @@ namespace http{
     {
         char buffer[1024] = {0};
         int bytes_received;
+
         bytes_received = recv(newsockfd, buffer, 1024, 0);
-        //  std::cout<<buffer<<std::endl;
-        if (bytes_received <= 0)
-        {
-            close(newsockfd);
-            exit_withError("Failed to read from socket");
-        }
         requist_info[newsockfd] += std::string(buffer);
         std::size_t header_end = requist_info[newsockfd].find("0\r\n\r\n");//used this string ::nops check the end!!!!!!
         std::size_t content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
+        // std::cout<<content_len +  header_end<<std::endl;
+        // std::cout<<requist_info[newsockfd].size()<<std::endl;
+        int check = 0;
+        while (true)
+        {
+            bytes_received = recv(newsockfd, buffer, 1024, 0);
+            if (bytes_received <= 0)
+            {
+                close(newsockfd);
+                exit_withError("Failed to read from socket");
+            }
+            requist_info[newsockfd] += std::string(buffer);
+            check += 1024;
+            if ((content_len +  header_end) <= check){
+                    break;
+             }    
+        }
+        std::cout<<requist_info[newsockfd]<<std::endl;
         std::size_t Transfer_encoding = requist_info[newsockfd].find("Transfer-Encoding: chunked");
         read_info.insert(std::make_pair(newsockfd, 0));
         if (Transfer_encoding != std::string::npos)
         {
             requist_info[newsockfd] = join_chunked(requist_info[newsockfd], newsockfd); 
         }
-        if ((content_len +  header_end) <= requist_info[newsockfd].size())
-        {
-            read_info[newsockfd] = true;
-        }
+        // if ((content_len +  header_end) == requist_info[newsockfd].size())
+        // {
+        //       std::cout<<"hjfgahjsfg"<<std::endl;
+        //     read_info[newsockfd] = true;
+        // }
         return (0);
     }
 
