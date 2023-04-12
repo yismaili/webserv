@@ -22,7 +22,9 @@ Respond::Respond()
     _is_cgi = false;
     _is_allowed_method = false;
     _rooted_path = "";
-    _is_autoindex = false;
+    _is_autoindex = "";
+    _is_redirection = false;
+    _is_index = false;
 }
 
 Respond::~Respond()
@@ -124,55 +126,6 @@ void    Respond::set_response_body(request &r)
 }
 
 std::string Respond::handle_get_response(request &r)
-{
-    std::string requested_path = r.get_uri();
-    if (!is_path_safe(requested_path))
-        return (get_error_content("400")); // or 403
-    
-    // contrust the full file path by appending the reequested path to the document root directory
-    std::string full_path = get_document_root() + requested_path;
-    // check if the file exists
-    std::ifstream file_stream(full_path);
-    if (!file_stream.is_open())
-        return (get_error_content("404"));
-    
-    // read the file content into a string
-    std::stringstream buffer;
-    buffer << file_stream.rdbuf();
-    std::string content_file = buffer.str();
-
-    // generate HTTP response
-    std::string response_body = content_file;
-    if (!r.get_query().empty())
-    {
-        // if there is a query string, search the content file for the query term
-        std::string query_term = r.get_query().substr(2); // remove "q="
-        std::string::size_type pos = content_file.find(query_term);
-        if (pos != std::string::npos)
-        {
-            // if the query term is found, return the content file from the query term to the end of the file
-            response_body = content_file.substr(pos);
-        }
-        else
-        {
-            // if the query term is not found, return an empty string
-            response_body = "Query term not found: " + query_term;
-        }
-    }
-    else
-    {
-        // if there is no query string, return the entire content file
-        response_body = content_file;
-    }
-    /*
-        std::string status_line = "HTTP/1.1 200 OK\r\n";
-    std::string content_type_header = "Content-Type: text/plain\r\n"; // Change this based on the file type
-    std::string content_length_header = "Content-Length: " + std::to_string(response_body.length()) + "\r\n";
-    std::string connection_header = "Connection: close\r\n";
-    std::string response_headers = content_type_header + content_length_header + connection_header + "\r\n";
-    */
-    return (response_body);
-}
 
 int         Respond::is_path_safe(std::string requested_path)
 {
@@ -201,6 +154,10 @@ std::string Respond::response_root(request &r)
     // step 2 : check the redirectation
     ft_parse_url_forwarding();
 
+    // step 3 : check the validation of rooted path
+    ft_parse_root_path();
+
+
 }
 
 void  Respond::ft_parse_location(request &r)
@@ -215,7 +172,7 @@ void  Respond::ft_parse_location(request &r)
     std::string path = r.get_uri();
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0; j < server._location.size(); j++)
+        for (int j = 0; j < server[i]._location.size(); j++)
         {
             if (server[i]._location[j].location_name == path)
             {
@@ -227,9 +184,9 @@ void  Respond::ft_parse_location(request &r)
     // prefix location body code
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0; j < server._location.size(); j++)
+        for (int j = 0; j < server[i]._location.size(); j++)
         {
-            if (path.find(server[i]._location.location_name) == 0)
+            if (path.find(server[i]._location[j].location_name) == 0)
             {
                 _path_found = server[i]._location[j].location_name;
             }
@@ -240,10 +197,10 @@ void  Respond::ft_parse_location(request &r)
     std::string::size_type pos = path.find(".");
     if (pos != std::string::npos)
     {
-        std::string extension = "*" + path.substr(pos);
+        std::string extension = ".*" + path.substr(pos);
         for (int i = 0; i < server.size(); i++)
         {
-            for (int j = 0; j < server._location.size(); j++)
+            for (int j = 0; j < server[i]._location.size(); j++)
             {
                 if (server[i]._location[j].location_name == extension)
                 {
@@ -278,78 +235,17 @@ void  Respond::ft_parse_location(request &r)
     // step 8 : check the return
 */
 
-// void    Respond::ft_parse_url_forwarding()
-// {
-//     // parse url forwarding based on the confige file
-//     // 1: redirect
-//     // 2: rewrite
-//     // 3: proxy_pass
-//     // 4: return
-
-//     // redirect body code
-//     for (int i = 0; i < server.size(); i++)
-//     {
-//         for (int j = 0; j < server._location.size(); j++)
-//         {
-//             if (server[i]._location[j].redirect_code != 0)
-//             {
-//                 _redirect_code = server[i]._location[j].redirect_code;
-//                 _redirect_url = server[i]._location[j].redirect_url;
-//             }
-//         }
-//     }
-
-//     // rewrite body code
-//     for (int i = 0; i < server.size(); i++)
-//     {
-//         for (int j = 0; j < server._location.size(); j++)
-//         {
-//             if (server[i]._location[j].rewrite_flag == true)
-//             {
-//                 _rewrite_flag = server[i]._location[j].rewrite_flag;
-//                 _rewrite_regex = server[i]._location[j].rewrite_regex;
-//                 _rewrite_replace = server[i]._location[j].rewrite_replace;
-//             }
-//         }
-//     }
-
-//     // proxy_pass body code
-//     for (int i = 0; i < server.size(); i++)
-//     {
-//         for (int j = 0; j < server._location.size(); j++)
-//         {
-//             if (server[i]._location[j].proxy_pass_flag == true)
-//             {
-//                 _proxy_pass_flag = server[i]._location[j].proxy_pass_flag;
-//                 _proxy_pass_url = server[i]._location[j].proxy_pass_url;
-//             }
-//         }
-//     }
-
-//     // return body code
-//     for (int i = 0; i < server.size(); i++)
-//     {
-//         for (int j = 0; j < server._location.size(); j++)
-//         {
-//             if (server[i]._location[j].return_code != 0)
-//             {
-//                 _return_code = server[i]._location[j].return_code;
-//                 _return_url = server[i]._location[j].return_url;
-//             }
-//         }
-//     }
-// }
-
 void    Respond::ft_parse_url_forwarding()
 {
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0; server._location.size(); j++)
+        for (int j = 0;  j < server._location.size(); j++)
         {
             if (_path_found == server[i]._location[j].location_name)
             {
                 // check for redirection ===== where redirection is make_pair
-                if (!server[i]._location[j].redirection.first.empty())
+                if (!server[i]._location[j].redirection.first.first.empty() &&
+                    !server[i]._location[j].redirection.first.second.empty())
                 {
                     int status_code = server[i]._location[j].redirection.second;
                     // search for message of the status_code
@@ -357,6 +253,7 @@ void    Respond::ft_parse_url_forwarding()
                     set_status_code(status_code);
                     set_status_message(message);
                     set_header("Location", server[i]._location[j].redirection.first);
+                    _is_redirection = true;
                     return ;
                 }
             }
@@ -378,6 +275,8 @@ void    Respond::ft_check_allowed_methods()
         {
             if (_path_found == server[i]._location[j].location_name)
             {
+                // get the autoindex
+                _autoindex = server[i]._location[j].autoindex;
                 // check for allowed methods
                 std::vector<std::string> allowed_methods = server[i]._location[j].allowed_methods;
                 for (int k = 0; k < allowed_methods.size(); k++)
@@ -417,7 +316,12 @@ void    Respond::ft_check_autoindex()
 
 void    Respond::ft_parse_root_path()
 {
+    struct stat file_stats;
     _rooted_path = server.get_root() + _path_found;
 
-    
+    if (!stat(_rooted_path.c_str(), &file_stats))
+        return;
+    set_status_code(403);
+    set_status_message("Forbidden");
+    return ; // i need to call error function instead
 }

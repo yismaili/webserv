@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/07 02:40:48 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/11 18:07:47 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,6 @@
 # include <errno.h>
 # include "../request/request.hpp"
 # include "../prs_rsc/server.hpp"
-
 class Respond
 {
     private:
@@ -40,16 +39,18 @@ class Respond
         size_t      _location;
         std::string _path_found;
         std::string _rooted_path;
-        
-        bool    _is_cgi;
-        bool    _is_allowed_method;
-        bool    _is_autoindex;
-        
-        std::string handle_get_response(request &r);
-        std::string handle_post_response(request &r);
-        std::string handle_put_response(request &r);
-        std::string handle_delete_response(request &r);
-        std::string handle_head_response(request &r);
+        std::string _is_autoindex;
+
+        bool        _is_cgi;
+        bool        _is_allowed_method;
+        bool        _is_redirection;
+        bool        _is_index;
+
+        std::string handle_get_response();
+        std::string handle_post_response();
+        std::string handle_put_response();
+        std::string handle_delete_response();
+        std::string handle_head_response();
         
         std::string get_file_content(std::string path);
         std::string get_file_content(std::string path, std::string file);
@@ -93,6 +94,20 @@ class Respond
         void        ft_check_allowed_methods();
         void        ft_check_autoindex();
         void        ft_parse_root_path();
+
+        // GET RESPONSE
+        void        ft_handle_redirection();
+        void        ft_handle_cgi();
+        void        ft_handle_file();
+        void        ft_handle_autoindex();
+        void        ft_check_cgi();
+        int         ft_check_file();
+        void        ft_handle_index();
+        void        ft_handle_index_2();
+        
+        // ERROR RESPONSE
+        std::string handle_error(int error_code);
+        std::string handle_error(int error_code, std::string error_message);
 };
 
 #endif
