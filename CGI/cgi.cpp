@@ -4,6 +4,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include "/Users/snouae/Desktop/server/request/request.hpp"
 
 
     // env["SERVER_SOFTWARE"] = "=webserv/1.0";
@@ -19,8 +20,37 @@
     // env["DOCUMENT_ROOT"] = "=html";
     // env["SCRIPT_FILENAME"] = "=??";
     // env["HTTP_COOKIE"] = "=Cookie";
+    /*	this->_env.push_back("SERVER_SOFTWARE=webserv/1.0");
+	this->_env.push_back("SERVER_NAME=" + this->_location.getServerName());
+	this->_env.push_back("GATEWAY_INTERFACE=CGI/1.1");
+	this->_env.push_back("SERVER_PROTOCOL=HTTP/1.1");
+	this->_env.push_back("SERVER_PORT= " + req.getPort());
+	this->_env.push_back("REQUEST_METHOD=" + req.getMethod());
+	this->_env.push_back("CONTENT_TYPE=" + req.getHeadr("Content-Type"));
+	this->_env.push_back("CONTENT_LENGTH=" + toStr(req.getBody().size()));
+	this->_env.push_back("QUERY_STRING=" + req.getQuery());
+	this->_env.push_back("REDIRECT_STATUS=200");
+	this->_env.push_back("DOCUMENT_ROOT=" + this->_location.getRoot());
+	this->_env.push_back("SCRIPT_FILENAME=" + this->_cmd[1]);
+	this->_env.push_back("HTTP_COOKIE=" + req.getHeadr("Cookie"));*/
 std::map<std::string, std::string>get_env()
 {
+    //std::map<std::string, std::string> env;
+
+    // env["SERVER_SOFTWARE"] = "MyServer/1.0";
+    // env["SERVER_NAME"] = "localhost";
+    // env["GATEWAY_INTERFACE"] = "CGI/1.1";
+    // env["SERVER_PROTOCOL"] = "HTTP/1.1";
+    // env["SERVER_PORT"] = "80";
+    // // env["REQUEST_METHOD"] = req.get_method();
+    // //env["SCRIPT_NAME"] = "/cgi-bin/mycgi";
+    // // env["CONTENT_TYPE"] = req.get_header("Content-Type");
+    // // env["CONTENT_LENGTH"] = std::to_string(req.get_body().size());
+    // // env["QUERY_STRING"] = req.get_query();
+    // env["REMOTE_ADDR"] = "127.0.0.1";
+    // env["REMOTE_HOST"] = "localhost";
+    // env["REDIRECT_STATUS"] = "200";
+    // env["HTTP_COOKIE"] = req.get_header("Cookie");
     std::map<std::string, std::string> env;
 
     env["SERVER_SOFTWARE"] = "MyServer/1.0";
@@ -30,19 +60,49 @@ std::map<std::string, std::string>get_env()
     env["SERVER_PORT"] = "80";
     env["REQUEST_METHOD"] = "GET";
     env["SCRIPT_NAME"] = "/cgi-bin/mycgi";
-    env["CONTENT_TYPE"] = "text/html";
-    env["CONTENT_LENGTH"] = "";
+    env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
+    env["CONTENT_LENGTH"] = "0";
     env["QUERY_STRING"] = "";
+
+    // Parse QUERY_STRING
+    // std::string query_string = getenv("QUERY_STRING");
+    // if (!query_string.empty())
+    // {
+    //     std::vector<std::string> tokens;
+    //     std::istringstream iss(query_string);
+    //     std::string token;
+    //     while (std::getline(iss, token, '&'))
+    //     {
+    //         tokens.push_back(token);
+    //     }
+
+    //     for (const auto& t : tokens)
+    //     {
+    //         std::vector<std::string> param;
+    //         std::istringstream iss(t);
+    //         std::string p;
+    //         while (std::getline(iss, p, '='))
+    //         {
+    //             param.push_back(p);
+    //         }
+
+    //         if (param.size() == 2)
+    //         {
+    //             env[param[0]] = param[1];
+    //         }
+    //     }
+    // }
+
     env["REMOTE_ADDR"] = "127.0.0.1";
     env["REMOTE_HOST"] = "localhost";
     env["REDIRECT_STATUS"] = "200";
-    return (env);
+    return env;
 }
 
 
-std::string run_cgi(request &req)
+std::string run_cgi()
 {
-    char *cmd[3] = {"python.py", "/usr/bin/python3", NULL};
+    char *cmd[3] = {"/usr/bin/python3", "test.py", NULL};
     std::string cgi_str;
 
     FILE *temp = std::tmpfile();
@@ -64,7 +124,6 @@ std::string run_cgi(request &req)
         envp[i] = strdup(e.c_str());
     }
     envp[i] = NULL;
-
     int pid = fork();
     if (pid == -1) 
     {
@@ -75,7 +134,7 @@ std::string run_cgi(request &req)
     {
         if (method == "POST")
         {
-            std::fprintf(temp1, "%s", req.body().c_str());
+            std::fprintf(temp1, "%s", "name=John&email=john@example.com");
             std::rewind(temp1);
             if (dup2(fdtemp1, STDIN_FILENO) == -1)
             {
@@ -89,23 +148,30 @@ std::string run_cgi(request &req)
             exit(1);
         }
         execve(cmd[0], cmd, envp);
-        std::cerr << "Error: failed to execute command\n";
-        exit(1);
+        //std::cerr << "Error: failed to execute command\n";
+        exit(0);
     }
-
-    close(fdtemp);
-    close(fdtemp1);
 
     int status;
     waitpid(pid, &status, 0);
     if (status != 0)
-        std::cerr << "error";
-    char buf;
-    while ((nbytes = read(fdtemp, buf, 1)) > 0)
+        std::cerr << "error\n";
+    char buf[1];
+    std::string content;
+    int byt;
+    std::rewind(temp);
+    while ((byt = read(fdtemp, buf, 1)) > 0){
         content.append(buf, 1);
-    if (nbytes == -1)
+    }
+    if (byt == -1)
         std::cerr << "Error: failed to read output\n";
+    //dup2(STDOUT_FILENO, fdtemp);
+    close(fdtemp);
+    close(fdtemp1);
     return (content);
 }
 
-
+int main()
+{
+    std::cout << run_cgi() << "\n";
+}
