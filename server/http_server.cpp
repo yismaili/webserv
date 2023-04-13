@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/13 01:00:11 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/13 17:54:14 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,29 +86,34 @@ namespace http{
             }   
             std::vector<http::sockets>::iterator it_recv = socket_id.begin();
             // Check each socket for activity
+            
             while (it_recv != socket_id.end())
             {
                    // Read the client request and send a response 
-                    it_recv->recv_data(it_recv->sockfd);
-                    std::cout << it_recv->requist_info[it_recv->sockfd] << std::endl;
-                    it_recv->send_data(it_recv->sockfd);
-                    close(it_recv->sockfd);
-                    FD_CLR(it_recv->sockfd, &writemaster_fds);
-                    if (it_recv->read_info[it_recv->sockfd] == true) {
+                    it_recv->recv_data(clint);
+                       std::cout << it_recv->requist_info[clint] << std::endl;
+                    if (it_recv->read_info[clint] == true) 
+                    { 
                         // Add the client socket to the set of sockets to write to
-                        it_recv->write_info[it_recv->sockfd] = true;
-                        FD_SET(it_recv->sockfd, &write_fds);
-                        FD_CLR(it_recv->sockfd, &readmaster_fds);
+                        it_recv->write_info[clint] = true;
+                        FD_SET(clint, &write_fds);
+                        FD_CLR(clint, &readmaster_fds);
+                        break;
+                    }
+            }
+            std::vector<http::sockets>::iterator it_send = socket_id.begin();
+            // Check each socket for activity
+            while (it_send != socket_id.end())
+            {
+                   // Read the client request and send a response 
+                if (FD_ISSET(clint, &write_fds)) {
+                    if (it_send->write_info[clint] == true) {
+                        it_send->send_data(clint);
+                        close(clint);
+                        FD_CLR(clint, &writemaster_fds);
                     }
                 }
-                if (FD_ISSET(it_recv->sockfd, &write_fds)) {
-                    if (it_recv->write_info[it_recv->sockfd] == true) {
-                        it_recv->send_data(it_recv->sockfd);
-                        close(it_recv->sockfd);
-                        FD_CLR(it_recv->sockfd, &writemaster_fds);
-                    }
-                }
-          
+            }
         }
     }
 

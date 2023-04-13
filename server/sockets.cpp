@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/13 00:32:36 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/13 15:23:55 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,7 @@ namespace http{
         sockaddr_in &sockets::git_serv_addr(){
             return (serv_addr);
         }
+        
         bool sockets::start_server() 
         {
             // Socket System Call
@@ -90,42 +91,44 @@ namespace http{
             // std::cout<<" Listening on adress ... "<<std::endl;
             return true;
         }
-         int sockets::recv_data(int newsockfd)
+        
+        int sockets::recv_data(int newsockfd)
         {
             char buffer[1024] = {0};
             int bytes_received;
 
             bytes_received = recv(newsockfd, buffer, 1024, 0);
             requist_info[newsockfd] += std::string(buffer);
-            std::size_t header_end = requist_info[newsockfd].find("0\r\n\r\n");//used this string ::nops check the end!!!!!!
-            std::size_t content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
-            if (requist_info[newsockfd].find("GET") != std::string::npos)
-            {
-                return (0);
-            }
-        std::size_t check = 0;
-            while (true)
-            {
-                bytes_received = recv(newsockfd, buffer, 1024, 0);
-                if (bytes_received <= 0)
-                {
-                    close(newsockfd);
-                   std::cout<<"Failed to read from socket"<<std::endl;
-                   exit(1);
-                }
-                requist_info[newsockfd] += std::string(buffer);
-                check += 1024;
-                if ((content_len +  header_end) <= check){
-                    read_info[sockfd] = true;
-                    break;
-                }    
-            }
-            std::size_t Transfer_encoding = requist_info[newsockfd].find("Transfer-Encoding: chunked");
+            // std::size_t header_end = requist_info[newsockfd].find("0\r\n\r\n");//used this string ::nops check the end!!!!!!
+            // std::size_t content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
+            // if (requist_info[newsockfd].find("GET") != std::string::npos)
+            // {
+            //     return (0);
+            // }
+            //static std::size_t check = 0;
+            // while (true)
+            // {
+                // bytes_received = recv(newsockfd, buffer, 1024, 0);
+                // if (bytes_received <= 0)
+                // {
+                //     close(newsockfd);
+                //    std::cout<<"Failed to read from socket"<<std::endl;
+                //    exit(1);
+                // }
+                // requist_info[newsockfd] += std::string(buffer);
+                // check += 1024;
+                // if ((content_len +  header_end) <= check)
+                // {
+                //     read_info[sockfd] = true;
+                    //break;
+                // }    
+            // }
+            //std::size_t Transfer_encoding = requist_info[newsockfd].find("Transfer-Encoding: chunked");
            // read_info.insert(std::make_pair(newsockfd, 0));
-            if (Transfer_encoding != std::string::npos)
-            {
-                requist_info[newsockfd] = join_chunked(requist_info[newsockfd], newsockfd); 
-            }
+            // if (Transfer_encoding != std::string::npos)
+            // {
+            //     requist_info[newsockfd] = join_chunked(requist_info[newsockfd], newsockfd); 
+            // }
             return (0);
         }
 
@@ -211,7 +214,7 @@ namespace http{
         // Check for errors while sending data
         if (bytes_sent == -1)
         {
-            std::cerr << "Error: Failed to send data to the socket\n";
+            std::cout << "Error: Failed to send data to the socket\n";
             close(socket);
             sent_data[socket] = 0;
             return -1;

@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/13 00:55:33 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/13 15:30:06 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,12 +42,13 @@ namespace http{
             void exit_withError(const std::string &errormessage);
             void closeServer(int newsockfd);
             int ckeck_close(std::string &str);
-        private:
+        public:
             int clint;
             http::sockets sock;
             std::vector<http::sockets> socket_id;
             fd_set readmaster_fds;
             fd_set writemaster_fds;
+            http::sockets sockl;
     };
 }
 #endif
