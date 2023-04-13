@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:16:17 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/11 23:01:42 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/13 01:03:50 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -255,4 +255,134 @@
 //     std::cout << "Joined message: " << joined_msg << std::endl;
 //     return 0;
 // }
+
+// #include <iostream>
+// #include <sys/socket.h>
+// #include <netinet/in.h>
+// #include <unistd.h>
+// #include <arpa/inet.h>
+// #include <cstring>
+// #include <poll.h>
+
+// int main()
+// {
+//     // create a socket and connect to a server
+//     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
+//     struct sockaddr_in servaddr;
+//     memset(&servaddr, 0, sizeof(servaddr));
+//     servaddr.sin_family = AF_INET;
+//     servaddr.sin_port = htons(8000);
+//     inet_pton(AF_INET, "localhost", &servaddr.sin_addr);
+//     connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
+
+//     // add the socket to the poll object
+//     struct pollfd fds[1];
+//     fds[0].fd = sockfd;
+//     fds[0].events = POLLIN;
+
+//     // loop indefinitely, waiting for events on the socket
+//     while (true) {
+//         // wait for an event on the socket
+//         int nready = poll(fds, 1, -1);
+
+//         // handle the event
+//         if (nready > 0 && fds[0].revents & POLLIN) {
+//             char buffer[1024];
+//             int n = read(sockfd, buffer, sizeof(buffer));
+//             if (n == 0) {
+//                 std::cout << "Connection closed by server" << std::endl;
+//                 break;
+//             } else {
+//                 std::cout << "Received " << n << " bytes: " << buffer << std::endl;
+//             }
+//         } else if (nready == -1) {
+//             std::cerr << "Error in poll: " << strerror(errno) << std::endl;
+//             break;
+//         }
+//     }
+
+//     close(sockfd);
+//     return 0;
+// }
+
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+
+#define MAX_CLIENTS 10
+#define BUFFER_SIZE 1024
+
+int main()
+{
+    int server_fd, client_fds[MAX_CLIENTS], max_fd;
+    struct sockaddr_in server_addr, client_addr;
+    char buffer[BUFFER_SIZE];
+    fd_set read_fds;
+
+    // create a socket and bind it to a port
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+    memset(&server_addr, 0, sizeof(server_addr));
+    server_addr.sin_family = AF_INET;
+    server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    server_addr.sin_port = htons(8000);
+    bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
+    listen(server_fd, 5);
+
+    // initialize the client file descriptor set
+    FD_ZERO(&read_fds);
+    FD_SET(server_fd, &read_fds);
+    max_fd = server_fd;
+
+    // loop indefinitely, waiting for events on the file descriptors
+    while (1) {
+        fd_set tmp_fds = read_fds;
+        if (select(max_fd + 1, &tmp_fds, NULL, NULL, NULL) == -1) {
+            perror("select");
+            exit(EXIT_FAILURE);
+        }
+
+        // iterate over all file descriptors and handle them
+        for (int i = 0; i <= max_fd; i++) {
+            if (FD_ISSET(i, &tmp_fds)) {
+                if (i == server_fd) {
+                    // if the server file descriptor is ready, accept a new connection
+                    socklen_t client_len = sizeof(client_addr);
+                    int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
+                    if (client_fd == -1) {
+                        perror("accept");
+                        exit(EXIT_FAILURE);
+                    }
+
+                    // add the new client file descriptor to the set
+                    FD_SET(client_fd, &read_fds);
+                    if (client_fd > max_fd) {
+                        max_fd = client_fd;
+                    }
+                    printf("New connection from %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+                } else {
+                    // if a client file descriptor is ready, read data from it
+                    int n = read(i, buffer, BUFFER_SIZE);
+                    if (n == -1) {
+                        perror("read");
+                        exit(EXIT_FAILURE);
+                    } else if (n == 0) {
+                        // if the client has closed the connection, remove it from the set
+                        close(i);
+                        FD_CLR(i, &read_fds);
+                        printf("Client %d disconnected\n", i);
+                    } else {
+                        // if there is data to read, print it to the console and echo it back to the client
+                        printf("Received %d bytes from client %d: %s", n, i, buffer);
+                        write(i, buffer, n);
+                    }
+                }
+            }
+        }
+    }
+
+    return 0;
+}
 
