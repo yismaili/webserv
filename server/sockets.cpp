@@ -1,27 +1,28 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tcp_server.cpp                                     :+:      :+:    :+:   */
+/*   sockets.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/04 22:20:32 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/15 00:58:45 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../include/tcp_server.hpp"
+#include "../include/sockets.hpp"
+#include <fcntl.h>
 namespace http{
     
-    tcp_server::tcp_server(/* args */)
+    sockets::sockets(/* args */)
     {
     }
         
-    tcp_server::~tcp_server()
+    sockets::~sockets()
     {
     }
     
-    tcp_server &tcp_server::init_data(int port_, std::string ip_add)
+    sockets &sockets::init_data(int port_, std::string ip_add)
     {
         sockfd =  -1;
         port = port_;
@@ -39,20 +40,21 @@ namespace http{
         return (*this);
     }
             
-        int tcp_server::git_sockfd()const
+        int sockets::git_sockfd()const
         {
             return (sockfd);
         }
             
-        unsigned int &tcp_server::get_sock_addr_len()
+        unsigned int &sockets::get_sock_addr_len()
         {
             return (sock_addr_len);
         }
             
-        sockaddr_in &tcp_server::git_serv_addr(){
+        sockaddr_in &sockets::git_serv_addr(){
             return (serv_addr);
         }
-        bool tcp_server::start_server() 
+        
+        bool sockets::start_server() 
         {
             // Socket System Call
             //Creates a socket and returns a Socket Descriptor (like file descriptor) which is an integer value
@@ -74,6 +76,7 @@ namespace http{
                 exit(EXIT_FAILURE);
             }
             sock_addr_len = sizeof(serv_addr);
+            fcntl(sockfd, F_SETFL, O_NONBLOCK);
             // Bind System Call
             //associate a socket with a specific address and port number
             if (bind(sockfd, (struct sockaddr *) &serv_addr, sock_addr_len) < 0) {
@@ -88,4 +91,19 @@ namespace http{
             // std::cout<<" Listening on adress ... "<<std::endl;
             return true;
         }
+    int sockets::accept_connection(int sockfd)
+    {
+        // Accepts a connection on a socket.
+        // std::cout<<"///////////////////////"<<std::endl;
+        // std::cout<<"/////////----///////////"<<std::endl;
+        int sockfd_client = accept(sockfd, (struct sockaddr *) NULL, NULL);
+        if (sockfd_client < 0) 
+        {
+           std::cout<<"error accepting connection"<<std::endl;
+           exit(1);
+        }
+        // std::cout<<"/////////----///////////"<<std::endl;
+        return (sockfd_client);
+    }
+       
 }

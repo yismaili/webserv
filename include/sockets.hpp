@@ -1,17 +1,17 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   tcp_server.hpp                                     :+:      :+:    :+:   */
+/*   sockets.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/04 22:16:35 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/15 00:15:45 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef INCLUDED_TCP_SERVER
-# define INCLUDED_TCP_SERVER
+#ifndef INCLUDED_SOCKETS_HPP
+# define INCLUDED_SOCKETS_HPP
 
 #include <iostream>
 #include <sstream>
@@ -22,24 +22,26 @@
 #include <unistd.h>
 #include<fstream>
 #include <arpa/inet.h>
+#include <map>
 
 namespace http{
-    class tcp_server{
+    class sockets{
         public: 
-            tcp_server(); 
-            ~tcp_server();
-            tcp_server &init_data(int port_, std::string ip_add);
+            sockets(); 
+            ~sockets();
+            sockets &init_data(int port_, std::string ip_add);
             int git_sockfd()const;
             unsigned int &get_sock_addr_len();
             sockaddr_in &git_serv_addr();
             bool start_server();
+            int accept_connection(int sockfd);
         public:
             int sockfd;
             int port;
             struct sockaddr_in serv_addr;
-            std::string serv_message;
             unsigned int sock_addr_len;
-            std::string ip_addr;   
+            std::string ip_addr;
+            
     };
 }
 #endif
