@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/14 22:52:09 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/15 00:58:45 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,7 +76,7 @@ namespace http{
                 exit(EXIT_FAILURE);
             }
             sock_addr_len = sizeof(serv_addr);
-            //fcntl(sockfd, F_SETFL, O_NONBLOCK);
+            fcntl(sockfd, F_SETFL, O_NONBLOCK);
             // Bind System Call
             //associate a socket with a specific address and port number
             if (bind(sockfd, (struct sockaddr *) &serv_addr, sock_addr_len) < 0) {
@@ -91,6 +91,19 @@ namespace http{
             // std::cout<<" Listening on adress ... "<<std::endl;
             return true;
         }
-        
+    int sockets::accept_connection(int sockfd)
+    {
+        // Accepts a connection on a socket.
+        // std::cout<<"///////////////////////"<<std::endl;
+        // std::cout<<"/////////----///////////"<<std::endl;
+        int sockfd_client = accept(sockfd, (struct sockaddr *) NULL, NULL);
+        if (sockfd_client < 0) 
+        {
+           std::cout<<"error accepting connection"<<std::endl;
+           exit(1);
+        }
+        // std::cout<<"/////////----///////////"<<std::endl;
+        return (sockfd_client);
+    }
        
 }

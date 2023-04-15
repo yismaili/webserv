@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/14 22:57:45 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/15 00:15:45 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ namespace http{
             unsigned int &get_sock_addr_len();
             sockaddr_in &git_serv_addr();
             bool start_server();
+            int accept_connection(int sockfd);
         public:
             int sockfd;
             int port;
