@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/15 01:40:45 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/15 01:49:58 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,11 +73,12 @@ namespace http{
                     }
                     else
                     {
+                        read_info[clients[i].fd] = false;
                         recv_data(clients[i].fd);
                         std::cout<<requist_info[clients[i].fd]<<std::endl;
                     }
                 }
-                if (clients[i].revents & POLLOUT)
+                if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
                     send_data(clients[i].fd);
                 }
@@ -145,7 +146,6 @@ namespace http{
 
             bytes_received = recv(newsockfd, buffer, 1024, 0);
             requist_info[newsockfd] += std::string(buffer);
-            // exit(1);
             // std::size_t header_end = requist_info[newsockfd].find("0\r\n\r\n");//used this string ::nops check the end!!!!!!
             // std::size_t content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
             // if (requist_info[newsockfd].find("GET") != std::string::npos)
@@ -154,22 +154,22 @@ namespace http{
             // }
             // while (true)
             // {
-                // bytes_received = recv(newsockfd, buffer, 1024, 0);
-                // if (bytes_received <= 0)
-                // {
-                //     close(newsockfd);
-                //    std::cout<<"Failed to read from socket"<<std::endl;
-                //    exit(1);
-                // }
-                // requist_info[newsockfd] += std::string(buffer);
-                // if ((content_len +  header_end) >= requist_info[newsockfd].size())
-                // {
-                //     read_info[sockfd] = true;
-                //     //break;
-                // }    
+            //     bytes_received = recv(newsockfd, buffer, 1024, 0);
+            //     if (bytes_received <= 0)
+            //     {
+            //         close(newsockfd);
+            //         std::cout<<"Failed to read from socket"<<std::endl;
+            //         exit(1);
+            //     }
+            //     requist_info[newsockfd] += std::string(buffer);
+            //     if ((content_len +  header_end) >= requist_info[newsockfd].size())
+            //     {
+            //         read_info[newsockfd] = true;
+            //         break;
+            //     }    
             // }
-            //std::size_t Transfer_encoding = requist_info[newsockfd].find("Transfer-Encoding: chunked");
-            //read_info.insert(std::make_pair(newsockfd, 0));
+            // std::size_t Transfer_encoding = requist_info[newsockfd].find("Transfer-Encoding: chunked");
+            // read_info.insert(std::make_pair(newsockfd, 0));
             // if (Transfer_encoding != std::string::npos)
             // {
             //     requist_info[newsockfd] = join_chunked(requist_info[newsockfd], newsockfd); 
