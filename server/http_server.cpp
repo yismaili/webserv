@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/15 01:49:58 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/15 18:35:31 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ namespace http{
 
     void http_sever::run() 
     {
-        int poll_ret, new_socket;
+        int poll_ret, new_socket, recv_ret;
         unsigned long i = 0;
         // Add server socket to poll list
         std::vector<http::sockets>::iterator it = socket_id.begin();
@@ -73,9 +73,11 @@ namespace http{
                     }
                     else
                     {
-                        read_info[clients[i].fd] = false;
-                        recv_data(clients[i].fd);
-                        std::cout<<requist_info[clients[i].fd]<<std::endl;
+                       recv_ret = recv_data(clients[i].fd);
+                       if (!recv_ret &&  read_info[clients[i].fd] == true)
+                       {
+                         std::cout<<requist_info[clients[i].fd]<<std::endl;
+                       }
                     }
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
@@ -140,79 +142,86 @@ namespace http{
         exit(1);
     }
      int http_sever::recv_data(int newsockfd)
-        {
+    {
             char buffer[1024] = {0};
             int bytes_received;
+            std::size_t header_end;
+            std::size_t content_len;
+            read_info.insert(std::make_pair(newsockfd, 0));
 
             bytes_received = recv(newsockfd, buffer, 1024, 0);
             requist_info[newsockfd] += std::string(buffer);
-            // std::size_t header_end = requist_info[newsockfd].find("0\r\n\r\n");//used this string ::nops check the end!!!!!!
-            // std::size_t content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
-            // if (requist_info[newsockfd].find("GET") != std::string::npos)
-            // {
-            //     return (0);
-            // }
-            // while (true)
-            // {
-            //     bytes_received = recv(newsockfd, buffer, 1024, 0);
-            //     if (bytes_received <= 0)
-            //     {
-            //         close(newsockfd);
-            //         std::cout<<"Failed to read from socket"<<std::endl;
-            //         exit(1);
-            //     }
-            //     requist_info[newsockfd] += std::string(buffer);
-            //     if ((content_len +  header_end) >= requist_info[newsockfd].size())
-            //     {
-            //         read_info[newsockfd] = true;
-            //         break;
-            //     }    
-            // }
-            // std::size_t Transfer_encoding = requist_info[newsockfd].find("Transfer-Encoding: chunked");
-            // read_info.insert(std::make_pair(newsockfd, 0));
-            // if (Transfer_encoding != std::string::npos)
-            // {
-            //     requist_info[newsockfd] = join_chunked(requist_info[newsockfd], newsockfd); 
-            // }
-            return (0);
-        }
+            try
+            {
+                header_end = requist_info[newsockfd].find("0\r\n\r\n");//used this string ::nops check the end!!!!!!
+                content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
+            }
+            catch(...)
+            {
+               
+            } 
+            if (requist_info[newsockfd].find("GET") != std::string::npos)
+            {
+                read_info[newsockfd] = true;
+                return (0);
+            }
+            if ((content_len +  header_end) <= requist_info[newsockfd].size())
+            {
+                read_info[newsockfd] = true;
+                return (0);
+            }    
+            return (1);
+    }
 
-        std::string http_sever::join_chunked(const std::string& chunked_msg, int sockfd)
+    int http_sever ::unchunk(int sockfd)
+    {
+        std::size_t Transfer_encoding = requist_info[sockfd].find("Transfer-Encoding: chunked");
+        if (Transfer_encoding != std::string::npos && read_info[sockfd] == true)
         {
-            std::string result = "";
-            std::size_t pos = 0;
-            (void) sockfd;
-            // Find the end of the headers
-            std::size_t header_end = chunked_msg.find("\r\n\r\n");
-            if (header_end == std::string::npos) {
-                // No headers found, return an empty string
+            std::string requist = join_chunked(requist_info[sockfd], sockfd); 
+            std::cout<<requist<<std::endl;
+        }
+        return (0);
+    }
+    
+    std::string http_sever::join_chunked(const std::string& chunked_msg, int sockfd)
+    {
+        std::string result = "";
+        std::size_t pos = 0;
+        (void) sockfd;
+        // Find the end of the headers
+        std::size_t header_end = chunked_msg.find("\r\n\r\n");
+        if (header_end == std::string::npos) 
+        {
+            // No headers found, return an empty string
             return "";
         }
 
-            // Append the headers to the result
-            result += chunked_msg.substr(0, header_end);
-
-            // Find the start of the first chunk
-            pos = header_end + 4;
-
-            while (true) {
-                // Find the next chunk size
-                std::size_t len_pos = chunked_msg.find("\r\n", pos);
-                std::string len_str = chunked_msg.substr(pos, len_pos - pos);
-                long len = strtol(len_str.c_str(), nullptr, 16);
-                // If the length is 0, we're done
-                if (len == 0) {
-                    read_info[sockfd] = true;
-                    break;
-                }
-
-                // Append the chunk data to the result
-                result += chunked_msg.substr(len_pos + 2, len);//use append() function
-                pos = len_pos + 2 + len + 2;
+        // Append the headers to the result
+        result += chunked_msg.substr(0, header_end);
+        // Find the start of the first chunk
+        pos = header_end + 4;
+        
+        while (true) 
+        {
+            // Find the next chunk size
+            std::size_t len_pos = chunked_msg.find("\r\n", pos);
+            std::string len_str = chunked_msg.substr(pos, len_pos - pos);
+            long len = strtol(len_str.c_str(), nullptr, 16);
+            // If the length is 0, we're done
+            if (len == 0) 
+            {
+                read_info[sockfd] = true;
+                break;
             }
 
-            return result;
+            // Append the chunk data to the result
+            result += chunked_msg.substr(len_pos + 2, len);//use append() function
+            pos = len_pos + 2 + len + 2;
         }
+
+        return result;
+    }
         
     std::string http_sever::build_response()
     {
@@ -238,19 +247,18 @@ namespace http{
         // Keep track of how much data has been sent to a particular socket
         static std::map<int, size_t> sent_data;
 
-        // If this is the first time sending data to the socket, print the response header
-        // if (sent_data.find(socket) == sent_data.end())
-        // {
-        //     std::cout << "Response Header:\n";
-        //     if (requist_info[socket].size() < 1000)
-        //     {
-        //         std::cout << "[" << requist_info[socket] << "]\n";
-        //     }
-        //     else
-        //     {
-        //         std::cout << "[" << requist_info[socket].substr(0, 1000) << "..." << requist_info[socket].substr(requist_info[socket].size() - 10, 15) << "]\n";
-        //     }
-       // }
+        //If this is the first time sending data to the socket, print the response header
+        if (sent_data.find(socket) == sent_data.end())
+        {
+            if (requist_info[socket].size() < 1024)
+            {
+                std::cout << " Response  sended "<<std::endl;
+            }
+            else
+            {
+                std::cout << " Response is sending "<<std::endl;
+            }
+       }
 
         // Send the data to the client
         std::string data_to_send = response;//requist_info[socket].substr(sent_data[socket], 1024);
