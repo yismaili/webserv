@@ -1,10 +1,12 @@
-#!/usr/bin/php-cgi
 <?php
-$name = $_POST['name'];
-$email = $_POST['email'];
-echo "Content-Type: text/html\n\n";
-echo "<html><body>";
-echo "<h1>Hello, $name!</h1>";
-echo "<p>Your email is: $email</p>";
-echo "</body></html>";
+$name = $_GET['name'];
+$email = $_GET['email'];
 ?>
+
+<html>
+<body>
+  <h1>Hello, <?php echo $name; ?>!</h1>
+  <p>Your email is: <?php echo $email; ?></p>
+</body>
+</html>
+

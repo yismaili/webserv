@@ -33,7 +33,7 @@
 	this->_env.push_back("DOCUMENT_ROOT=" + this->_location.getRoot());
 	this->_env.push_back("SCRIPT_FILENAME=" + this->_cmd[1]);
 	this->_env.push_back("HTTP_COOKIE=" + req.getHeadr("Cookie"));*/
-std::map<std::string, std::string>get_env()
+std::map<std::string, std::string>get_env(char *file)
 {
     //std::map<std::string, std::string> env;
 
@@ -52,7 +52,6 @@ std::map<std::string, std::string>get_env()
     // env["REDIRECT_STATUS"] = "200";
     // env["HTTP_COOKIE"] = req.get_header("Cookie");
     std::map<std::string, std::string> env;
-
     env["SERVER_SOFTWARE"] = "MyServer/1.0";
     env["SERVER_NAME"] = "localhost";
     env["GATEWAY_INTERFACE"] = "CGI/1.1";
@@ -62,47 +61,21 @@ std::map<std::string, std::string>get_env()
     env["SCRIPT_NAME"] = "/cgi-bin/mycgi";
     env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
     env["CONTENT_LENGTH"] = "0";
-    env["QUERY_STRING"] = "";
-
-    // Parse QUERY_STRING
-    // std::string query_string = getenv("QUERY_STRING");
-    // if (!query_string.empty())
-    // {
-    //     std::vector<std::string> tokens;
-    //     std::istringstream iss(query_string);
-    //     std::string token;
-    //     while (std::getline(iss, token, '&'))
-    //     {
-    //         tokens.push_back(token);
-    //     }
-
-    //     for (const auto& t : tokens)
-    //     {
-    //         std::vector<std::string> param;
-    //         std::istringstream iss(t);
-    //         std::string p;
-    //         while (std::getline(iss, p, '='))
-    //         {
-    //             param.push_back(p);
-    //         }
-
-    //         if (param.size() == 2)
-    //         {
-    //             env[param[0]] = param[1];
-    //         }
-    //     }
-    // }
-
+    env["QUERY_STRING"] = "name=John&last_name=john@example.com";
     env["REMOTE_ADDR"] = "127.0.0.1";
     env["REMOTE_HOST"] = "localhost";
     env["REDIRECT_STATUS"] = "200";
+    env["SCRIPT_FILENAME"] = file;
+
+
     return env;
 }
 
 
-std::string run_cgi()
+
+std::string run_cgi(char *file, char *path)
 {
-    char *cmd[3] = {"/usr/bin/python3", "test.py", NULL};
+    char *cmd[3] = {path, file, NULL};
     std::string cgi_str;
 
     FILE *temp = std::tmpfile();
@@ -110,7 +83,7 @@ std::string run_cgi()
     int fdtemp = fileno(temp);
     int fdtemp1 = fileno(temp1);
 
-    std::map<std::string, std::string> env = get_env();
+    std::map<std::string, std::string> env = get_env(file);
     std::string method = env["REQUEST_METHOD"];
     std::string content_type = env["CONTENT_TYPE"];
     std::string content_length_str = env["CONTENT_LENGTH"];
@@ -134,13 +107,13 @@ std::string run_cgi()
     {
         if (method == "POST")
         {
-            std::fprintf(temp1, "%s", "name=John&email=john@example.com");
-            std::rewind(temp1);
             if (dup2(fdtemp1, STDIN_FILENO) == -1)
             {
                 std::cerr << "Error: failed to redirect stdin\n";
                 exit(1);
             }
+            std::fprintf(temp1, "%s", "name=John&email=john@example.com");
+            std::rewind(temp1);
         }
         if (dup2(fdtemp, STDOUT_FILENO) == -1)
         {
@@ -165,13 +138,17 @@ std::string run_cgi()
     }
     if (byt == -1)
         std::cerr << "Error: failed to read output\n";
-    //dup2(STDOUT_FILENO, fdtemp);
+    // if (content.find("Content-Type:") == std::string::npos) {
+    //     std::cerr << "Error: no HTTP headers found in output\n";
+    //     // Return an empty string or handle the error in some other way
+    //     return "";
+    // }
     close(fdtemp);
     close(fdtemp1);
     return (content);
 }
 
-int main()
-{
-    std::cout << run_cgi() << "\n";
-}
+// int main()
+// {
+//     std::cout << run_cgi() << "\n";
+// }
