@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/15 18:35:31 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/15 23:06:48 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,7 +64,6 @@ namespace http{
                         // Accept incoming connection
                         std::cout << "ACCEPTING...\n";
                         new_socket = accept_connection(clients[i].fd);
-                        std::cout<<new_socket<<std::endl;
                         // Add new socket to poll list
                         pollfd new_client_pollfd;
                         new_client_pollfd.fd = new_socket;
@@ -76,13 +75,15 @@ namespace http{
                        recv_ret = recv_data(clients[i].fd);
                        if (!recv_ret &&  read_info[clients[i].fd] == true)
                        {
-                         std::cout<<requist_info[clients[i].fd]<<std::endl;
+                            unchunk(clients[i].fd);
+                            std::cout<<requist_info[clients[i].fd]<<std::endl;
                        }
                     }
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
                     send_data(clients[i].fd);
+                    close(clients[i].fd);
                 }
                 if (clients[i].revents & POLLERR)
                 {
@@ -173,15 +174,15 @@ namespace http{
             return (1);
     }
 
-    int http_sever ::unchunk(int sockfd)
+    std::string http_sever ::unchunk(int sockfd)
     {
         std::size_t Transfer_encoding = requist_info[sockfd].find("Transfer-Encoding: chunked");
         if (Transfer_encoding != std::string::npos && read_info[sockfd] == true)
         {
-            std::string requist = join_chunked(requist_info[sockfd], sockfd); 
-            std::cout<<requist<<std::endl;
+            std::string str = join_chunked(requist_info[sockfd], sockfd); 
+            return (str);
         }
-        return (0);
+        return (requist_info[sockfd]);
     }
     
     std::string http_sever::join_chunked(const std::string& chunked_msg, int sockfd)

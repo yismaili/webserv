@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/15 18:28:09 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/15 22:54:27 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,7 +46,7 @@ namespace http{
             std::string join_chunked(const std::string& chunked_msg, int sockfd);
             int recv_data(int newsockfd);
             int send_data(int socket);
-            int unchunk(int sockfd);
+            std::string unchunk(int sockfd);
         public:
             int clint;
             http::sockets sock;
