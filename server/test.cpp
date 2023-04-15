@@ -6,383 +6,158 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/25 17:16:17 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/13 17:54:46 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/14 15:53:50 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <string.h>
-#include <iterator>
-#include <string>
-#include <iostream>
-#include <sstream> 
-#include <vector>
-#include <curl/curl.h>
-#include <cstring>
-
-//  std::string build_requist(){
-//     //Insert html page or ...
-//     std::ostringstream requist; //create the output string stream
-//     requist <<" POST / HTTP/1.1";
-//     requist <<"Transfer-Encoding: Chunked";
-//     requist <<"User-Agent: PostmanRuntime/7.25.0";
-//     requist <<"Accept: */*";
-//     requist <<"Postman-Token: aedda9fd-74ba-49a9-9bf2-b67fdf86c914";
-//     requist <<"Host: localhost:8080";
-//     requist <<"Accept-Encoding: gzip, deflate, br";
-//     requist <<"Connection: keep-alive";
-//     requist <<"Content-Type: application/x-www-form-urlencoded";
-//     requist <<"Content-Length: 181;";
-//     requist << "7\r\n";
-//     requist << "Mozilla\r\n";
-//     requist << "9\r\n";
-//     requist << "Developer\r\n";
-//     requist << "7\r\n";
-//     requist << "Network\r\n";
-//     requist << "0\r\n";
-//     requist << "\r\n";
-//     std::string str_t(requist.str());
-//     return (str_t);
-// }
-
-// std::string unchunk(const std::string &data) {
-//     std::string res;
-//     std::size_t found  = data.find("\r\n\r\n");
-//     std::size_t lenOf_chunk = std::stoi(data.substr(data.find("Content-Length: ") + 16, 10).c_str());
-//         exit(1);
-//    // if (data.size() < lenOf_chunk + found){
-//         std::string head = data.substr(0, data.find("\r\n") - 1);
-//         std::string chunks = data.substr(data.find("r\n\r\n")+4, data.size() -1);
-//         std::string subchunk = chunks.substr(0,10);
-//     // std::cout <<"----"<<head<< std::endl;
-//         std::string body = "";
-//         int chunk_size = strtol(subchunk.c_str(), NULL, 16);
-//         std::size_t i = 0;
-//         while (chunk_size)
-//         {
-//            i = chunks.find("\r\n", i) + 2;
-//            body += chunks.substr(i, chunk_size);
-//            i += chunk_size + 2;
-//            subchunk = chunks.substr(i, 10);
-//            chunk_size = strtol(subchunk.c_str(), NULL, 16);
-//         }
-//        res = head + "\r\n\r\n" + body + "\r\n\r\n";
-//    // }
-//     return(res);
-// }
-
-
-// int main() {
-//     std::string response_body = unchunk(build_requist());
-//     std::cout << response_body << std::endl;
-//     return 0;
-// }
-
-// HTTP/1.1 200 OK Content-Type: text/plainTransfer-Encoding: chunked7\r\nMozilla\r\n9\r\nDeveloper\r\n7\r\nNetwork\r\n0\r\n\r\n
-
-// using namespace std;
-
-// // Callback function that receives the response body
-// size_t write_callback(char *ptr, size_t size, size_t nmemb, void *userdata) {
-//     string *response = (string *) userdata;
-//     response->append(ptr, size * nmemb);
-//     return size * nmemb;
-// }
-
-// int main() {
-//         // Split the response into chunks
-//         stringstream ss(build_requist());
-//         vector<char> chunks;
-//         std::string str = ss.str();
-//         const char* cstr = str.c_str();
-//         //std::cout<<cstr<<std::endl;
-//         int i = 0;
-//         while(cstr[i]){
-//             //chunks.push_back(cstr[i]);
-//             // if (cstr[i + 2] == '\r' && cstr[i + 3] == '\n'){
-//             //     break;
-//             // }
-//             if (isnumber(cstr[i]) && cstr[i + 1] == '\r'){
-//                 std::cout<<cstr[i]<<std::endl;  
-//             }
-//             i++;
-//         }
-//             std::cout<<cstr +(i + 1) <<std::endl;
-//     return 0;
-// }
-
-
 // #include <stdio.h>
 // #include <stdlib.h>
-// #include <string.h>
-// #include <unistd.h>
+// #include <sys/poll.h>
 // #include <sys/socket.h>
 // #include <netinet/in.h>
-// #include <arpa/inet.h>
-// #include <sys/ioctl.h>
-
-// int main() {
-//     int sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-//     if (sock < 0) {
-//         perror("socket");
-//         return -1;
-//     }
-
-//     struct sockaddr_in addr;
-//     memset(&addr, 0, sizeof(addr));
-//     addr.sin_family = AF_INET;
-//     addr.sin_addr.s_addr = htonl(INADDR_ANY);
-//     addr.sin_port = htons(1234);
-
-//     if (bind(sock, (struct sockaddr *)&addr, sizeof(addr)) < 0) {
-//         perror("bind");
-//         close(sock);
-//         return -1;
-//     }
-
-//     int bufsize = 4096;
-//     if (ioctl(sock, FIONBIO, &bufsize) < 0) {
-//         perror("ioctl");
-//         close(sock);
-//         return -1;
-//     }
-
-//     char buf[bufsize];
-//     struct sockaddr_in client_addr;
-//     socklen_t addrlen = sizeof(client_addr);
-//     int nbytes = recvfrom(sock, buf, sizeof(buf), 0,
-//                           (struct sockaddr *)&client_addr, &addrlen);
-//     if (nbytes < 0) {
-//         perror("recvfrom");
-//         close(sock);
-//         return -1;
-//     }
-
-//     printf("Received %d bytes from %s:%d\n", nbytes,
-//            inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
-
-//     close(sock);
-//     return 0;
-// }
-
-
-// #include <iostream>
-// #include <string>
-
-// std::string join_chunked(const std::string& chunked_msg) {
-//     std::string result = "";
-//     std::size_t pos = 0;
-
-//     while (true) {
-//         // Find the next chunk size
-//         std::size_t len_pos = chunked_msg.find("\r\n", pos);
-//         std::string len_str = chunked_msg.substr(pos, len_pos - pos);
-//         int len = strtol(len_str.c_str(), nullptr, 16);
-
-
-//         // If the length is 0, we're done
-//         if (len == 0) {
-//             break;
-//         }
-
-//         // Append the chunk data to the result
-//         result += chunked_msg.substr(len_pos + 2, len);
-//         pos = len_pos + 2 + len + 2;
-//     }
-
-//     return result;
-// }
-
-// int main() {
-//     // Example usage
-//     std::string chunked_msg = "POST / HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\nTransfer-Encoding: chunked\r\n\r\n4\r\nfoo=\r\n3\r\nbar\r\n0\r\n\r\n";
-//     std::string	head =  chunked_msg.substr(0,  chunked_msg.find("\r\n") - 1);
-//     std::string joined_msg = join_chunked( chunked_msg);
-//     //std::cout << "Chunked message: " << chunked_msg << std::endl;
-//     std::cout << "Joined message: " << head << std::endl;
-//     return 0;
-// }
-
-// #include <iostream>
-// #include <string>
-
-// std::string join_chunked(const std::string& chunked_msg) {
-//     std::string result = "";
-//     std::size_t pos = 0;
-
-//     // Find the end of the headers
-//     std::size_t header_end = chunked_msg.find("\r\n\r\n");
-//     if (header_end == std::string::npos) {
-//         // No headers found, return an empty string
-//         return "";
-//     }
-
-//     // Append the headers to the result
-//     result += chunked_msg.substr(0, header_end);
-
-//     // Find the start of the first chunk
-//     pos = header_end + 4;
-
-//     while (true) {
-//         // Find the next chunk size
-//         std::size_t len_pos = chunked_msg.find("\r\n", pos);
-//         std::string len_str = chunked_msg.substr(pos, len_pos - pos);
-//         int len = std::stoi(len_str, nullptr, 16);
-
-//         // If the length is 0, we're done
-//         if (len == 0) {
-//             break;
-//         }
-
-//         // Append the chunk data to the result
-//         result += chunked_msg.substr(len_pos + 2, len);
-//         pos = len_pos + 2 + len + 2;
-//     }
-
-//     return result;
-// }
-
-// int main() {
-//     // Example usage
-//     std::string chunked_msg = "POST / HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\nTransfer-Encoding: chunked\r\n\r\n4\r\n\nfoo=\r\n3\r\nbar\r\n0\r\n\r\n";
-//     std::string joined_msg = join_chunked(chunked_msg);
-//    // std::cout << "Chunked message: " << chunked_msg << std::endl;
-//     std::cout << "Joined message: " << joined_msg << std::endl;
-//     return 0;
-// }
-
-// #include <iostream>
-// #include <sys/socket.h>
-// #include <netinet/in.h>
-// #include <unistd.h>
-// #include <arpa/inet.h>
-// #include <cstring>
-// #include <poll.h>
-
-// int main()
-// {
-//     // create a socket and connect to a server
-//     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-//     struct sockaddr_in servaddr;
-//     memset(&servaddr, 0, sizeof(servaddr));
-//     servaddr.sin_family = AF_INET;
-//     servaddr.sin_port = htons(8000);
-//     inet_pton(AF_INET, "localhost", &servaddr.sin_addr);
-//     connect(sockfd, (struct sockaddr *)&servaddr, sizeof(servaddr));
-
-//     // add the socket to the poll object
-//     struct pollfd fds[1];
-//     fds[0].fd = sockfd;
-//     fds[0].events = POLLIN;
-
-//     // loop indefinitely, waiting for events on the socket
-//     while (true) {
-//         // wait for an event on the socket
-//         int nready = poll(fds, 1, -1);
-
-//         // handle the event
-//         if (nready > 0 && fds[0].revents & POLLIN) {
-//             char buffer[1024];
-//             int n = read(sockfd, buffer, sizeof(buffer));
-//             if (n == 0) {
-//                 std::cout << "Connection closed by server" << std::endl;
-//                 break;
-//             } else {
-//                 std::cout << "Received " << n << " bytes: " << buffer << std::endl;
-//             }
-//         } else if (nready == -1) {
-//             std::cerr << "Error in poll: " << strerror(errno) << std::endl;
-//             break;
-//         }
-//     }
-
-//     close(sockfd);
-//     return 0;
-// }
-
-
-// #include <stdio.h>
-// #include <stdlib.h>
-// #include <string.h>
-// #include <sys/socket.h>
-// #include <arpa/inet.h>
-
+// #include <unistd.h> // for read() and close()
 // #define MAX_CLIENTS 10
 // #define BUFFER_SIZE 1024
 
-// int main()
-// {
-//     int server_fd, client_fds[MAX_CLIENTS], max_fd;
-//     struct sockaddr_in server_addr, client_addr;
-//     char buffer[BUFFER_SIZE];
-//     fd_set read_fds;
+// int main() {
+//     int server_fd, new_socket, i, poll_ret;
+//     struct sockaddr_in address;
+//     int addrlen = sizeof(address);
+//     char buffer[BUFFER_SIZE] = {0};
+//     struct pollfd clients[MAX_CLIENTS];
 
-//     // create a socket and bind it to a port
+//     // Create server socket
 //     server_fd = socket(AF_INET, SOCK_STREAM, 0);
-//     memset(&server_addr, 0, sizeof(server_addr));
-//     server_addr.sin_family = AF_INET;
-//     server_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-//     server_addr.sin_port = htons(8000);
-//     bind(server_fd, (struct sockaddr *)&server_addr, sizeof(server_addr));
-//     listen(server_fd, 5);
 
-//     // initialize the client file descriptor set
-//     FD_ZERO(&read_fds);
-//     FD_SET(server_fd, &read_fds);
-//     max_fd = server_fd;
+//     // Bind socket to a port
+//     address.sin_family = AF_INET;
+//     address.sin_addr.s_addr = INADDR_ANY;
+//     address.sin_port = htons(8080);
+//     bind(server_fd, (struct sockaddr *)&address, sizeof(address));
 
-//     // loop indefinitely, waiting for events on the file descriptors
+//     // Listen for incoming connections
+//     listen(server_fd, 3);
+
+//     // Add server socket to poll list
+//     clients[0].fd = server_fd;
+//     clients[0].events = POLLIN;
+
+//     // Initialize remaining poll list
+//     for (i = 1; i < MAX_CLIENTS; i++) {
+//         clients[i].fd = -1;
+//     }
+
 //     while (1) {
-//         fd_set tmp_fds = read_fds;
-//         if (select(max_fd + 1, &tmp_fds, NULL, NULL, NULL) == -1) {
-//             perror("select");
-//             exit(EXIT_FAILURE);
+//         // Wait for events on any of the monitored file descriptors
+//         poll_ret = poll(clients, MAX_CLIENTS, -1);
+		
+//         // Check for events on server socket
+//         if (clients[0].revents & POLLIN) {
+//             // Accept incoming connection
+//             new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
+
+//             // Add new socket to poll list
+//             for (i = 1; i < MAX_CLIENTS; i++) {
+//                 if (clients[i].fd == -1) {
+//                     clients[i].fd = new_socket;
+//                     clients[i].events = POLLIN;
+//                     break;
+//                 }
+//             }
 //         }
 
-//         // iterate over all file descriptors and handle them
-//         for (int i = 0; i <= max_fd; i++) {
-//             if (FD_ISSET(i, &tmp_fds)) {
-//                 if (i == server_fd) {
-//                     // if the server file descriptor is ready, accept a new connection
-//                     socklen_t client_len = sizeof(client_addr);
-//                     int client_fd = accept(server_fd, (struct sockaddr *)&client_addr, &client_len);
-//                     if (client_fd == -1) {
-//                         perror("accept");
-//                         exit(EXIT_FAILURE);
-//                     }
-
-//                     // add the new client file descriptor to the set
-//                     FD_SET(client_fd, &read_fds);
-//                     if (client_fd > max_fd) {
-//                         max_fd = client_fd;
-//                     }
-//                     printf("New connection from %s:%d\n", inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port));
+//         // Check for events on client sockets
+//         for (i = 1; i < MAX_CLIENTS; i++) {
+//             if (clients[i].fd != -1 && clients[i].revents & POLLIN) {
+//                 // Read data from client
+//                 if (read(clients[i].fd, buffer, BUFFER_SIZE) == 0) {
+//                     // Connection closed by client
+//                     close(clients[i].fd);
+//                     clients[i].fd = -1;
 //                 } else {
-//                     // if a client file descriptor is ready, read data from it
-//                     int n = read(i, buffer, BUFFER_SIZE);
-//                     if (n == -1) {
-//                         perror("read");
-//                         exit(EXIT_FAILURE);
-//                     } else if (n == 0) {
-//                         // if the client has closed the connection, remove it from the set
-//                         close(i);
-//                         FD_CLR(i, &read_fds);
-//                         printf("Client %d disconnected\n", i);
-//                     } else {
-//                         // if there is data to read, print it to the console and echo it back to the client
-//                         printf("Received %d bytes from client %d: %s", n, i, buffer);
-//                         write(i, buffer, n);
-//                     }
+//                     // Process incoming data
+//                     printf("Received data from client %d: %s\n", clients[i].fd, buffer);
+//                     // Send response back to client
+//                     send(clients[i].fd, "Server received your message\n", 30, 0);
 //                 }
 //             }
 //         }
 //     }
-
 //     return 0;
 // }
 
+
+#include <iostream>
+#include <vector>
+#include <poll.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <cstring>
+
+#define BUFFER_SIZE 1024
+#define MAX_CLIENTS 10
+
+int main() {
+    int server_fd, new_socket, i, poll_ret;
+    struct sockaddr_in address;
+    int addrlen = sizeof(address);
+    char buffer[BUFFER_SIZE] = {0};
+    std::vector<pollfd> clients;
+
+    // Create server socket
+    server_fd = socket(AF_INET, SOCK_STREAM, 0);
+
+    // Bind socket to a port
+    address.sin_family = AF_INET;
+    address.sin_addr.s_addr = INADDR_ANY;
+    address.sin_port = htons(8080);
+    bind(server_fd, (struct sockaddr *)&address, sizeof(address));
+
+    // Listen for incoming connections
+    listen(server_fd, 3);
+
+    // Add server socket to poll list
+    pollfd server_pollfd;
+    server_pollfd.fd = server_fd;
+    server_pollfd.events = POLLIN;
+    clients.push_back(server_pollfd);
+
+    while (1) {
+        // Wait for events on any of the monitored file descriptors
+        poll_ret = poll(clients.data(), clients.size(), -1);
+
+        // Check for events on server socket
+        if (clients[0].revents & POLLIN) {
+            // Accept incoming connection
+            new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t*)&addrlen);
+
+            // Add new socket to poll list
+            pollfd new_client_pollfd;
+            new_client_pollfd.fd = new_socket;
+            new_client_pollfd.events = POLLIN;
+            clients.push_back(new_client_pollfd);
+        }
+
+        // Check for events on client sockets
+        for (std::vector<pollfd>::iterator it = clients.begin() + 1; it != clients.end(); ++it) {
+            if (it->fd != -1 && it->revents & POLLIN) {
+                // Read data from client
+                if (read(it->fd, buffer, BUFFER_SIZE) == 0) {
+                    // Connection closed by client
+                    close(it->fd);
+                    it->fd = -1;
+                } else {
+                    // Process incoming data
+                    printf("Received data from client %d: %s\n", it->fd, buffer);
+                    // Send response back to client
+                    send(it->fd, "Server received your message\n", 30, 0);
+                }
+            }
+        }
+
+        // Remove closed client sockets
+       //clients.erase(std::remove_if(clients.begin(), clients.end(), [](const pollfd& pfd) { return pfd.fd == -1; }), clients.end());
+    }
+
+    return 0;
+}

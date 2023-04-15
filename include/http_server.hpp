@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/13 15:30:06 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/14 22:57:50 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@
 #include <iterator>
 #include <sys/select.h>
 #include <ctype.h>
-
+#include <poll.h>
+#define BUFFER_SIZE 1024
 namespace http{
     class http_sever{
         public:
@@ -42,13 +43,17 @@ namespace http{
             void exit_withError(const std::string &errormessage);
             void closeServer(int newsockfd);
             int ckeck_close(std::string &str);
+            std::string join_chunked(const std::string& chunked_msg, int sockfd);
+            int recv_data(int newsockfd);
+            int send_data(int socket);
         public:
             int clint;
             http::sockets sock;
             std::vector<http::sockets> socket_id;
-            fd_set readmaster_fds;
-            fd_set writemaster_fds;
-            http::sockets sockl;
+            std::vector<pollfd> clients;
+            std::map<int, std::string> requist_info;
+            std::map<int, bool> read_info;
+            std::map<int, bool> write_info;
     };
 }
 #endif
