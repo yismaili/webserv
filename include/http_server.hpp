@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/14 22:57:50 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/15 01:39:28 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,9 +26,9 @@
 #include <vector>
 #include "sockets.hpp"
 #include <iterator>
-#include <sys/select.h>
 #include <ctype.h>
 #include <poll.h>
+#include <sys/poll.h>
 #define BUFFER_SIZE 1024
 namespace http{
     class http_sever{

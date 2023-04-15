@@ -6,12 +6,12 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/15 01:03:30 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/15 01:40:45 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/http_server.hpp"
-#include <sys/poll.h>
+
 namespace http{
    http_sever::http_sever(std::vector<int> port_, std::string ip_add) :sock()
    {
@@ -37,7 +37,6 @@ namespace http{
     {
         int poll_ret, new_socket;
         unsigned long i = 0;
-        std::vector<int> sockfd;
         // Add server socket to poll list
         std::vector<http::sockets>::iterator it = socket_id.begin();
         while (it != socket_id.end())
@@ -58,19 +57,13 @@ namespace http{
             //Check for events on server socket
             while (i != clients.size())
             {
-               if (clients[i].revents & POLLIN)
-               {
+                if (clients[i].revents & POLLIN)
+                {
                     if (is_server(clients[i].fd))
                     {
                         // Accept incoming connection
                         std::cout << "ACCEPTING...\n";
-                        std::vector<http::sockets> ::iterator it = socket_id.begin() + i;
-                        // std::cout<<"-cleint---"<<(clients[i].fd)<<std::endl;
-                        new_socket = it->accept_connection(clients[i].fd);
-                        // if (new_socket < 0){
-                        //     continue;
-                        // }
-                        //  std::cout<<"-++++++--"<<std::endl;
+                        new_socket = accept_connection(clients[i].fd);
                         std::cout<<new_socket<<std::endl;
                         // Add new socket to poll list
                         pollfd new_client_pollfd;
@@ -80,22 +73,21 @@ namespace http{
                     }
                     else
                     {
-                        // std::cout<< "---clent----"<<clients[i].fd<<std::endl;
                         recv_data(clients[i].fd);
-                        // std::cout<<"----"<<std::endl;
                         std::cout<<requist_info[clients[i].fd]<<std::endl;
-                     //   i++;
                     }
-               }
-               if (clients[i].revents & POLLOUT)
-               {
+                }
+                if (clients[i].revents & POLLOUT)
+                {
                     send_data(clients[i].fd);
-               }
-            //    if ()
-            //  std::cout<<"----"<<std::endl;
+                }
+                if (clients[i].revents & POLLERR)
+                {
+                    std::cout<<"error\n"<<std::endl;
+                    exit(1);
+                }
                 i++;
             }
-            // std::cout<<"--222222--"<<std::endl;
         }   
     }
 
@@ -291,18 +283,17 @@ namespace http{
             }
         }
     }
-    // int http_sever::accept_connection(int sockfd)
-    // {
-    //     // Accepts a connection on a socket.
-    //     std::cout<<"///////////////////////"<<std::endl;
-    //     int sockfd_client = accept(sockfd, (struct sockaddr *) &sock.serv_addr, &sock.sock_addr_len);
-    //     if (sockfd_client < 0) 
-    //     {
-    //        std::cout<<"accepting connection"<<std::endl;
-    //        exit(1);
-    //     }
-    //     return (sockfd_client);
-    // }
+    int http_sever::accept_connection(int sockfd)
+    {
+        // Accepts a connection on a socket.
+        int sockfd_client = accept(sockfd, (struct sockaddr *) NULL, NULL);
+        if (sockfd_client < 0) 
+        {
+           std::cout<<"accepting connection"<<std::endl;
+           exit(1);
+        }
+        return (sockfd_client);
+    }
 }
 
 
