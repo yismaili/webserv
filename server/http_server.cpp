@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/15 23:06:48 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/16 02:45:16 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,7 @@ namespace http{
                        recv_ret = recv_data(clients[i].fd);
                        if (!recv_ret &&  read_info[clients[i].fd] == true)
                        {
-                            unchunk(clients[i].fd);
+                            requist_info[clients[i].fd] = unchunk(clients[i].fd);
                             std::cout<<requist_info[clients[i].fd]<<std::endl;
                        }
                     }
@@ -160,17 +160,25 @@ namespace http{
             catch(...)
             {
                
-            } 
+            }
             if (requist_info[newsockfd].find("GET") != std::string::npos)
             {
                 read_info[newsockfd] = true;
                 return (0);
             }
-            if ((content_len +  header_end) <= requist_info[newsockfd].size())
+            else if ((content_len +  header_end) <= requist_info[newsockfd].size())
             {
                 read_info[newsockfd] = true;
                 return (0);
-            }    
+            }
+            else
+            {
+                std::cout<<requist_info[newsockfd].find("0\r\n")<<std::endl;
+                if (requist_info[newsockfd].find("0\r\n\r\n") != std::string::npos){
+                    read_info[newsockfd] = true;
+                    return (0);
+                }
+            } 
             return (1);
     }
 
@@ -215,7 +223,6 @@ namespace http{
                 read_info[sockfd] = true;
                 break;
             }
-
             // Append the chunk data to the result
             result += chunked_msg.substr(len_pos + 2, len);//use append() function
             pos = len_pos + 2 + len + 2;
