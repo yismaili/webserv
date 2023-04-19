@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/16 02:45:16 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/19 02:15:41 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,8 +62,8 @@ namespace http{
                     if (is_server(clients[i].fd))
                     {
                         // Accept incoming connection
-                        std::cout << "ACCEPTING...\n";
                         new_socket = accept_connection(clients[i].fd);
+                        std::cout << "ACCEPTING...\n";
                         // Add new socket to poll list
                         pollfd new_client_pollfd;
                         new_client_pollfd.fd = new_socket;
@@ -72,18 +72,21 @@ namespace http{
                     }
                     else
                     {
-                       recv_ret = recv_data(clients[i].fd);
-                       if (!recv_ret &&  read_info[clients[i].fd] == true)
-                       {
-                            requist_info[clients[i].fd] = unchunk(clients[i].fd);
-                            std::cout<<requist_info[clients[i].fd]<<std::endl;
-                       }
+                        recv_ret = recv_data(clients[i].fd);
+                        if (!recv_ret && read_info[clients[i].fd] == true)
+                        {
+                            unchunk(clients[i].fd);
+                        }
                     }
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
+                  std::cout<<requist_info[clients[i].fd]<<std::endl;
+                // std::vector<pollfd>::iterator it = clients.begin() + i;
                     send_data(clients[i].fd);
                     close(clients[i].fd);
+                    // clients.erase(it);
+                    // i--;
                 }
                 if (clients[i].revents & POLLERR)
                 {
@@ -93,22 +96,6 @@ namespace http{
                 i++;
             }
         }   
-    }
-
-
-    int http_sever::ckeck_close(std::string &requist)
-    {
-        std::string endOfstr("0\r\n\r\n");
-        std::size_t size_end = endOfstr.size();
-        std::size_t size_requist = requist.size();
-        while (size_end > 0)
-        {
-            size_end--;
-            size_requist--;
-            if (size_requist < 0 || requist[size_requist] != endOfstr[size_end])
-                return (1);
-        }
-        return (0);
     }
     
     int http_sever::is_server(int sock)
@@ -142,92 +129,123 @@ namespace http{
         close(newsockfd);
         exit(1);
     }
-     int http_sever::recv_data(int newsockfd)
+    
+    int http_sever ::transfer_encoding_chunked(int sockfd)
     {
-            char buffer[1024] = {0};
-            int bytes_received;
-            std::size_t header_end;
-            std::size_t content_len;
-            read_info.insert(std::make_pair(newsockfd, 0));
-
-            bytes_received = recv(newsockfd, buffer, 1024, 0);
-            requist_info[newsockfd] += std::string(buffer);
-            try
+       
+        if (requist_info[sockfd].find("Content-Length: ") == std::string::npos)
+        {
+            if (requist_info[sockfd].find("Transfer-Encoding: chunked") != std::string::npos)
             {
-                header_end = requist_info[newsockfd].find("0\r\n\r\n");//used this string ::nops check the end!!!!!!
-                content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
-            }
-            catch(...)
-            {
-               
-            }
-            if (requist_info[newsockfd].find("GET") != std::string::npos)
-            {
-                read_info[newsockfd] = true;
-                return (0);
-            }
-            else if ((content_len +  header_end) <= requist_info[newsockfd].size())
-            {
-                read_info[newsockfd] = true;
-                return (0);
+                if (requist_info[sockfd].find("0\r\n\r\n") != std::string::npos)
+                    return (1);
+                else
+                    return (0);
             }
             else
-            {
-                std::cout<<requist_info[newsockfd].find("0\r\n")<<std::endl;
-                if (requist_info[newsockfd].find("0\r\n\r\n") != std::string::npos){
-                    read_info[newsockfd] = true;
-                    return (0);
-                }
-            } 
-            return (1);
+                return (0);           
+        }
+        return (2);
     }
 
-    std::string http_sever ::unchunk(int sockfd)
+    int http_sever::recv_data(int sockfd)
     {
-        std::size_t Transfer_encoding = requist_info[sockfd].find("Transfer-Encoding: chunked");
-        if (Transfer_encoding != std::string::npos && read_info[sockfd] == true)
+        char buffer[1024] = {0};
+        int bytes_received;
+        std::size_t header_end = 0;
+        std::size_t content_len = 0;
+        static  std::size_t cont_ = 0;
+            
+        read_info.insert(std::make_pair(sockfd, 0));
+        bytes_received = recv(sockfd, buffer, sizeof(buffer), 0);
+        if (bytes_received <= 0)
         {
-            std::string str = join_chunked(requist_info[sockfd], sockfd); 
-            return (str);
+            close(sockfd);
+            std::cout<<"connection was closed\n";
+            return (-2);
         }
-        return (requist_info[sockfd]);
-    }
-    
-    std::string http_sever::join_chunked(const std::string& chunked_msg, int sockfd)
-    {
-        std::string result = "";
-        std::size_t pos = 0;
-        (void) sockfd;
-        // Find the end of the headers
-        std::size_t header_end = chunked_msg.find("\r\n\r\n");
-        if (header_end == std::string::npos) 
+        requist_info[sockfd] += std::string(buffer);
+        if (requist_info[sockfd].find("\r\n\r\n") != std::string::npos)
         {
-            // No headers found, return an empty string
-            return "";
-        }
-
-        // Append the headers to the result
-        result += chunked_msg.substr(0, header_end);
-        // Find the start of the first chunk
-        pos = header_end + 4;
-        
-        while (true) 
-        {
-            // Find the next chunk size
-            std::size_t len_pos = chunked_msg.find("\r\n", pos);
-            std::string len_str = chunked_msg.substr(pos, len_pos - pos);
-            long len = strtol(len_str.c_str(), nullptr, 16);
-            // If the length is 0, we're done
-            if (len == 0) 
+            if (transfer_encoding_chunked(sockfd) == 1)
             {
                 read_info[sockfd] = true;
+                return (0);
+            }
+            else if (transfer_encoding_chunked(sockfd) == 0)
+            {
+                read_info[sockfd] = false;
+                return (1);
+            }
+            else if (transfer_encoding_chunked(sockfd) == 2)
+            {
+                cont_+= bytes_received;
+                header_end = requist_info[sockfd].find("\r\n\r\n");
+                content_len = std::strtol(requist_info[sockfd].substr(requist_info[sockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
+                if ((content_len +  header_end + 4) <= cont_)
+                {
+                    // std::cout<<"-----"<<content_len +  header_end + 4<<std::endl;
+                    // std::cout<<"-----"<<cont_<<std::endl;
+                    read_info[sockfd] = true;
+                    return (0);
+                }
+                else
+                {
+                    read_info[sockfd] = false;
+                    return (1);
+                } 
+            }
+        }
+        read_info[sockfd] = false;
+        return (1);
+    }
+
+    void http_sever ::unchunk(int sockfd)
+    {
+        std::size_t Transfer_encoding = requist_info[sockfd].find("Transfer-Encoding: chunked");
+        if (Transfer_encoding != std::string::npos && Transfer_encoding < requist_info[sockfd].find("\r\n\r\n"))
+        {
+             requist_info[sockfd] = join_chunked(requist_info[sockfd]);
+        }
+    }
+    
+    std::string http_sever::join_chunked(const std::string &data) 
+    {
+        std::string result = "";
+        std::size_t sizeof_chunk;
+        std::string	body = "";
+        std::string	chunks = ""; 
+        std::string	subchunk = "";
+        std::size_t header_end;
+        std::size_t  pos; 
+        
+        // Find the end of the headers
+        header_end = data.find("\r\n\r\n");
+        if (header_end == std::string::npos) {
+            // No headers found, return an empty string 
+            return "";
+        }
+        // Append the headers to the result
+        result = data.substr(0, header_end);
+        result += "\r\n\r\n";
+        chunks = data.substr(data.find("\r\n\r\n") + 4, data.size() - 1);
+        subchunk = chunks.substr(0, 20);
+        sizeof_chunk =  strtol(subchunk.c_str(), NULL, 16);
+        pos = 0;
+        
+        while (true)
+        {
+            pos = chunks.find("\r\n",  pos);
+            result += chunks.substr(pos += 2, sizeof_chunk);
+            pos += sizeof_chunk + 2;
+            subchunk = chunks.substr(pos, 20);
+            sizeof_chunk = strtol(subchunk.c_str(), NULL, 16);
+            if (sizeof_chunk == 0)
+            {
+                result += "\r\n\r\n";
                 break;
             }
-            // Append the chunk data to the result
-            result += chunked_msg.substr(len_pos + 2, len);//use append() function
-            pos = len_pos + 2 + len + 2;
         }
-
         return result;
     }
         
@@ -313,14 +331,6 @@ namespace http{
 }
 
 
-/*  HTTP/1.1 200 OK
-Content-Type: text/plain
-Transfer-Encoding: chunked
-7\r\n
-Mozilla\r\n
-11\r\n
-Developer Network\r\n
-0\r\n
-\r\n 
+/*  HTTP/1.1 200 OK Content-Type: text/plain Transfer-Encoding: chunked 7\r\n Mozilla\r\n 11\r\n Developer Network\r\n 0\r\n\r\n 
 
  */

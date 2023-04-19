@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/15 22:54:27 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/19 02:15:49 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,11 +42,11 @@ namespace http{
             void print_message(const std::string &message);
             void exit_withError(const std::string &errormessage);
             void closeServer(int newsockfd);
-            int ckeck_close(std::string &str);
-            std::string join_chunked(const std::string& chunked_msg, int sockfd);
+            std::string join_chunked(const std::string &data);
             int recv_data(int newsockfd);
             int send_data(int socket);
-            std::string unchunk(int sockfd);
+            void unchunk(int sockfd);
+            int transfer_encoding_chunked(int sockfd);
         public:
             int clint;
             http::sockets sock;
