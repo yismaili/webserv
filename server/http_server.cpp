@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/19 02:15:41 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/20 01:42:36 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,9 +203,11 @@ namespace http{
     void http_sever ::unchunk(int sockfd)
     {
         std::size_t Transfer_encoding = requist_info[sockfd].find("Transfer-Encoding: chunked");
+        //  std::size_t Content_Length = requist_info[sockfd].find("Content-Length: ");
         if (Transfer_encoding != std::string::npos && Transfer_encoding < requist_info[sockfd].find("\r\n\r\n"))
         {
-             requist_info[sockfd] = join_chunked(requist_info[sockfd]);
+            requist_info[sockfd] = join_chunked(requist_info[sockfd]);
+            //   exit(1); // you have problem heir
         }
     }
     
@@ -229,16 +231,15 @@ namespace http{
         result = data.substr(0, header_end);
         result += "\r\n\r\n";
         chunks = data.substr(data.find("\r\n\r\n") + 4, data.size() - 1);
-        subchunk = chunks.substr(0, 20);
+        subchunk = chunks.substr(0, 100);
         sizeof_chunk =  strtol(subchunk.c_str(), NULL, 16);
         pos = 0;
-        
         while (true)
         {
             pos = chunks.find("\r\n",  pos);
             result += chunks.substr(pos += 2, sizeof_chunk);
             pos += sizeof_chunk + 2;
-            subchunk = chunks.substr(pos, 20);
+            subchunk = chunks.substr(pos, 100);
             sizeof_chunk = strtol(subchunk.c_str(), NULL, 16);
             if (sizeof_chunk == 0)
             {
@@ -329,8 +330,3 @@ namespace http{
         return (sockfd_client);
     }
 }
-
-
-/*  HTTP/1.1 200 OK Content-Type: text/plain Transfer-Encoding: chunked 7\r\n Mozilla\r\n 11\r\n Developer Network\r\n 0\r\n\r\n 
-
- */
