@@ -1,6 +1,6 @@
 NAME = webserv
 CC = c++
-CFLAGS = -Wall -Wextra -Werror -std=c++98 #-g -fsanitize=address
+CFLAGS = -Wall -Wextra -Werror -std=c++98 	#-g -fsanitize=address
 SRCS = server/main.cpp server/sockets.cpp server/http_server.cpp
 HDR = include/http_server.hpp include/sockets.hpp
 OBJS = $(SRCS:.cpp=.o)

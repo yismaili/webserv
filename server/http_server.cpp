@@ -6,12 +6,12 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/15 01:03:30 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/20 01:42:36 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/http_server.hpp"
-#include <sys/poll.h>
+
 namespace http{
    http_sever::http_sever(std::vector<int> port_, std::string ip_add) :sock()
    {
@@ -35,9 +35,8 @@ namespace http{
 
     void http_sever::run() 
     {
-        int poll_ret, new_socket;
+        int poll_ret, new_socket, recv_ret;
         unsigned long i = 0;
-        std::vector<int> sockfd;
         // Add server socket to poll list
         std::vector<http::sockets>::iterator it = socket_id.begin();
         while (it != socket_id.end())
@@ -58,20 +57,13 @@ namespace http{
             //Check for events on server socket
             while (i != clients.size())
             {
-               if (clients[i].revents & POLLIN)
-               {
+                if (clients[i].revents & POLLIN)
+                {
                     if (is_server(clients[i].fd))
                     {
                         // Accept incoming connection
+                        new_socket = accept_connection(clients[i].fd);
                         std::cout << "ACCEPTING...\n";
-                        std::vector<http::sockets> ::iterator it = socket_id.begin() + i;
-                        // std::cout<<"-cleint---"<<(clients[i].fd)<<std::endl;
-                        new_socket = it->accept_connection(clients[i].fd);
-                        // if (new_socket < 0){
-                        //     continue;
-                        // }
-                        //  std::cout<<"-++++++--"<<std::endl;
-                        std::cout<<new_socket<<std::endl;
                         // Add new socket to poll list
                         pollfd new_client_pollfd;
                         new_client_pollfd.fd = new_socket;
@@ -80,39 +72,30 @@ namespace http{
                     }
                     else
                     {
-                        // std::cout<< "---clent----"<<clients[i].fd<<std::endl;
-                        recv_data(clients[i].fd);
-                        // std::cout<<"----"<<std::endl;
-                        std::cout<<requist_info[clients[i].fd]<<std::endl;
-                     //   i++;
+                        recv_ret = recv_data(clients[i].fd);
+                        if (!recv_ret && read_info[clients[i].fd] == true)
+                        {
+                            unchunk(clients[i].fd);
+                        }
                     }
-               }
-               if (clients[i].revents & POLLOUT)
-               {
+                }
+                if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
+                {
+                  std::cout<<requist_info[clients[i].fd]<<std::endl;
+                // std::vector<pollfd>::iterator it = clients.begin() + i;
                     send_data(clients[i].fd);
-               }
-            //    if ()
-            //  std::cout<<"----"<<std::endl;
+                    close(clients[i].fd);
+                    // clients.erase(it);
+                    // i--;
+                }
+                if (clients[i].revents & POLLERR)
+                {
+                    std::cout<<"error\n"<<std::endl;
+                    exit(1);
+                }
                 i++;
             }
-            // std::cout<<"--222222--"<<std::endl;
         }   
-    }
-
-
-    int http_sever::ckeck_close(std::string &requist)
-    {
-        std::string endOfstr("0\r\n\r\n");
-        std::size_t size_end = endOfstr.size();
-        std::size_t size_requist = requist.size();
-        while (size_end > 0)
-        {
-            size_end--;
-            size_requist--;
-            if (size_requist < 0 || requist[size_requist] != endOfstr[size_end])
-                return (1);
-        }
-        return (0);
     }
     
     int http_sever::is_server(int sock)
@@ -146,81 +129,126 @@ namespace http{
         close(newsockfd);
         exit(1);
     }
-     int http_sever::recv_data(int newsockfd)
+    
+    int http_sever ::transfer_encoding_chunked(int sockfd)
+    {
+       
+        if (requist_info[sockfd].find("Content-Length: ") == std::string::npos)
         {
-            char buffer[1024] = {0};
-            int bytes_received;
-
-            bytes_received = recv(newsockfd, buffer, 1024, 0);
-            requist_info[newsockfd] += std::string(buffer);
-            // exit(1);
-            // std::size_t header_end = requist_info[newsockfd].find("0\r\n\r\n");//used this string ::nops check the end!!!!!!
-            // std::size_t content_len = std::strtol(requist_info[newsockfd].substr(requist_info[newsockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
-            // if (requist_info[newsockfd].find("GET") != std::string::npos)
-            // {
-            //     return (0);
-            // }
-            // while (true)
-            // {
-                // bytes_received = recv(newsockfd, buffer, 1024, 0);
-                // if (bytes_received <= 0)
-                // {
-                //     close(newsockfd);
-                //    std::cout<<"Failed to read from socket"<<std::endl;
-                //    exit(1);
-                // }
-                // requist_info[newsockfd] += std::string(buffer);
-                // if ((content_len +  header_end) >= requist_info[newsockfd].size())
-                // {
-                //     read_info[sockfd] = true;
-                //     //break;
-                // }    
-            // }
-            //std::size_t Transfer_encoding = requist_info[newsockfd].find("Transfer-Encoding: chunked");
-            //read_info.insert(std::make_pair(newsockfd, 0));
-            // if (Transfer_encoding != std::string::npos)
-            // {
-            //     requist_info[newsockfd] = join_chunked(requist_info[newsockfd], newsockfd); 
-            // }
-            return (0);
+            if (requist_info[sockfd].find("Transfer-Encoding: chunked") != std::string::npos)
+            {
+                if (requist_info[sockfd].find("0\r\n\r\n") != std::string::npos)
+                    return (1);
+                else
+                    return (0);
+            }
+            else
+                return (0);           
         }
+        return (2);
+    }
 
-        std::string http_sever::join_chunked(const std::string& chunked_msg, int sockfd)
+    int http_sever::recv_data(int sockfd)
+    {
+        char buffer[1024] = {0};
+        int bytes_received;
+        std::size_t header_end = 0;
+        std::size_t content_len = 0;
+        static  std::size_t cont_ = 0;
+            
+        read_info.insert(std::make_pair(sockfd, 0));
+        bytes_received = recv(sockfd, buffer, sizeof(buffer), 0);
+        if (bytes_received <= 0)
         {
-            std::string result = "";
-            std::size_t pos = 0;
-            (void) sockfd;
-            // Find the end of the headers
-            std::size_t header_end = chunked_msg.find("\r\n\r\n");
-            if (header_end == std::string::npos) {
-                // No headers found, return an empty string
+            close(sockfd);
+            std::cout<<"connection was closed\n";
+            return (-2);
+        }
+        requist_info[sockfd] += std::string(buffer);
+        if (requist_info[sockfd].find("\r\n\r\n") != std::string::npos)
+        {
+            if (transfer_encoding_chunked(sockfd) == 1)
+            {
+                read_info[sockfd] = true;
+                return (0);
+            }
+            else if (transfer_encoding_chunked(sockfd) == 0)
+            {
+                read_info[sockfd] = false;
+                return (1);
+            }
+            else if (transfer_encoding_chunked(sockfd) == 2)
+            {
+                cont_+= bytes_received;
+                header_end = requist_info[sockfd].find("\r\n\r\n");
+                content_len = std::strtol(requist_info[sockfd].substr(requist_info[sockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
+                if ((content_len +  header_end + 4) <= cont_)
+                {
+                    // std::cout<<"-----"<<content_len +  header_end + 4<<std::endl;
+                    // std::cout<<"-----"<<cont_<<std::endl;
+                    read_info[sockfd] = true;
+                    return (0);
+                }
+                else
+                {
+                    read_info[sockfd] = false;
+                    return (1);
+                } 
+            }
+        }
+        read_info[sockfd] = false;
+        return (1);
+    }
+
+    void http_sever ::unchunk(int sockfd)
+    {
+        std::size_t Transfer_encoding = requist_info[sockfd].find("Transfer-Encoding: chunked");
+        //  std::size_t Content_Length = requist_info[sockfd].find("Content-Length: ");
+        if (Transfer_encoding != std::string::npos && Transfer_encoding < requist_info[sockfd].find("\r\n\r\n"))
+        {
+            requist_info[sockfd] = join_chunked(requist_info[sockfd]);
+            //   exit(1); // you have problem heir
+        }
+    }
+    
+    std::string http_sever::join_chunked(const std::string &data) 
+    {
+        std::string result = "";
+        std::size_t sizeof_chunk;
+        std::string	body = "";
+        std::string	chunks = ""; 
+        std::string	subchunk = "";
+        std::size_t header_end;
+        std::size_t  pos; 
+        
+        // Find the end of the headers
+        header_end = data.find("\r\n\r\n");
+        if (header_end == std::string::npos) {
+            // No headers found, return an empty string 
             return "";
         }
-
-            // Append the headers to the result
-            result += chunked_msg.substr(0, header_end);
-
-            // Find the start of the first chunk
-            pos = header_end + 4;
-
-            while (true) {
-                // Find the next chunk size
-                std::size_t len_pos = chunked_msg.find("\r\n", pos);
-                std::string len_str = chunked_msg.substr(pos, len_pos - pos);
-                long len = strtol(len_str.c_str(), nullptr, 16);
-                // If the length is 0, we're done
-                if (len == 0) {
-                    read_info[sockfd] = true;
-                    break;
-                }
-
-                // Append the chunk data to the result
-                result += chunked_msg.substr(len_pos + 2, len);//use append() function
-                pos = len_pos + 2 + len + 2;
+        // Append the headers to the result
+        result = data.substr(0, header_end);
+        result += "\r\n\r\n";
+        chunks = data.substr(data.find("\r\n\r\n") + 4, data.size() - 1);
+        subchunk = chunks.substr(0, 100);
+        sizeof_chunk =  strtol(subchunk.c_str(), NULL, 16);
+        pos = 0;
+        while (true)
+        {
+            pos = chunks.find("\r\n",  pos);
+            result += chunks.substr(pos += 2, sizeof_chunk);
+            pos += sizeof_chunk + 2;
+            subchunk = chunks.substr(pos, 100);
+            sizeof_chunk = strtol(subchunk.c_str(), NULL, 16);
+            if (sizeof_chunk == 0)
+            {
+                result += "\r\n\r\n";
+                break;
             }
-
-            return result;
         }
+        return result;
+    }
         
     std::string http_sever::build_response()
     {
@@ -246,19 +274,18 @@ namespace http{
         // Keep track of how much data has been sent to a particular socket
         static std::map<int, size_t> sent_data;
 
-        // If this is the first time sending data to the socket, print the response header
-        // if (sent_data.find(socket) == sent_data.end())
-        // {
-        //     std::cout << "Response Header:\n";
-        //     if (requist_info[socket].size() < 1000)
-        //     {
-        //         std::cout << "[" << requist_info[socket] << "]\n";
-        //     }
-        //     else
-        //     {
-        //         std::cout << "[" << requist_info[socket].substr(0, 1000) << "..." << requist_info[socket].substr(requist_info[socket].size() - 10, 15) << "]\n";
-        //     }
-       // }
+        //If this is the first time sending data to the socket, print the response header
+        if (sent_data.find(socket) == sent_data.end())
+        {
+            if (requist_info[socket].size() < 1024)
+            {
+                std::cout << " Response  sended "<<std::endl;
+            }
+            else
+            {
+                std::cout << " Response is sending "<<std::endl;
+            }
+       }
 
         // Send the data to the client
         std::string data_to_send = response;//requist_info[socket].substr(sent_data[socket], 1024);
@@ -291,29 +318,15 @@ namespace http{
             }
         }
     }
-    // int http_sever::accept_connection(int sockfd)
-    // {
-    //     // Accepts a connection on a socket.
-    //     std::cout<<"///////////////////////"<<std::endl;
-    //     int sockfd_client = accept(sockfd, (struct sockaddr *) &sock.serv_addr, &sock.sock_addr_len);
-    //     if (sockfd_client < 0) 
-    //     {
-    //        std::cout<<"accepting connection"<<std::endl;
-    //        exit(1);
-    //     }
-    //     return (sockfd_client);
-    // }
+    int http_sever::accept_connection(int sockfd)
+    {
+        // Accepts a connection on a socket.
+        int sockfd_client = accept(sockfd, (struct sockaddr *) NULL, NULL);
+        if (sockfd_client < 0) 
+        {
+           std::cout<<"accepting connection"<<std::endl;
+           exit(1);
+        }
+        return (sockfd_client);
+    }
 }
-
-
-/*  HTTP/1.1 200 OK
-Content-Type: text/plain
-Transfer-Encoding: chunked
-7\r\n
-Mozilla\r\n
-11\r\n
-Developer Network\r\n
-0\r\n
-\r\n 
-
- */
