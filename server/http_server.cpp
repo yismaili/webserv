@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/24 13:34:39 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/24 15:39:20 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,15 +75,15 @@ namespace http{
                     else
                     {
                         recv_ret = recv_data(clients[i].fd);
-                        if (!recv_ret && read_info[clients[i].fd] == true)
+                        if (!recv_ret)
                         {
                             unchunk(clients[i].fd);
                         }
+                  std::cout<<requist[clients[i].fd]<<std::endl;
                     }
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                  std::cout<<requist[clients[i].fd]<<std::endl;
                     // std::vector<pollfd>::iterator it = clients.begin() + i;
                     send_data(clients[i].fd);
                     clients[i].events = POLLIN;
@@ -145,7 +145,10 @@ namespace http{
                     return (0);
             }
             else
+            {
+                read_info[sockfd] = true;
                 return (0);           
+            }
         }
         return (2);
     }
@@ -165,15 +168,30 @@ namespace http{
             std::cout<<"connection was closed\n";
             return (-2);
         }
-        tmp_requist[sockfd] += std::string(buffer);
+        // std::string tmp = "HTTP/1.1 200 OK\r\n"
+        //               "HTTP/1.1 200 OK\r\n"
+        //               "Transfer-Encoding: chunked\r\n"
+        //               "\r\n"
+        //               "7\r\n"
+        //               "Mozilla\r\n"
+        //               "11\r\n"
+        //               "Developer Network\r\n"
+        //               "0\r\n"
+        //               "\r\n";
+         tmp_requist[sockfd].append(std::string(buffer, bytes_received));
+        // std::cout<< tmp_requist[sockfd]<<std::endl;
+        // tmp_requist[sockfd] = tmp;
         if (tmp_requist[sockfd].find("\r\n\r\n") != std::string::npos)
         {
+             //std::cout<<"+++++++++1++++++\n";
             if (transfer_encoding_chunked(sockfd) == 1)
             {
+                //std::cout<<"++++++++2+++++++\n";
                 return (0);
             }
             else if (transfer_encoding_chunked(sockfd) == 0)
             {
+                 //std::cout<<"+++++++3++++++++\n";
                 return (1);
             }
             else if (transfer_encoding_chunked(sockfd) == 2)
@@ -198,7 +216,6 @@ namespace http{
     void http_sever ::unchunk(int sockfd)
     {
         std::size_t Transfer_encoding = tmp_requist[sockfd].find("Transfer-Encoding: chunked");
-        //  std::size_t Content_Length = tmp_requist[sockfd].find("Content-Length: ");
         if (Transfer_encoding != std::string::npos && Transfer_encoding < tmp_requist[sockfd].find("\r\n\r\n"))
         {
             requist[sockfd] = join_chunked(tmp_requist[sockfd], sockfd);
@@ -223,7 +240,7 @@ namespace http{
         result = data.substr(0, header_end);
         result += "\r\n\r\n";
         chunks = data.substr(data.find("\r\n\r\n") + 4, data.size() - 1);
-        subchunk = chunks.substr(0, 100);
+        subchunk = chunks.substr(0, 20);
         sizeof_chunk =  strtol(subchunk.c_str(), NULL, 16);
         pos = 0;
         while (true)
@@ -231,7 +248,7 @@ namespace http{
             pos = chunks.find("\r\n",  pos);
             result += chunks.substr(pos += 2, sizeof_chunk);
             pos += sizeof_chunk + 2;
-            subchunk = chunks.substr(pos, 100);
+            subchunk = chunks.substr(pos, 20);
             sizeof_chunk = strtol(subchunk.c_str(), NULL, 16);
             if (sizeof_chunk == 0)
             {
