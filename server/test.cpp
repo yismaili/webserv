@@ -161,51 +161,148 @@
 
 //     return 0;
 // }
+// #include <iostream>
+// #include <string>
+
+// std::string join_chunked(const std::string& chunked_msg) {
+//     std::string result = "";
+//     std::size_t pos = 0;
+
+//     // Find the end of the headers
+//     std::size_t header_end = chunked_msg.find("\r\n\r\n");
+//     if (header_end == std::string::npos) {
+//         // No headers found, return an empty string
+//         return "";
+//     }
+//     // Append the headers to the result
+//     result += chunked_msg.substr(0, header_end);
+
+
+//     // Find the start of the first chunk
+//     pos = header_end + 4;
+
+//     while (true) {
+//         // Find the next chunk size
+//         std::size_t len_pos = chunked_msg.find("\r\n", pos);
+//         std::string len_str = chunked_msg.substr(pos, len_pos - pos);
+//         int len = std::stoi(len_str, nullptr, 16);
+
+//         // If the length is 0, we're done
+//         if (len == 0) {
+//             break;
+//         }
+
+//         // Append the chunk data to the result
+//         result += chunked_msg.substr(len_pos + 2, len);
+//         pos = len_pos + 2 + len + 2;
+//     }
+
+//     return result;
+// }
+
+// int main() {
+//     // Example usage
+//     std::string chunked_msg = "POST / HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\nTransfer-Encoding: chunked\r\n\r\n4\r\n\nfoo=\r\n3\r\nbar\r\n0\r\n\r\n";
+//     std::string joined_msg = join_chunked(chunked_msg);
+//     std::cout << "Chunked message: " << chunked_msg << std::endl;
+//     std::cout << "Joined message: " << joined_msg << std::endl;
+
+//     return 0;
+// }
+
 #include <iostream>
 #include <string>
+#include <sstream>
 
-std::string join_chunked(const std::string& chunked_msg) {
-    std::string result = "";
-    std::size_t pos = 0;
+using namespace std;
 
-    // Find the end of the headers
-    std::size_t header_end = chunked_msg.find("\r\n\r\n");
-    if (header_end == std::string::npos) {
-        // No headers found, return an empty string
-        return "";
+int main() {
+    // Simulated chunked response message
+    string response = "HTTP/1.1 200 OK\r\n"
+                      "Content-Type: text/plain\r\n"
+                      "Transfer-Encoding: chunked\r\n"
+                      "\r\n"
+                      "7\r\n"
+                      "Mozilla\r\n"
+                      "11\r\n"
+                      "Developer Network\r\n"
+                      "0\r\n"
+                      "\r\n";
+
+    // Find the start of the message body
+    size_t pos = response.find("\r\n\r\n");
+    std::string head_str = response.substr(0, pos);
+    if (pos == string::npos) {
+        cerr << "Error: message body not found\n";
+        return 1;
     }
-    // Append the headers to the result
-    result += chunked_msg.substr(0, header_end);
+    pos += 4;
 
-
-    // Find the start of the first chunk
-    pos = header_end + 4;
-
-    while (true) {
-        // Find the next chunk size
-        std::size_t len_pos = chunked_msg.find("\r\n", pos);
-        std::string len_str = chunked_msg.substr(pos, len_pos - pos);
-        int len = std::stoi(len_str, nullptr, 16);
-
-        // If the length is 0, we're done
-        if (len == 0) {
+    // Parse the chunks and join them together
+    stringstream ss(response.substr(pos));
+    string chunk, body;
+    size_t size;
+    while (getline(ss, chunk)) {
+        // Extract the chunk size
+        size = stoul(chunk, nullptr, 16);
+        if (size == 0) {
+            // End of message body
             break;
         }
 
-        // Append the chunk data to the result
-        result += chunked_msg.substr(len_pos + 2, len);
-        pos = len_pos + 2 + len + 2;
+        // Extract the chunk data
+        chunk.resize(size);
+        ss.read(&chunk[0], size);
+        ss.ignore(2); // Ignore the "\r\n" sequence after the chunk
+
+        // Append the chunk to the message body
+        body += chunk;
     }
 
-    return result;
-}
-
-int main() {
-    // Example usage
-    std::string chunked_msg = "POST / HTTP/1.0\r\nContent-Type: application/x-www-form-urlencoded\r\nTransfer-Encoding: chunked\r\n\r\n4\r\n\nfoo=\r\n3\r\nbar\r\n0\r\n\r\n";
-    std::string joined_msg = join_chunked(chunked_msg);
-    std::cout << "Chunked message: " << chunked_msg << std::endl;
-    std::cout << "Joined message: " << joined_msg << std::endl;
+    // Print the complete message body
+    cout << head_str <<"\nMessage body: " << body << endl;
 
     return 0;
 }
+//  std::string	requist_head = data.substr(0, data.find("\r\n\r\n"));
+//         std::string	chunk_data = data.substr(data.find("\r\n\r\n") + 4, data.size() - 1);
+//         std::string	num_chunk = chunk_data.substr(0, 100);
+//         std::string	body = "";
+//         int			sizeof_chunk = strtol(num_chunk.c_str(), NULL, 16);
+//         size_t		i = 0;
+
+//         while (sizeof_chunk)
+//         {
+//             i = chunk_data.find("\r\n", i) + 2;
+//             body += chunk_data.substr(i, sizeof_chunk);
+//             i += sizeof_chunk + 2;
+//             num_chunk = chunk_data.substr(i, 100);
+//             sizeof_chunk = strtol(num_chunk.c_str(), NULL, 16);
+//             if (sizeof_chunk == 0)
+//             {
+//                 read_info[sockfd] = true;
+//             }
+            
+//         }
+// 	    return (requist_head + "\r\n\r\n" + body + "\r\n\r\n");
+
+
+
+
+
+
+
+/*
+
+HTTP/1.1 200 OK\r\n
+Content-Type: text/plain\r\n
+Transfer-Encoding: chunked\r\n
+\r\n
+7\r\n
+Mozilla\r\n
+11\r\n"
+Developer Network\r\n
+0\r\n
+\r\n
+
+*/
