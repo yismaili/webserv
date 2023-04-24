@@ -264,28 +264,6 @@ int main() {
 
     return 0;
 }
-//  std::string	requist_head = data.substr(0, data.find("\r\n\r\n"));
-//         std::string	chunk_data = data.substr(data.find("\r\n\r\n") + 4, data.size() - 1);
-//         std::string	num_chunk = chunk_data.substr(0, 100);
-//         std::string	body = "";
-//         int			sizeof_chunk = strtol(num_chunk.c_str(), NULL, 16);
-//         size_t		i = 0;
-
-//         while (sizeof_chunk)
-//         {
-//             i = chunk_data.find("\r\n", i) + 2;
-//             body += chunk_data.substr(i, sizeof_chunk);
-//             i += sizeof_chunk + 2;
-//             num_chunk = chunk_data.substr(i, 100);
-//             sizeof_chunk = strtol(num_chunk.c_str(), NULL, 16);
-//             if (sizeof_chunk == 0)
-//             {
-//                 read_info[sockfd] = true;
-//             }
-            
-//         }
-// 	    return (requist_head + "\r\n\r\n" + body + "\r\n\r\n");
-
 
 
 
