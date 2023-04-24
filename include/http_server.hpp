@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/24 13:28:13 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/24 19:07:39 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,10 +52,9 @@ namespace http{
             http::sockets sock;
             std::vector<http::sockets> socket_id;
             std::vector<pollfd> clients;
-            std::map<int, std::string> tmp_requist;
+            std::map<int, std::string> requist_data;
             std::map<int, bool> read_info;
             std::map<int, bool> write_info;
-            std::map<int, std::string> requist;
     };
 }
 #endif
