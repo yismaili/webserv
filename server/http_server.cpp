@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/24 15:39:20 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/24 16:29:10 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,16 +79,16 @@ namespace http{
                         {
                             unchunk(clients[i].fd);
                         }
-                  std::cout<<requist[clients[i].fd]<<std::endl;
                     }
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                    // std::vector<pollfd>::iterator it = clients.begin() + i;
+                    std::cout<<requist[clients[i].fd]<<std::endl;
+                    std::vector<pollfd>::iterator it = clients.begin() + i;
                     send_data(clients[i].fd);
                     clients[i].events = POLLIN;
-                    // clients.erase(it);
-                    // i--;
+                    clients.erase(it);
+                    i--;
                 }
                 if (clients[i].revents & POLLERR)
                 {
@@ -168,30 +168,15 @@ namespace http{
             std::cout<<"connection was closed\n";
             return (-2);
         }
-        // std::string tmp = "HTTP/1.1 200 OK\r\n"
-        //               "HTTP/1.1 200 OK\r\n"
-        //               "Transfer-Encoding: chunked\r\n"
-        //               "\r\n"
-        //               "7\r\n"
-        //               "Mozilla\r\n"
-        //               "11\r\n"
-        //               "Developer Network\r\n"
-        //               "0\r\n"
-        //               "\r\n";
-         tmp_requist[sockfd].append(std::string(buffer, bytes_received));
-        // std::cout<< tmp_requist[sockfd]<<std::endl;
-        // tmp_requist[sockfd] = tmp;
+        tmp_requist[sockfd].append(std::string(buffer, bytes_received));
         if (tmp_requist[sockfd].find("\r\n\r\n") != std::string::npos)
         {
-             //std::cout<<"+++++++++1++++++\n";
             if (transfer_encoding_chunked(sockfd) == 1)
             {
-                //std::cout<<"++++++++2+++++++\n";
                 return (0);
             }
             else if (transfer_encoding_chunked(sockfd) == 0)
             {
-                 //std::cout<<"+++++++3++++++++\n";
                 return (1);
             }
             else if (transfer_encoding_chunked(sockfd) == 2)
@@ -199,7 +184,7 @@ namespace http{
                 cont_+= bytes_received;
                 header_end = tmp_requist[sockfd].find("\r\n\r\n");
                 content_len = std::strtol(tmp_requist[sockfd].substr(tmp_requist[sockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
-                if ((content_len +  header_end + 4) <= cont_)
+                if ((content_len +  header_end + 4) <= tmp_requist[sockfd].size())
                 {
                     read_info[sockfd] = true;
                     return (0);
