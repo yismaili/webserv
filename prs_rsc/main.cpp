@@ -1,4 +1,5 @@
 #include "location.hpp"
+#include "../include/http_server.hpp"
 
 std::vector<server> servers;
 int skip_spaces(std::string str)
@@ -135,7 +136,7 @@ int main(int ac, char **av)
         std::cerr << "Error : not closed" << std::endl;
         return (1);
     }
-    std::cout << v.size() << "\n";
+   // std::cout << v.size() << "\n";
 
     for (size_t i = 0; i < v.size(); i++)
     {
@@ -144,15 +145,39 @@ int main(int ac, char **av)
         delete (s);
     }
 
-   for (size_t i = 0; i < servers.size(); i++)
+    std::vector<int> all_ports;
+    for (size_t i = 0; i < servers.size(); i++)
    {
-        servers[i].display_sever();
-        std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
-        for (size_t j = 0; j < servers[i]._location.size(); j++)
-        {
-            std::cout << "location : " << servers[i]._location[j].location_name << std::endl;
-            servers[i]._location[j].display_sever();
-        }
-        std::cout << "++++++++++++++++++++++\n";
+        for (size_t j = 0; j < servers[i].get_listen().size(); i++)
+            all_ports.push_back(servers[i].get_listen()[j]);
+        
+        // servers[i].display_sever();
+        // std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
+        // for (size_t j = 0; j < servers[i]._location.size(); j++)
+        // {
+        //     std::cout << "location : " << servers[i]._location[j].location_name << std::endl;
+        //     servers[i]._location[j].display_sever();
+        // }
+        // std::cout << "++++++++++++++++++++++\n";
    }
+//    for (size_t i = 0; i < all_ports.size(); i++)
+//    {    
+//         std::cout << all_ports[i] << "\n";
+//    }
+   
+    http::http_sever server(all_ports, "127.0.0.1");
+    server.run();
+
+//    for (size_t i = 0; i < servers.size(); i++)
+//    {
+//         servers[i].display_sever();
+//         std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
+//         for (size_t j = 0; j < servers[i]._location.size(); j++)
+//         {
+//             std::cout << "location : " << servers[i]._location[j].location_name << std::endl;
+//             servers[i]._location[j].display_sever();
+//         }
+//         std::cout << "++++++++++++++++++++++\n";
+//    }
+
 }
