@@ -4,7 +4,7 @@ SRC		=	request.cpp main.cpp request_utils.cpp
 
 CC 		= c++
 
-FLAGS	= -std=c++98 -Wall -Wextra -Werror -g -fsanitize=address
+FLAGS	= -std=c++98 -Wall -Wextra -Werror 
 # FLAGS	= -std=c++98 -Wall -Wextra -Werror
 
 OBJS 	= $(SRC:.c=.o)

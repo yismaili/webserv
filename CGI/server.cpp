@@ -14,6 +14,7 @@ int main(int ac, char **av)
         std::cout << "error\n";
         return (1);
     }
+    
     int server_fd, new_socket; long valread;
     struct sockaddr_in address;
     int addrlen = sizeof(address);
@@ -55,13 +56,14 @@ int main(int ac, char **av)
             perror("In accept");
             exit(EXIT_FAILURE);
         }
-        
         char buffer[30000] = {0};
         valread = read( new_socket , buffer, 30000);
         printf("%s\n",buffer );
-        //write(new_socket , hello , strlen(hello));
+        //write(new_socket , hello , strlen ));
         //printf("------------------Hello message sent-------------------\n");
-        std::string content = run_cgi(av[1], av[2]);
+        request r(buffer);
+        //std::cout << "query :::::::::::::::::::::::::::::::::::::::::::::: " <<r.get_query() << "\n";
+        std::string content = run_cgi(av[1], av[2], r);
         std::string header = "HTTP/1.1 200 OK\n";
         header = header + content ;
         std::cout << content;
