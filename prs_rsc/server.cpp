@@ -30,7 +30,7 @@ bool isIpAddress(const std::string& ip) {
     int numDots = 0;
     std::string temp = "";
 
-    for (int i = 0; i < ip.size(); i++)
+    for (size_t i = 0; i < ip.size(); i++)
     {
         if (ip[i] == '.') 
         {
@@ -176,7 +176,7 @@ int ft_non_alphabetic(std::string value)
 
 void ft_check_index(std::string index_file, std::string line)
 {
-    size_t i = index_file.find_last_of(".");
+    int i = index_file.find_last_of(".");
     if (i == -1)
         ft_error(line, "Error");
     std::string filedot = index_file.substr(i + 1);
@@ -219,7 +219,8 @@ int is_world(std::string str, std::string tmp)
     return(0);
 }
 
-server::server(Data_config data, bool check_location) : _client_max_body_size(1048576) , _autoindex(false), _root("/var/www")
+server::server(Data_config data, bool check_location) 
+     : _root("/var/www"), _client_max_body_size(1048576)
 {
     std::istringstream ss(data.data_server);
     std::string line;
@@ -232,6 +233,8 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
     int c_listen = 0;
     int c_index = 0;
     int c_error_page = 0;
+    int c_rederiction = 0;
+    int c_upload = 0;
     while (getline(ss, line))
     {
         if(line.empty() || line[0] == '#')
@@ -294,6 +297,7 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
                     ft_error(line, "Error");
                 _listen.push_back(port);
             }
+            c_listen++;
         }
         else if (key == "root")
         {   
@@ -326,13 +330,16 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
             is_empty_value(value, line);
             if (ft_numbers_value(iss) )
                 ft_error(line, "Error");
+            std::map<int, std::string>::const_iterator it = _error_page.find(error_code);
+             if (it != _error_page.end())
+                ft_error(line, "Error");
             _error_page[error_code] = value;
             c_error_page++;
         }
         else if (key == "index")
         {
             is_empty_value(value, line);
-            ft_check_index(value, line);
+            //ft_check_index(value, line);
             _index.push_back(value);
             while (iss >> value)
             {
@@ -341,7 +348,7 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
             }
             c_index++;
         }
-        else if (key == "allow_methods")
+        else if (key == "allow_methods" && !check_location)
         {
             is_empty_value(value, line);
             value = ft_method(value, line, _allow_methods);
@@ -356,7 +363,7 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
         else if (key == "autoindex")
         {
             if (c_autoindex)
-                ft_error(line, "Erro duplicated");
+                ft_error(line, "Error duplicated");
             is_empty_value(value, line);
             value = toLower(value);
             if (value == "on")
@@ -369,9 +376,52 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
                 ft_error(line, "Error");
             c_autoindex++;
         }
+        else if (key == "return" && !check_location)
+        {
+            if (c_rederiction)
+                ft_error(line, "Error duplicated rederiction");
+            is_empty_value(value, line);
+            int status = ft_number(value, line);
+            if (status < 300 || status > 400)
+                ft_error(line, "Error");    
+            iss >> value;
+            is_empty_value(value, line);
+            if (ft_numbers_value(iss) )
+                ft_error(line, "Error");
+            _rederiction = std::make_pair(status, value);
+            c_rederiction++;
+        }
+        else if (key == "path_info" && !check_location)
+        {
+            is_empty_value(value, line);
+           std::string cgi = toLower(value);
+            if (value != ".py" && value != ".php")
+                ft_error(line, "Error");
+            iss >> value;
+            is_empty_value(value, line);
+            if (ft_numbers_value(iss) )
+                ft_error(line, "Error");
+            _path_info[cgi] = value;
+        }
+        else if (key == "upload" && !check_location)
+        {
+             if (c_upload)
+                ft_error(line, "Error duplicated");
+            is_empty_value(value, line);
+            value = toLower(value);
+            if (value == "on")
+                _upload = true;
+            else if (value == "off")
+                _upload = false;
+            else
+                ft_error(line, "Error"); 
+            if (ft_numbers_value(iss))
+                ft_error(line, "Error");
+            c_upload++;
+        }
         else if ((search_char(line, '}') || search_char(line, '{') ))
         {
-            std::cout << "-----------------> : "<< line << "\n";
+            //std::cout << "-----------------> : "<< line << "\n";
             if (line.size() > 1)
             {
                 if (!is_world(line, "server") && !is_world(line, "location"))
@@ -381,12 +431,9 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
         else
             ft_error(line, "Error");
     }
-    if(!c_allow_method && check_location)
-    {
+
+    if(!c_allow_method && !check_location)
         _allow_methods.push_back("GET");
-        _allow_methods.push_back("POST");
-        _allow_methods.push_back("DELETE");
-    }
     if (!c_listen && check_location)
         _listen.push_back(80);
     if (!c_index && check_location)
@@ -400,6 +447,7 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
         _error_page[405] = "/405.html";
         _error_page[500] = "/500.html";
     }
+
     if(data.location.size())
     {
         // puts("heeeeere");
@@ -421,15 +469,15 @@ server::server(Data_config data, bool check_location) : _client_max_body_size(10
 void server::display_sever()
 { 
     std::cout << "listen : "; 
-    for (int i = 0; i < _listen.size(); i++) 
+    for (size_t i = 0; i < _listen.size(); i++) 
         std::cout << _listen[i] << " ";
     std::cout << std::endl;
     std::cout << "Server name : "; 
-    for (int i = 0; i < _server_name.size(); i++) 
+    for (size_t i = 0; i < _server_name.size(); i++) 
         std::cout << _server_name[i] << " ";
     std::cout << std::endl;
     std::cout << "Index : "; 
-    for (int i = 0; i < _index.size(); i++) 
+    for (size_t i = 0; i < _index.size(); i++) 
         std::cout << _index[i] << " ";
     std::cout << std::endl;
     std::cout << "hostname : " << _host << std::endl;
@@ -439,7 +487,7 @@ void server::display_sever()
     for(std::map<int, std::string>::const_iterator it = _error_page.begin(); it != _error_page.end(); ++it)
         std::cout << it->first << "  "<< it->second<< "\n";
     std::cout << "allow methods : "; 
-    for (int i = 0; i < _allow_methods.size(); i++) 
+    for (size_t i = 0; i < _allow_methods.size(); i++) 
         std::cout << _allow_methods[i] << " ";
     std::cout << std::endl;
     std::cout << "autoindex : ";
@@ -447,32 +495,58 @@ void server::display_sever()
         std::cout << "on\n";
     else
          std::cout << "of\n";
+    std::cout << "rederiction : " << _rederiction.first << ", " << _rederiction.second << '\n';; 
 }
 
-    std::vector<std::string> server::get_index() const
-    {
-        return (_index);
-    }
-    std::string server::get_root() const
-    {
-        return (_root);
-    }
-    std::map<int, std::string> server::get_error_page() const
-    {
-        return (_error_page);
-    }
-    std::vector<std::string> server::get_allow_methods() const
-    {
-        return (_allow_methods);
-    }
-    bool server::get_autoindex () const
-    {
-        return (_autoindex);
-    }
+std::vector<std::string> server::get_index() const
+{
+    return (_index);
+}
+
+std::string server::get_root() const
+{
+    return (_root);
+}
+
+std::map<int, std::string> server::get_error_page() const
+{
+    return (_error_page);
+}
+
+std::vector<std::string> server::get_allow_methods() const
+{
+    return (_allow_methods);
+}
+bool server::get_autoindex () const
+{
+    return (_autoindex);
+}
+
+std::vector<int> server::get_listen() const
+{
+    return(_listen);
+}
+std::vector<std::string> server::get_server_name() const
+{
+    return(_server_name);
+}
+
+std::string server::get_host() const
+{
+    return(_host);
+}
+
+int server::get_client_max_body_size() const
+{
+    return(_client_max_body_size);
+}
 
 server::~server()
 {
+
 }
+
 server::server()
 {
+
 }

@@ -6,12 +6,16 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include "server.hpp"
+
 
 struct Data_config
 {
     std::string data_server;
     std::map<std::string, std::string> location;
 };
+
+
 
 struct compters
 {

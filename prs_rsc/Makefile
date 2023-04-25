@@ -1,6 +1,6 @@
 SRC = main.cpp server.cpp location.cpp
 CC = c++
-FLAGS = 
+FLAGS = -Wall -Wextra -Werror 
 RM = rm  -rf
 OBJ= $(SRC:.cpp=.o)
 NAME = WebServer
