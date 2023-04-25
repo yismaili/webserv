@@ -522,7 +522,7 @@ bool server::get_autoindex () const
     return (_autoindex);
 }
 
-std::vector<int> server::get_listen() const
+std::vector<int> &server::get_listen() 
 {
     return(_listen);
 }
