@@ -148,8 +148,8 @@ int main(int ac, char **av)
     std::vector<int> all_ports;
     for (size_t i = 0; i < servers.size(); i++)
    {
-        for (size_t j = 0; j < servers[i].get_listen().size(); i++)
-            all_ports.push_back(servers[i].get_listen()[j]);
+        for (size_t j = 0; j < servers[i]._listen.size(); j++)
+            all_ports.push_back(servers[i]._listen[j]);
         
         // servers[i].display_sever();
         // std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
@@ -160,13 +160,13 @@ int main(int ac, char **av)
         // }
         // std::cout << "++++++++++++++++++++++\n";
    }
-//    for (size_t i = 0; i < all_ports.size(); i++)
-//    {    
-//         std::cout << all_ports[i] << "\n";
-//    }
+   for (size_t i = 0; i < all_ports.size(); i++)
+   {    
+        std::cout << all_ports[i] << "\n";
+   }
    
-    http::http_sever server(all_ports, "127.0.0.1");
-    server.run();
+    http::http_sever server1(all_ports, "127.0.0.1");
+    server1.run();
 
 //    for (size_t i = 0; i < servers.size(); i++)
 //    {
@@ -179,5 +179,5 @@ int main(int ac, char **av)
 //         }
 //         std::cout << "++++++++++++++++++++++\n";
 //    }
-
+return (0);
 }

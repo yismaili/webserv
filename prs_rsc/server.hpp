@@ -11,7 +11,6 @@ class location;
 class server
 {
 protected:
-    std::vector<int> _listen; /*s*/
     std::vector<std::string> _server_name; /*s*/
     std::vector<std::string> _index;
     std::string _host; /*s*/
@@ -32,12 +31,13 @@ protected:
     // std::string _ssl_protocols;
     // std::string _ssl_ciphers;
 public:
+    std::vector<int> _listen; /*s*/
     std::vector<location> _location;
     server(Data_config data, bool check_location);
     server();
      virtual ~server();
     void display_sever();
-    std::vector<int> get_listen() const;
+    std::vector<int> &get_listen();
     std::vector<std::string> get_server_name() const;
     std::string get_host() const;
     int get_client_max_body_size() const;
