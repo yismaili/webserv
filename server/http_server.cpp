@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/24 19:09:04 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/25 20:51:57 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,13 +78,12 @@ namespace http{
                         if (!recv_ret)
                         {
                             unchunk(clients[i].fd);
-                        //std::cout<<requist_data[clients[i].fd]<<std::endl;
                         }
                     }
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                    std::cout<<requist_data[clients[i].fd]<<std::endl;
+                            std::cout<<requist_data[clients[i].fd]<<std::endl;
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     send_data(clients[i].fd);
                     clients[i].events = POLLIN;
@@ -93,8 +92,11 @@ namespace http{
                 }
                 if (clients[i].revents & POLLERR)
                 {
+                    std::vector<pollfd>::iterator it = clients.begin() + i;
                     std::cout<<"error\n"<<std::endl;
-                    exit(1);
+                    close(clients[i].fd);
+                    clients.erase(it);
+                    i--;
                 }
                 i++;
             }
@@ -217,12 +219,11 @@ namespace http{
         std::string	subchunk = "";
         std::size_t header_end;
         std::size_t  pos; 
-        
         // Find the end of the headers
         header_end = data.find("\r\n\r\n");
         // Append the headers to the result
-        result = data.substr(0, header_end);
-        result += "\r\n\r\n";
+        result.append(data.substr(0, header_end));
+        result.append("\r\n\r\n");
         chunks = data.substr(data.find("\r\n\r\n") + 4, data.size() - 1);
         subchunk = chunks.substr(0, 20);
         sizeof_chunk =  strtol(subchunk.c_str(), NULL, 16);
@@ -230,13 +231,22 @@ namespace http{
         while (true)
         {
             pos = chunks.find("\r\n",  pos);
-            result += chunks.substr(pos += 2, sizeof_chunk);
+            result.append(chunks.substr(pos += 2, sizeof_chunk));
             pos += sizeof_chunk + 2;
+            try
+            {
             subchunk = chunks.substr(pos, 20);
+                
+            }
+            catch(const std::exception& e)
+            {
+                std::cerr << e.what() << '\n';
+            }
+            
             sizeof_chunk = strtol(subchunk.c_str(), NULL, 16);
             if (sizeof_chunk == 0)
             {
-                result += "\r\n\r\n";
+                result.append("\r\n\r\n");
                 read_info[sockfd] = true;
                 break;
             }
