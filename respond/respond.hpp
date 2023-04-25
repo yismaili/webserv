@@ -40,6 +40,8 @@ class Respond
         std::string _path_found;
         std::string _rooted_path;
         std::string _is_autoindex;
+        std::string _boundary;
+        std::string _upload_store;
 
         bool        _is_cgi;
         bool        _is_allowed_method;
@@ -106,6 +108,9 @@ class Respond
 
         // POST RESPONSE
         std::string check_post_type();
+        void        handle_post_response();
+        void        handle_form_data();
+        int         get_upload_store();
 
 
         // DELETE RESPONSE

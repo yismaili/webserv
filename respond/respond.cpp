@@ -25,6 +25,8 @@ Respond::Respond()
     _is_autoindex = "";
     _is_redirection = false;
     _is_index = false;
+    _boundary = r.get_header("Content-Type").substr(r.get_header("Content-Type").find("boundary=") + 9);
+    _upload_store = "";
 }
 
 Respond::~Respond()

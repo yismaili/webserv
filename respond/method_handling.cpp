@@ -40,13 +40,54 @@ std::string Respond::handle_get_response()
 
 std::string Respond::handle_post_response()
 {
-    if (check_post_type() == "x-www-form-urlencoded" && _is_cgi == true)
+    if (check_post_type() == "application/x-www-form-urlencoded" && _is_cgi == true)
     {
         // need to call cgi and execute it
         cout_response();
     }
+    if (check_post_type() == "multipart/form-data")
+    {
+        handle_form_data();
+    }
 
+}
 
+void    Respond::handle_form_data()
+{
+    std::vector<std::string>   file = r.get_body();
+    std::vector<std::string>::iterator  file_it = file.begin();
+    struct stat st;
+    if (get_upload_store() == false || server.get_upload == "off")
+        return ;
+    _rooted_path.append(_upload_store);
+    // if (stat(_rooted_path.c_str(), &st != 0))
+    // {
+
+    // }
+    while (file_it != file.end())
+    {
+
+    }
+}
+
+int Respond::get_upload_store()
+{
+    for (int i = 0; i < server.size(); i++)
+    {
+        for (int j = 0; j < server[i]._location.size(); j++)
+        {
+            if (server[i]._location[j].location_name == _path_found)
+            {
+                if (server[i]._location[j].upload_store.empty())
+                    return (0);
+                else
+                {
+                    _upload_store = server[i]._location[j].upload_store;
+                    return (1);
+                }
+            }
+        }
+    }
 }
 
 std::string Respond::check_post_type()
