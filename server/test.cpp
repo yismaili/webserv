@@ -210,65 +210,60 @@
 //     return 0;
 // }
 
-#include <iostream>
-#include <string>
-#include <sstream>
+// #include <iostream>
+// #include <string>
+// #include <sstream>
 
-using namespace std;
+// using namespace std;
 
-int main() {
-    // Simulated chunked response message
-    string response = "HTTP/1.1 200 OK\r\n"
-                      "Content-Type: text/plain\r\n"
-                      "Transfer-Encoding: chunked\r\n"
-                      "\r\n"
-                      "7\r\n"
-                      "Mozilla\r\n"
-                      "11\r\n"
-                      "Developer Network\r\n"
-                      "0\r\n"
-                      "\r\n";
+// int main() {
+//     // Simulated chunked response message
+//     string response = "HTTP/1.1 200 OK\r\n"
+//                       "Content-Type: text/plain\r\n"
+//                       "Transfer-Encoding: chunked\r\n"
+//                       "\r\n"
+//                       "7\r\n"
+//                       "Mozilla\r\n"
+//                       "11\r\n"
+//                       "Developer Network\r\n"
+//                       "0\r\n"
+//                       "\r\n";
 
-    // Find the start of the message body
-    size_t pos = response.find("\r\n\r\n");
-    std::string head_str = response.substr(0, pos);
-    if (pos == string::npos) {
-        cerr << "Error: message body not found\n";
-        return 1;
-    }
-    pos += 4;
+//     // Find the start of the message body
+//     size_t pos = response.find("\r\n\r\n");
+//     std::string head_str = response.substr(0, pos);
+//     if (pos == string::npos) {
+//         cerr << "Error: message body not found\n";
+//         return 1;
+//     }
+//     pos += 4;
 
-    // Parse the chunks and join them together
-    stringstream ss(response.substr(pos));
-    string chunk, body;
-    size_t size;
-    while (getline(ss, chunk)) {
-        // Extract the chunk size
-        size = stoul(chunk, nullptr, 16);
-        if (size == 0) {
-            // End of message body
-            break;
-        }
+//     // Parse the chunks and join them together
+//     stringstream ss(response.substr(pos));
+//     string chunk, body;
+//     size_t size;
+//     while (getline(ss, chunk)) {
+//         // Extract the chunk size
+//         size = stoul(chunk, nullptr, 16);
+//         if (size == 0) {
+//             // End of message body
+//             break;
+//         }
 
-        // Extract the chunk data
-        chunk.resize(size);
-        ss.read(&chunk[0], size);
-        ss.ignore(2); // Ignore the "\r\n" sequence after the chunk
+//         // Extract the chunk data
+//         chunk.resize(size);
+//         ss.read(&chunk[0], size);
+//         ss.ignore(2); // Ignore the "\r\n" sequence after the chunk
 
-        // Append the chunk to the message body
-        body += chunk;
-    }
+//         // Append the chunk to the message body
+//         body += chunk;
+//     }
 
-    // Print the complete message body
-    cout << head_str <<"\nMessage body: " << body << endl;
+//     // Print the complete message body
+//     cout << head_str <<"\nMessage body: " << body << endl;
 
-    return 0;
-}
-
-
-
-
-
+//     return 0;
+// }
 
 /*
 
@@ -284,3 +279,43 @@ Developer Network\r\n
 \r\n
 
 */
+
+
+#include <stdio.h>
+#include <string.h>
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+
+int main() {
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock == -1) {
+        perror("Error: Could not create socket");
+        return 1;
+    }
+
+    struct sockaddr_in server_address;
+    memset(&server_address, 0, sizeof(server_address));
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(8888);
+    server_address.sin_addr.s_addr = INADDR_ANY;
+
+    if (connect(sock, (struct sockaddr*)&server_address, sizeof(server_address)) == -1) {
+        perror("Error: Could not connect to server");
+        return 1;
+    }
+
+    const char* message = "This is a test message.";
+    int sent_bytes = send(sock, message, strlen(message), 0);
+    if (sent_bytes == -1) {
+        perror("Error: Could not send data");
+        close(sock);
+        return 1;
+    }
+
+    printf("Sent %d bytes of data to %s\n", sent_bytes, inet_ntoa(server_address.sin_addr));
+
+    close(sock);
+    return 0;
+}
