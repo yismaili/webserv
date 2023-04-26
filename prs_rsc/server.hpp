@@ -50,5 +50,9 @@ public:
 
 int is_world(std::string str, std::string tmp);
 int search_char(std::string str, char c);
+std::string trimString(const std::string& str);
+int skip_spaces(std::string str);
+std::vector<server> ft_fill_servers(char **av);
+std::vector<int> get_all_ports(std::vector<server> servers);
 
 #endif
