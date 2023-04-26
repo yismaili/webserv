@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/25 20:51:57 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/26 03:20:17 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,10 +137,21 @@ namespace http{
     
     int http_sever ::transfer_encoding_chunked(int sockfd)
     {
-       
-        if (requist_data[sockfd].find("Content-Length: ") == std::string::npos)
+        std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
+        std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
+
+        
+        if (content_length != std::string::npos && transfer_encoding != std::string::npos)
         {
-            if (requist_data[sockfd].find("Transfer-Encoding: chunked") != std::string::npos)
+            if (requist_data[sockfd].find("0\r\n\r\n") != std::string::npos)
+                return (1);
+            else
+                return (0);
+        }
+        
+        if (content_length == std::string::npos)
+        {
+            if (transfer_encoding != std::string::npos)
             {
                 if (requist_data[sockfd].find("0\r\n\r\n") != std::string::npos)
                     return (1);
@@ -233,16 +244,7 @@ namespace http{
             pos = chunks.find("\r\n",  pos);
             result.append(chunks.substr(pos += 2, sizeof_chunk));
             pos += sizeof_chunk + 2;
-            try
-            {
-            subchunk = chunks.substr(pos, 20);
-                
-            }
-            catch(const std::exception& e)
-            {
-                std::cerr << e.what() << '\n';
-            }
-            
+            subchunk = chunks.substr(pos, 20); 
             sizeof_chunk = strtol(subchunk.c_str(), NULL, 16);
             if (sizeof_chunk == 0)
             {
