@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/26 03:20:17 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/26 04:26:03 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -276,22 +276,14 @@ namespace http{
     {
         // Get the response to be sent to the client
         std::string response = build_response();
-
         // Keep track of how much data has been sent to a particular socket
-        static std::map<int, size_t> sent_data;
+        static std::map<int, std::size_t> sent_data;
 
         //If this is the first time sending data to the socket, print the response header
         if (sent_data.find(socket) == sent_data.end())
         {
-            if (requist_data[socket].size() < 1024)
-            {
-                std::cout << " Response  sended "<<std::endl;
-            }
-            else
-            {
-                std::cout << " Response is sending "<<std::endl;
-            }
-       }
+            std::cout << " Response  sended "<<std::endl;
+        }
 
         // Send the data to the client
         std::string data_to_send = response;//requist_data[socket].substr(sent_data[socket], 1024);
@@ -324,6 +316,7 @@ namespace http{
             }
         }
     }
+    
     int http_sever::accept_connection(int sockfd)
     {
         // Accepts a connection on a socket.
