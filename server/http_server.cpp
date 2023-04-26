@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/26 04:26:03 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/26 23:45:52 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,7 @@ namespace http{
 
     void http_sever::run() 
     {
-        int poll_ret, new_socket, recv_ret;
+        int poll_ret, new_socket, recv_ret, sent_ret;
         unsigned long i = 0;
         // Add server socket to poll list
         std::vector<http::sockets>::iterator it = socket_id.begin();
@@ -83,12 +83,20 @@ namespace http{
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                            std::cout<<requist_data[clients[i].fd]<<std::endl;
+                    std::cout<<requist_data[clients[i].fd]<<std::endl;
                     std::vector<pollfd>::iterator it = clients.begin() + i;
-                    send_data(clients[i].fd);
-                    clients[i].events = POLLIN;
-                    clients.erase(it);
-                    i--;
+                    sent_ret = send_data(clients[i].fd);
+                    if (sent_ret == 0){
+                        clients[i].events = POLLIN;
+                        clients.erase(it);
+                        i--;
+                    }
+                    else if (sent_ret == -2)
+                    {
+                        clients.erase(it);
+                        close(clients[i].fd);
+                        i--;
+                    }
                 }
                 if (clients[i].revents & POLLERR)
                 {
@@ -284,35 +292,33 @@ namespace http{
         {
             std::cout << " Response  sended "<<std::endl;
         }
-
         // Send the data to the client
-        std::string data_to_send = response;//requist_data[socket].substr(sent_data[socket], 1024);
-        long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0); 
-        //read_info.insert(std::make_pair(socket, 0));
+        requist_data[socket] = response;
+        std::string data_to_send = requist_data[socket].substr(sent_data[socket], 1024);
+        long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
         // Check for errors while sending data
         if (bytes_sent == -1)
         {
             std::cout << "Error: Failed to send data to the socket\n";
             close(socket);
             sent_data[socket] = 0;
-            return -1;
+            return (-2);
         }
         else
         {
             // Update the amount of data that has been sent to the socket
             sent_data[socket] += bytes_sent;
-
             // If all data has been sent, erase the request information and return 0
             if (sent_data[socket] >= requist_data[socket].size())
             {
                 requist_data.erase(socket);
                 sent_data[socket] = 0;
-                return 0;
+                return (0);
             }
             // If there is still data to send, return 1
             else
             {
-                return 1;
+                return (1);
             }
         }
     }
