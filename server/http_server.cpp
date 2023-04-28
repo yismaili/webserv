@@ -6,11 +6,20 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/26 23:45:52 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/28 16:39:49 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/http_server.hpp"
+
+#include <iostream>
+#include <ctime>
+#include <chrono>
+#include <sstream>
+#include <iomanip>
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <unistd.h>
 
 namespace http{
    http_sever::http_sever(std::vector<int> port_, std::string ip_add) :sock()
@@ -266,18 +275,18 @@ namespace http{
         
     std::string http_sever::build_response()
     {
-        // Insert html page or ...
-        std::ostringstream response; //create the output string stream
-        
-        response << "HTTP/1.1 200 OK\r\n";
-        response << "Content-Type: text/html; charset=UTF-8\r\n";
-        response << "\r\n";
-        response << "<html><body><h1>Hello younes </h1>";
-        response << "<h1>from HTTP server!</h4>";
-        response << "</body></html>";
-        
-        std::string response_str = response.str();
-        return (response_str);
+         time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::hours(1));
+        std::stringstream ss;
+        ss << "my_cookie=12345; expires=" << std::put_time(gmtime(&now), "%a, %d %b %Y %H:%M:%S GMT") << "; path=/";
+        std::string cookie_str = ss.str();
+
+        std::string response = "HTTP/1.1 200 OK\r\n";
+        response += "Content-Type: text/plain\r\n";
+        response += "Set-Cookie: " + cookie_str + "\r\n";
+        response += "Content-Length: 5\r\n";
+        response += "\r\n";
+        response += "Hello";
+        return (response);
     }
     
     int http_sever::send_data(int socket)

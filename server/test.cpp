@@ -281,41 +281,81 @@ Developer Network\r\n
 */
 
 
-#include <stdio.h>
-#include <string.h>
+// #include <stdio.h>
+// #include <string.h>
+// #include <sys/socket.h>
+// #include <netinet/in.h>
+// #include <unistd.h>
+// #include <arpa/inet.h>
+
+// int main() {
+//     int sock = socket(AF_INET, SOCK_STREAM, 0);
+//     if (sock == -1) {
+//         perror("Error: Could not create socket");
+//         return 1;
+//     }
+
+//     struct sockaddr_in server_address;
+//     memset(&server_address, 0, sizeof(server_address));
+//     server_address.sin_family = AF_INET;
+//     server_address.sin_port = htons(8888);
+//     server_address.sin_addr.s_addr = INADDR_ANY;
+
+//     if (connect(sock, (struct sockaddr*)&server_address, sizeof(server_address)) == -1) {
+//         perror("Error: Could not connect to server");
+//         return 1;
+//     }
+
+//     const char* message = "This is a test message.";
+//     int sent_bytes = send(sock, message, strlen(message), 0);
+//     if (sent_bytes == -1) {
+//         perror("Error: Could not send data");
+//         close(sock);
+//         return 1;
+//     }
+
+//     printf("Sent %d bytes of data to %s\n", sent_bytes, inet_ntoa(server_address.sin_addr));
+
+//     close(sock);
+//     return 0;
+// }
+
+
+#include <iostream>
+#include <ctime>
+#include <chrono>
+#include <sstream>
+#include <iomanip>
+#include <sys/types.h>
 #include <sys/socket.h>
-#include <netinet/in.h>
 #include <unistd.h>
-#include <arpa/inet.h>
+
+using namespace std;
+
+void set_cookie(int client_socket) {
+    time_t now = chrono::system_clock::to_time_t(chrono::system_clock::now() + chrono::hours(1));
+    stringstream ss;
+    ss << "my_cookie=12345; expires=" << put_time(gmtime(&now), "%a, %d %b %Y %H:%M:%S GMT") << "; path=/";
+    string cookie_str = ss.str();
+
+    string response = "HTTP/1.1 200 OK\r\n";
+    response += "Content-Type: text/plain\r\n";
+    response += "Set-Cookie: " + cookie_str + "\r\n";
+    response += "Content-Length: 5\r\n";
+    response += "\r\n";
+    response += "Hello";
+
+    send(client_socket, response.c_str(), response.length(), 0);
+}
 
 int main() {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock == -1) {
-        perror("Error: Could not create socket");
-        return 1;
-    }
+    // ... server setup code ...
 
-    struct sockaddr_in server_address;
-    memset(&server_address, 0, sizeof(server_address));
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(8888);
-    server_address.sin_addr.s_addr = INADDR_ANY;
+    // example usage
+    int client_socket = ...; // assume you already have a socket connected to the client
+    set_cookie(client_socket);
 
-    if (connect(sock, (struct sockaddr*)&server_address, sizeof(server_address)) == -1) {
-        perror("Error: Could not connect to server");
-        return 1;
-    }
-
-    const char* message = "This is a test message.";
-    int sent_bytes = send(sock, message, strlen(message), 0);
-    if (sent_bytes == -1) {
-        perror("Error: Could not send data");
-        close(sock);
-        return 1;
-    }
-
-    printf("Sent %d bytes of data to %s\n", sent_bytes, inet_ntoa(server_address.sin_addr));
-
-    close(sock);
+    // ... server cleanup code ...
     return 0;
 }
+
