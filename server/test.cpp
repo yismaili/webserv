@@ -281,41 +281,75 @@ Developer Network\r\n
 */
 
 
-#include <stdio.h>
-#include <string.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <unistd.h>
-#include <arpa/inet.h>
+// #include <stdio.h>
+// #include <string.h>
+// #include <sys/socket.h>
+// #include <netinet/in.h>
+// #include <unistd.h>
+// #include <arpa/inet.h>
+
+// int main() {
+//     int sock = socket(AF_INET, SOCK_STREAM, 0);
+//     if (sock == -1) {
+//         perror("Error: Could not create socket");
+//         return 1;
+//     }
+
+//     struct sockaddr_in server_address;
+//     memset(&server_address, 0, sizeof(server_address));
+//     server_address.sin_family = AF_INET;
+//     server_address.sin_port = htons(8888);
+//     server_address.sin_addr.s_addr = INADDR_ANY;
+
+//     if (connect(sock, (struct sockaddr*)&server_address, sizeof(server_address)) == -1) {
+//         perror("Error: Could not connect to server");
+//         return 1;
+//     }
+
+//     const char* message = "This is a test message.";
+//     int sent_bytes = send(sock, message, strlen(message), 0);
+//     if (sent_bytes == -1) {
+//         perror("Error: Could not send data");
+//         close(sock);
+//         return 1;
+//     }
+
+//     printf("Sent %d bytes of data to %s\n", sent_bytes, inet_ntoa(server_address.sin_addr));
+
+//     close(sock);
+//     return 0;
+// }
+
+
+#include <iostream>
+#include <random>
+#include <string>
+
+std::string generate_cookie_value(int length) {
+    int i;
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, sizeof(alphanum) - 1);
+
+    std::string result(length, '\0');
+    i = 0;
+    while(i < length) 
+    {
+        result[i++] = alphanum[dis(gen)];
+    }
+
+    return result;
+}
 
 int main() {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock == -1) {
-        perror("Error: Could not create socket");
-        return 1;
-    }
-
-    struct sockaddr_in server_address;
-    memset(&server_address, 0, sizeof(server_address));
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(8888);
-    server_address.sin_addr.s_addr = INADDR_ANY;
-
-    if (connect(sock, (struct sockaddr*)&server_address, sizeof(server_address)) == -1) {
-        perror("Error: Could not connect to server");
-        return 1;
-    }
-
-    const char* message = "This is a test message.";
-    int sent_bytes = send(sock, message, strlen(message), 0);
-    if (sent_bytes == -1) {
-        perror("Error: Could not send data");
-        close(sock);
-        return 1;
-    }
-
-    printf("Sent %d bytes of data to %s\n", sent_bytes, inet_ntoa(server_address.sin_addr));
-
-    close(sock);
+    std::string cookie_value = generate_cookie_value(60);
+    std::cout << cookie_value << std::endl;
     return 0;
 }
+
+

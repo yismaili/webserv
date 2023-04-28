@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/24 19:07:39 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/28 18:03:29 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,14 @@
 #include <ctype.h>
 #include <poll.h>
 #include <sys/poll.h>
+#include <random>
+#include <ctime>
+#include <chrono>
+#include <iomanip>
+
+
+
+
 #define BUFFER_SIZE 1024
 namespace http{
     class http_sever{
@@ -47,6 +55,7 @@ namespace http{
             int send_data(int socket);
             void unchunk(int sockfd);
             int transfer_encoding_chunked(int sockfd);
+            std::string generate_cookie_value(int length);
         public:
             int clint;
             http::sockets sock;
