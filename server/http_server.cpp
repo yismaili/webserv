@@ -6,20 +6,11 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/28 16:39:49 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/28 18:22:37 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/http_server.hpp"
-
-#include <iostream>
-#include <ctime>
-#include <chrono>
-#include <sstream>
-#include <iomanip>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <unistd.h>
 
 namespace http{
    http_sever::http_sever(std::vector<int> port_, std::string ip_add) :sock()
@@ -272,12 +263,34 @@ namespace http{
         }
         return result;
     }
-        
+    
+    std::string http_sever::generate_cookie_value(int length) 
+    {
+        int i;
+        static const char alphanum[] =
+            "0123456789"
+            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            "abcdefghijklmnopqrstuvwxyz";
+
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<> dis(0, sizeof(alphanum) - 1);
+
+        std::string result(length, '\0');
+        i = 0;
+        while(i < length) 
+        {
+            result[i++] = alphanum[dis(gen)];
+        }
+
+        return "cookie =" + result;
+    }
+    
     std::string http_sever::build_response()
     {
-         time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::hours(1));
+        time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::seconds(10));
         std::stringstream ss;
-        ss << "my_cookie=12345; expires=" << std::put_time(gmtime(&now), "%a, %d %b %Y %H:%M:%S GMT") << "; path=/";
+        ss << generate_cookie_value(60) << std::put_time(gmtime(&now), "%a, %d %b %Y %H:%M:%S GMT") << "; path=/";
         std::string cookie_str = ss.str();
 
         std::string response = "HTTP/1.1 200 OK\r\n";

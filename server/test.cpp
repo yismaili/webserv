@@ -322,40 +322,34 @@ Developer Network\r\n
 
 
 #include <iostream>
-#include <ctime>
-#include <chrono>
-#include <sstream>
-#include <iomanip>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <unistd.h>
+#include <random>
+#include <string>
 
-using namespace std;
+std::string generate_cookie_value(int length) {
+    int i;
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
 
-void set_cookie(int client_socket) {
-    time_t now = chrono::system_clock::to_time_t(chrono::system_clock::now() + chrono::hours(1));
-    stringstream ss;
-    ss << "my_cookie=12345; expires=" << put_time(gmtime(&now), "%a, %d %b %Y %H:%M:%S GMT") << "; path=/";
-    string cookie_str = ss.str();
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> dis(0, sizeof(alphanum) - 1);
 
-    string response = "HTTP/1.1 200 OK\r\n";
-    response += "Content-Type: text/plain\r\n";
-    response += "Set-Cookie: " + cookie_str + "\r\n";
-    response += "Content-Length: 5\r\n";
-    response += "\r\n";
-    response += "Hello";
+    std::string result(length, '\0');
+    i = 0;
+    while(i < length) 
+    {
+        result[i++] = alphanum[dis(gen)];
+    }
 
-    send(client_socket, response.c_str(), response.length(), 0);
+    return result;
 }
 
 int main() {
-    // ... server setup code ...
-
-    // example usage
-    int client_socket = ...; // assume you already have a socket connected to the client
-    set_cookie(client_socket);
-
-    // ... server cleanup code ...
+    std::string cookie_value = generate_cookie_value(60);
+    std::cout << cookie_value << std::endl;
     return 0;
 }
+
 
