@@ -321,35 +321,74 @@ Developer Network\r\n
 // }
 
 
+// #include <iostream>
+// #include <random>
+// #include <string>
+
+// std::string generate_cookie_value(int length) {
+//     int i;
+//     static const char alphanum[] =
+//         "0123456789"
+//         "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+//         "abcdefghijklmnopqrstuvwxyz";
+
+//     std::random_device rd;
+//     std::mt19937 gen(rd());
+//     std::uniform_int_distribution<> dis(0, sizeof(alphanum) - 1);
+
+//     std::string result(length, '\0');
+//     i = 0;
+//     while(i < length) 
+//     {
+//         result[i++] = alphanum[dis(gen)];
+//     }
+
+//     return result;
+// }
+
+// int main() {
+//     std::string cookie_value = generate_cookie_value(60);
+//     std::cout << cookie_value << std::endl;
+//     return 0;
+// }
+
 #include <iostream>
-#include <random>
-#include <string>
-
-std::string generate_cookie_value(int length) {
-    int i;
-    static const char alphanum[] =
-        "0123456789"
-        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        "abcdefghijklmnopqrstuvwxyz";
-
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dis(0, sizeof(alphanum) - 1);
-
-    std::string result(length, '\0');
-    i = 0;
-    while(i < length) 
-    {
-        result[i++] = alphanum[dis(gen)];
-    }
-
-    return result;
-}
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
 int main() {
-    std::string cookie_value = generate_cookie_value(60);
-    std::cout << cookie_value << std::endl;
+    int sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0) {
+        std::cerr << "Failed to create socket\n";
+        return 1;
+    }
+
+    struct sockaddr_in server_address;
+    server_address.sin_family = AF_INET;
+    server_address.sin_port = htons(80); // connect to port 80 on the remote server
+    server_address.sin_addr.s_addr = inet_addr("93.184.216.34"); // connect to the IP address of example.com
+
+    if (connect(sock, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
+        std::cerr << "Failed to connect to server\n";
+        return 1;
+    }
+
+    std::string message = "GET / HTTP/1.1\r\nHost: www.example.com\r\n\r\n";
+    if (send(sock, message.c_str(), message.length(), 0) < 0) {
+        std::cerr << "Failed to send message to server\n";
+        return 1;
+    }
+
+    char response_buffer[1024] = {0};
+    if (recv(sock, response_buffer, sizeof(response_buffer), 0) < 0) {
+        std::cerr << "Failed to receive response from server\n";
+        return 1;
+    }
+
+    std::cout << response_buffer << "\n";
+
+    close(sock);
     return 0;
 }
-
 
