@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/28 18:22:37 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/30 18:56:00 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ namespace http{
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
                     std::cout<<requist_data[clients[i].fd]<<std::endl;
+                    r.parse_request(requist_data[clients[i].fd]);
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     sent_ret = send_data(clients[i].fd);
                     if (sent_ret == 0){
