@@ -1,0 +1,136 @@
+Note for the remaining things i didn't parse yet in the request.cpp
+#/******************************************************************/
+
+this->_headers["Accept-Charsets"] = "";
+this->_headers["Accept-Language"] = "";
+this->_headers["Allow"] = "";
+this->_headers["Auth-Scheme"] = "";
+this->_headers["Authorization"] = "";
+this->_headers["Content-Language"] = "";
+this->_headers["Content-Length"] = "";
+this->_headers["Content-Location"] = "";
+this->_headers["Content-Type"] = "";
+this->_headers["Date"] = "";
+this->_headers["Host"] = "";
+this->_headers["Last-Modified"] = "";
+this->_headers["Location"] = "";
+this->_headers["Referer"] = "";
+this->_headers["Retry-After"] = "";
+this->_headers["Server"] = "";
+this->_headers["Transfer-Encoding"] = "";
+this->_headers["User-Agent"] = "";
+this->_headers["Www-Authenticate"] = "";
+this->_headers["Connection"] = "Keep-Alive";
+
+#/******************************************************************/
+i need to clear the _header before using it
+
+this->_header.clear();
+
+#/******************************************************************/
+i need to make the parsing function return an int like 505 or 404 or 200...etc
+200 will be returned if the parsing is successful
+404 will be returned if the request is not found
+505 will be returned if the version is not supported
+400 will be returned if the request is bad
+
+#/******************************************************************/
+I need to compare the content length if existed with the body request
++ after parsing the config file i need to compare a certain thing of it with the body request also
+
+#/******************************************************************/
+
+request_path is the portion of the URL that comes after the domain name and the optional port number, and it identifies the specific resource being requested.
+
+For example, if the URL requested is http://example.com/path/to/file.html, then the request_path string would be /path/to/file.html.
+
+#/******************************************************************/
+i will need this URI to in the file_path 
+--> chagpt steps:
+To send a file as a response to an HTTP/1.1 request, you need to follow these steps:
+
+Parse the client request: You need to parse the client's request to extract the URI (Uniform Resource Identifier) requested by the client.
+
+Map the URI to a file path: The URI requested by the client needs to be mapped to a file path on your server. You can do this by using a mapping table or by using a convention.
+
+Open the file: Once you have the file path, you need to open the file using a file stream. In most programming languages, you can use the "open" function to open a file.
+
+Read the file: Once the file is open, you need to read the file content into a buffer. The file content can be read in chunks to optimize performance.
+
+Create the response header: After reading the file content, you need to create the response header. The response header should include the HTTP version, the status code, content type, content length, and other relevant information.
+
+Send the response header: Once the response header is created, you need to send the response header to the client.
+
+Send the file content: After sending the response header, you need to send the file content to the client. You can do this by writing the content buffer to the socket or output stream.
+
+Close the file: After sending the file content, you need to close the file stream.
+
+Close the connection: After closing the file stream, you need to close the connection.
+
+#/******************************************************************/
+
+i should get the file size 
+
+something like this:
+size_t response::getResponseFileSize()
+{
+	if (_file.good())
+	{
+		size_t currentPos = _file.tellg();
+		size_t fileSize = 0;
+
+		_file.seekg(0, _file.end);
+		fileSize = _file.tellg();
+		_file.seekg(currentPos);
+		return (fileSize);
+	}
+	else
+		return (0);
+}
+
+#/******************************************************************/
+
+i need to handle the Date in the respond
+
+#/******************************************************************/
+
+i need to handle the Last-Modified in the respond
+
+#/******************************************************************/
+
+i need to handle the Content-Language in the respond
+
+#/******************************************************************/
+
+i need to handle the Content-Location in the respond
+
+#/******************************************************************/
+
+i need to handle the Content-Type in the respond
+
+#/******************************************************************/
+
+I should handle redirections
+
+#/******************************************************************/
+
+i need to handle the Allow in the respond
+
+#/******************************************************************/
+
+init headers of response
+
+	_headers["Allow"] = "";
+	_headers["Content-Language"] = "";
+	_headers["Content-Length"] = "0";
+	_headers["Content-Location"] = "";
+	_headers["Content-Type"] = "";
+	_headers["Date"] = "";
+	_headers["Last-Modified"] = "";
+	_headers["Connection"] = "";
+	_headers["Location"] = "";
+	_headers["Retry-After"] = "";
+	_headers["Server"] = "Webserv";
+	_headers["Transfer-Encoding"] = "identity";
+	_headers["WwwAuthenticate"] = "";
+	_headers["Set-Cookie"] = "";

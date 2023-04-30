@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   respond_utils.cpp                                  :+:      :+:    :+:   */
+/*   method_utils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/12 19:49:02 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/30 18:06:19 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,22 +14,12 @@
 
 void    Respond::ft_handle_redirection()
 {
-    std::string response;
-    std::string body;
-
-    body = "<html><head><title>301 Moved Permanently</title></head><body><h1>Moved Permanently</h1><p>The document has moved <a href=\"" + this->_uri + "\">here</a>.</p></body></html>";
-    response = r.get_version() + " 301 Moved Permanently\r\n";
-    response += "Content-Type: text/html\r\n";
-    response += "Content-Length: " + std::to_string(body.length()) + "\r\n";
-    response += "Connection: keep-alive\r\n";
-    response += "Location: " + r.get_uri() + "\r\n";
-    response += "\r\n";
-    response += body;
-    return (response);
+    
 }
 
 void    Respond::ft_handle_cgi()
 {
+    
 }
 
 int    ft_check_file()
@@ -49,11 +39,11 @@ void    Respond::ft_handle_file()
     std::ifstream file;
     if (_rooted_path != "")
     {
-        file.open(_rooted_path);
+        file.open(_rooted_path.c_str());
         if (file.is_open())
         {
             _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            _status_code = "200";
+            _status_code = 200;
             _status_message = "OK";
             _headers["Content-Type"] = "text/html";
             _headers["Content-Length"] = std::to_string(_response_body.length());
@@ -64,6 +54,11 @@ void    Respond::ft_handle_file()
             _status_code = "404";
             _status_message = "Not Found";
         }
+    }
+    else
+    {
+        _status_code = "404";
+        _status_message = "Not Found";
     }
 }
 /*
@@ -114,22 +109,25 @@ void    Respond::ft_handle_index_2()
 
 void    Respond::ft_handle_autoindex()
 {
-        for (int j = 0; j < server[i]._location.size(); j++)
+    for (int i = 0; i < server.size(); i++)
     {
-        if (_path_found == server[i]._location[j].location_name)
+        for (int j = 0; j < server[i]._location.size(); j++)
         {
-            if (!server[i]._location[j].get_autoindex())
+            if (_path_found == server[i]._location[j].location_name)
             {
-                if (!server[i].get_autoindex())
+                if (!server[i]._location[j].get_autoindex())
                 {
-                    // show forbidden result
-                    ft_handle_error(403);
+                    if (!server[i].get_autoindex())
+                    {
+                        // show forbidden result
+                        ft_handle_error(403);
+                    }
+                    else
+                        ft_show_autoindex();
                 }
                 else
                     ft_show_autoindex();
             }
-            else
-                ft_show_autoindex();
         }
     }
 }
@@ -159,7 +157,7 @@ void    Respond::ft_show_autoindex()
     
     if (dir == NULL)
     {
-        ft_handle_error(403);
+        handle_error_response(403);
         return ;
     }
     
@@ -177,7 +175,7 @@ void    Respond::ft_show_autoindex()
             
             if (stat(file_path.c_str(), &file_stat) < 0)
             {
-                ft_handle_error(403);
+                handle_error_response(403);
                 continue ;
             }
             
@@ -191,4 +189,26 @@ void    Respond::ft_show_autoindex()
     closedir(dir);
     index_html += "</tbody>\n</table>\n</body>\n</html>\n";
     _response_body = index_html;
+}
+
+void    Respond::handle_error_response(int error_code)
+{
+    _response_body = "<html><head><title>" + std::to_string(error_code) + " " + _status_message + "</title></head><body><h1>" + std::to_string(error_code) + " " + _status_message + "</h1><p>You don't have permission to access " + this->_uri + " on this server.</p></body></html>";
+    set_status_code(_status_code);
+    set_status_message(get_response_status(_status_code));
+    set_header("Content-Type", "text/html");
+    set_header("Content-Length", std::to_string(_response_body.length()));
+    set_header("Connection", "keep-alive");
+
+    print_response();
+}
+
+void    Respond::print_response()
+{
+    std::cout << "HTTP/1.1 " << get_status_code() << " " << get_status_message() << "\r\n";
+    for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
+        std::cout << it->first << ": " << it->second << "\r\n";
+    std::cout << "\r\n";
+    if (get_response_body() != "")
+        std::cout << _response_body;
 }
