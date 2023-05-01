@@ -339,14 +339,13 @@ server::server(Data_config data, bool check_location)
         }
         else if (key == "index")
         {
+            if (c_index)
+                ft_error(line, "Error duplicated");
             is_empty_value(value, line);
             //ft_check_index(value, line);
-            _index.push_back(value);
-            while (iss >> value)
-            {
-                ft_check_index(value, line);
-                _index.push_back(value);
-            }
+            _index = value;
+            if (ft_numbers_value(iss))
+                ft_error(line, "Error");
             c_index++;
         }
         else if (key == "allow_methods" && !check_location)
@@ -447,7 +446,7 @@ server::server(Data_config data, bool check_location)
     if (!c_listen && check_location)
         _listen.push_back(80);
     if (!c_index && check_location)
-        _index.push_back("index.html");
+        _index = "index.html";
     if (!c_host && check_location)
         _host = "127.0.0.1";
     if(!c_error_page && check_location)
@@ -487,9 +486,9 @@ void server::display_sever()
     for (size_t i = 0; i < _server_name.size(); i++) 
         std::cout << _server_name[i] << " ";
     std::cout << std::endl;
-    std::cout << "Index : "; 
-    for (size_t i = 0; i < _index.size(); i++) 
-        std::cout << _index[i] << " ";
+    std::cout << "Index : " << _index << "\n";
+    // for (size_t i = 0; i < _index.size(); i++) 
+    //     std::cout << _index[i] << " ";
     std::cout << std::endl;
     std::cout << "hostname : " << _host << std::endl;
     std::cout << "root : " << _root << std::endl;
@@ -510,7 +509,7 @@ void server::display_sever()
     std::cout << "upload_store :"<< _upload_store << "\n"; 
 }
 
-std::vector<std::string> server::get_index() const
+std::string server::get_index() const
 {
     return (_index);
 }

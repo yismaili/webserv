@@ -12,7 +12,7 @@ class server
 {
 protected:
     std::vector<std::string> _server_name; /*s*/
-    std::vector<std::string> _index;
+    std::string _index;
     std::string _host; /*s*/
     std::string _root; 
     int _client_max_body_size; /*l*/
@@ -42,7 +42,7 @@ public:
     std::vector<std::string> get_server_name() const;
     std::string get_host() const;
     int get_client_max_body_size() const;
-    std::vector<std::string> get_index() const;
+    std::string get_index() const;
     std::string get_root() const;
     std::map<int, std::string> get_error_page() const;
     std::vector<std::string> get_allow_methods() const;
