@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/30 18:56:00 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/04/30 23:14:40 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -289,18 +289,18 @@ namespace http{
     
     std::string http_sever::build_response()
     {
-        time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::seconds(10));
-        std::stringstream ss;
-        ss << generate_cookie_value(60) << std::put_time(gmtime(&now), "%a, %d %b %Y %H:%M:%S GMT") << "; path=/";
-        std::string cookie_str = ss.str();
-
-        std::string response = "HTTP/1.1 200 OK\r\n";
-        response += "Content-Type: text/plain\r\n";
-        response += "Set-Cookie: " + cookie_str + "\r\n";
-        response += "Content-Length: 5\r\n";
-        response += "\r\n";
-        response += "Hello";
-        return (response);
+       // Insert html page or ...
+        std::ostringstream response; //create the output string stream
+        
+        response << "HTTP/1.1 200 OK\r\n";
+        response << "Content-Type: text/html; charset=UTF-8\r\n";
+        response << "\r\n";
+        response << "<html><body><h1>Hello younes </h1>";
+        response << "<h1>from HTTP server!</h4>";
+        response << "</body></html>";
+        
+        std::string response_str = response.str();
+        return (response_str);
     }
     
     int http_sever::send_data(int socket)

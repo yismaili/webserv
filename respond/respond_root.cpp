@@ -6,37 +6,37 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/30 15:29:13 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/01 15:43:16 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "respond.hpp"
 
-void    Respond::response_root()
+void    Respond::response_root(std::vector<server> servers)
 {
     // step 1 :check the location
-    if (ft_parse_location())
+    if (ft_parse_location(servers))
     {
         handle_error_response(_status_code);
         return ;
     }
 
     // step 2 : check the redirectation
-    if (ft_parse_url_forwarding())
+    if (ft_parse_url_forwarding(servers))
     {
         handle_error_response(_status_code);
         return ;
     } 
 
     // step 3 : check the validation of rooted path
-    if (ft_parse_root_path())
+    if (ft_parse_root_path(servers))
     {
         handle_error_response(_status_code);
         return ;
     }
     
     // step 4 : check the allowed methods
-    if (ft_check_allowed_methods())
+    if (ft_check_allowed_methods(servers))
     {
         handle_error_response(_status_code);
         return ;
@@ -63,7 +63,7 @@ void    Respond::response_root()
     print_response();
 }
 
-int Respond::ft_parse_location()
+int Respond::ft_parse_location(std::vector<server> server)
 {
     // exact location body code
     std::string path = r.get_uri();
@@ -114,7 +114,7 @@ int Respond::ft_parse_location()
     // root location
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0; j < server._location.size(); j++)
+        for (int j = 0; j < server[i]._location.size(); j++)
         {
             if (server[i]._location[j].location_name == "/")
             {
@@ -128,11 +128,11 @@ int Respond::ft_parse_location()
     return (1);
 }
 
-int Respond::ft_parse_url_forwarding()
+int Respond::ft_parse_url_forwarding(std::vector<server> server)
 {
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0;  j < server._location.size(); j++)
+        for (int j = 0;  j < server[i]._location.size(); j++)
         {
             if (_path_found == server[i]._location[j].location_name)
             {
@@ -160,7 +160,7 @@ int Respond::ft_parse_url_forwarding()
     }
 }
 
-int Respond::ft_check_allowed_methods()
+int Respond::ft_check_allowed_methods(std::vector<server> server)
 {
     for (int i = 0; i < server.size(); i++)
     {
@@ -188,11 +188,11 @@ int Respond::ft_check_allowed_methods()
     return (1);
 }
 
-void    Respond::ft_check_autoindex()
+void    Respond::ft_check_autoindex(std::vector<server> server)
 {
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0; server._location.size(); j++)
+        for (int j = 0; server[i]._location.size(); j++)
         {
             if (_path_found == server[i]._location[j].location_name)
             {

@@ -14,7 +14,7 @@ Respond::Respond()
 {
     _http_version = "HTTP/1.1";
     _response_body = "";
-    _status_code = "200";
+    _status_code = 200;
     _status_message = "OK";
     // _document_root = "./www";
     _path_found = "";
