@@ -18,8 +18,9 @@ protected:
     int _client_max_body_size; /*l*/
     std::map<int, std::string> _error_page;
     std::vector<std::string> _allow_methods;
-    std::pair <int , std::string> _rederiction;
+    std::pair <int , std::string> _rediriction;
     std::map<std::string ,std::string> _path_info; 
+    std::string _upload_store;
     bool _autoindex;
     bool _upload;
     // std::vector<std::string> _access_log;
@@ -35,7 +36,7 @@ public:
     std::vector<location> _location;
     server(Data_config data, bool check_location);
     server();
-     virtual ~server();
+    ~server();
     void display_sever();
     std::vector<int> &get_listen();
     std::vector<std::string> get_server_name() const;
@@ -46,6 +47,8 @@ public:
     std::map<int, std::string> get_error_page() const;
     std::vector<std::string> get_allow_methods() const;
     bool get_autoindex () const;
+    std::pair <int , std::string> get_rediriction() const;
+    std::string get_upload_store() const;
 };
 
 int is_world(std::string str, std::string tmp);
