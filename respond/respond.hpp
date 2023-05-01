@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/01 15:43:45 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/01 20:08:47 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,8 @@
 # include "../prs_rsc/server.hpp"
 # include "additional_class.hpp"
 # include "../prs_rsc/location.hpp"
+# include "../CGI/cgi.hpp"
+
 class server;
 class location;
 
@@ -67,13 +69,12 @@ class Respond
         int         ft_parse_root_path(std::vector<server> server);
 
         // GET RESPONSE
-        void        ft_handle_redirection();
         void        ft_handle_cgi();
         void        ft_handle_file();
-        void        ft_handle_autoindex();
+        void        ft_handle_autoindex(std::vector<server> servers);
         void        ft_check_cgi();
-        int         ft_check_file();
-        void        ft_handle_index();
+        int         ft_check_file(std::vector<server> servers);
+        void        ft_handle_index(std::vector<server> servers);
         void        ft_handle_index_2();
         void        ft_show_autoindex();
 
@@ -107,7 +108,7 @@ class Respond
         bool        _is_redirection;
         bool        _is_index;
 
-        void        handle_get_response();
+        void        handle_get_response(std::vector<server> servers);
         void        handle_post_response();
         void        handle_delete_response();
         void        print_response();
@@ -120,52 +121,12 @@ class Respond
         std::string get_content_type();
         // ERROR RESPONSE
         void        handle_error_response(int error_code);
-        void        ft_handle_error(int error_code)
+        void        ft_handle_error(int error_code);
 
         // DELETE RESPONSE
 
-        void        cout_respond();
+        // void        cout_respond();
 
 };
 
 #endif
-
-/*
-    std::string line;
-    std::string key;
-    std::string value;
-    std::string file_name;
-    std::string file_content;
-    std::string file_path;
-    std::ofstream file;
-    std::string::iterator it = r.get_body().begin();
-    std::string::iterator ite = r.get_body().end();
-    while (it != ite)
-    {
-        if (*it == '=')
-        {
-            key = line;
-            line.clear();
-        }
-        else if (*it == '&')
-        {
-            value = line;
-            line.clear();
-            file_name = _upload_store_path;
-            file_name.append(key);
-            file.open(file_name.c_str());
-            file << value;
-            file.close();
-        }
-        else
-            line.push_back(*it);
-        it++;
-    }
-    value = line;
-    line.clear();
-    file_name = _upload_store_path;
-    file_name.append(key);
-    file.open(file_name.c_str());
-    file << value;
-    file.close();
-    */

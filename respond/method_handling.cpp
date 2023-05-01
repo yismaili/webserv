@@ -6,13 +6,13 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/01 15:20:45 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/01 16:47:01 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "respond.hpp"
 
-void    Respond::handle_get_response()
+void    Respond::handle_get_response(std::vector<server> servers)
 {
     
     // step 2: check if it's a CGI or not (like if `index` of the configuration file has .py or .php...etc)
@@ -20,15 +20,15 @@ void    Respond::handle_get_response()
         ft_handle_cgi();
     
     // step 3: check if it's a file or not
-    if (ft_check_file() == true)
+    if (ft_check_file(servers) == true)
         ft_handle_file();
 
     // step 4 : check the index in the configuration file and render it
     if (_is_index == true)
-        ft_handle_index();
+        ft_handle_index(servers);
     
     // step 5: check if the autoindex if on or off
-    ft_handle_autoindex();
+    ft_handle_autoindex(servers);
     
     // ft_handle_error(404);
 

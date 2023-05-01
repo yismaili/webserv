@@ -102,7 +102,7 @@ std::string Respond::get_document_root()
     return (_document_root);
 }
 
-int Respond::ft_parse_root_path()
+int Respond::ft_parse_root_path(std::vector<server> server)
 {
     struct stat file_stats;
     _rooted_path = server.get_root() + _path_found;

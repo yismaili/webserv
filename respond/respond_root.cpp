@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/01 15:43:16 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/01 18:32:55 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,11 +22,8 @@ void    Respond::response_root(std::vector<server> servers)
     }
 
     // step 2 : check the redirectation
-    if (ft_parse_url_forwarding(servers))
-    {
-        handle_error_response(_status_code);
-        return ;
-    } 
+    if (!ft_parse_url_forwarding(servers))
+        return ; 
 
     // step 3 : check the validation of rooted path
     if (ft_parse_root_path(servers))
@@ -34,7 +31,7 @@ void    Respond::response_root(std::vector<server> servers)
         handle_error_response(_status_code);
         return ;
     }
-    
+
     // step 4 : check the allowed methods
     if (ft_check_allowed_methods(servers))
     {
@@ -43,15 +40,11 @@ void    Respond::response_root(std::vector<server> servers)
     }
 
     // step 5 : check the autoindex
-    ft_check_autoindex();
-
-    // handle redirection in case it's true
-    if (_is_redirection == true)
-        ft_handle_redirection();
+    ft_check_autoindex(servers);
 
     // methods area
     if (r.get_method() == "Get")
-        handle_get_response();
+        handle_get_response(servers);
     else if (r.get_method() == "Post")
         handle_post_response();
     else if (r.get_method() == "Delete")
@@ -59,7 +52,7 @@ void    Respond::response_root(std::vector<server> servers)
     else // unsupported http method
         handle_error_response(405);
     
-    // set the response
+    // cout the response
     print_response();
 }
 
@@ -137,15 +130,14 @@ int Respond::ft_parse_url_forwarding(std::vector<server> server)
             if (_path_found == server[i]._location[j].location_name)
             {
                 // check for redirection ===== where redirection is make_pair
-                if (!server[i]._location[j].redirection.first.first.empty() &&
-                    !server[i]._location[j].redirection.first.second.empty())
+                if (!server[i]._location[j].get_redirection().second.empty())
                 {
-                    int status_code = server[i]._location[j].redirection.second;
+                    int status_code = server[i]._location[j].get_redirection().first;
                     // search for message of the status_code
                     std::string message = get_response_status(status_code);
                     set_status_code(status_code);
                     set_status_message(message);
-                    set_header("Location", server[i]._location[j].redirection.first);
+                    set_header("Location", server[i]._location[j].get_redirection().second);
                     _is_redirection = true;
                     return (0);
                 }
@@ -164,14 +156,14 @@ int Respond::ft_check_allowed_methods(std::vector<server> server)
 {
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0; server._location.size(); j++)
+        for (int j = 0; server[i]._location.size(); j++)
         {
             if (_path_found == server[i]._location[j].location_name)
             {
                 // get the autoindex
                 // _autoindex = server[i]._location[j].autoindex;
                 // check for allowed methods
-                std::vector<std::string> allowed_methods = server[i]._location[j].allowed_methods;
+                std::vector<std::string> allowed_methods = server[i]._location[j].get_allow_methods();
                 for (int k = 0; k < allowed_methods.size(); k++)
                 {
                     if (allowed_methods[k] == r.get_method())
@@ -183,6 +175,7 @@ int Respond::ft_check_allowed_methods(std::vector<server> server)
             }
         }
     }
+    return (1);
 
     set_status_code(405);
     return (1);
@@ -197,7 +190,7 @@ void    Respond::ft_check_autoindex(std::vector<server> server)
             if (_path_found == server[i]._location[j].location_name)
             {
                 // check for autoindex
-                if (server[i]._location[j].autoindex == true)
+                if (server[i]._location[j].get_autoindex() == true)
                 {
                     _is_autoindex = true;
                     return ;
