@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 21:26:20 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 21:28:08 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,7 +83,6 @@ namespace http{
                         conf_fd.insert(std::make_pair(new_socket, find_conf(clients[i].fd)));
                         std::cout << "ACCEPTING...\n";
                         // Add new socket to poll list
-                        //+++++
                         pollfd new_client_pollfd;
                         new_client_pollfd.fd = new_socket;
                         new_client_pollfd.events = POLLOUT | POLLIN;
