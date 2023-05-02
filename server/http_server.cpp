@@ -6,20 +6,23 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/01 00:37:20 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 02:58:33 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/http_server.hpp"
+#include "../prs_rsc/server.hpp"
 
 namespace http{
-   http_sever::http_sever(std::vector<int> port_, std::string ip_add) :sock()
+   http_sever::http_sever(std::vector<server> conf) :sock()
    {
-        std::vector<int>::iterator it = port_.begin();
-        while (it < port_.end())
+        for (size_t i = 0; i < conf.size(); i++)
         {
-           socket_id.push_back(sock.init_data(*it, ip_add));
-            it++;
+            for (size_t j = 0; j < conf[i]._listen.size(); j++){
+               socket_id.push_back(sock.init_data(conf[i]._listen[j], conf[i].get_host(), conf[i]._listen[j]));
+               
+                std::cout<<conf[i]._listen[j]<<"-----"<<conf[i].get_host()<<std::endl;
+            }
         }
     }
     

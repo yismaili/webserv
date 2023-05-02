@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/01 00:34:24 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 02:35:46 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@
 namespace http{
     class http_sever{
         public:
-            http_sever(std::vector<int> port_, std::string ip_add);  
+            http_sever(std::vector<server> conf);  
             ~http_sever();
             int accept_connection(int sockfd);
             std::string build_response();
@@ -60,7 +60,9 @@ namespace http{
         public:
             int clint;
             http::sockets sock;
+            
             std::vector<http::sockets> socket_id;
+             std::map<int, server> conf;
             std::vector<pollfd> clients;
             std::map<int, std::string> requist_data;
             std::map<int, bool> read_info;

@@ -352,43 +352,56 @@ Developer Network\r\n
 //     return 0;
 // }
 
-#include <iostream>
-#include <sys/socket.h>
+// #include <iostream>
+// #include <sys/socket.h>
+// #include <arpa/inet.h>
+// #include <unistd.h>
+
+// int main() {
+//     int sock = socket(AF_INET, SOCK_STREAM, 0);
+//     if (sock < 0) {
+//         std::cerr << "Failed to create socket\n";
+//         return 1;
+//     }
+
+//     struct sockaddr_in server_address;
+//     server_address.sin_family = AF_INET;
+//     server_address.sin_port = htons(80); // connect to port 80 on the remote server
+//     server_address.sin_addr.s_addr = inet_addr("93.184.216.34"); // connect to the IP address of example.com
+
+//     if (connect(sock, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
+//         std::cerr << "Failed to connect to server\n";
+//         return 1;
+//     }
+
+//     std::string message = "GET / HTTP/1.1\r\nHost: www.example.com\r\n\r\n";
+//     if (send(sock, message.c_str(), message.length(), 0) < 0) {
+//         std::cerr << "Failed to send message to server\n";
+//         return 1;
+//     }
+
+//     char response_buffer[1024] = {0};
+//     if (recv(sock, response_buffer, sizeof(response_buffer), 0) < 0) {
+//         std::cerr << "Failed to receive response from server\n";
+//         return 1;
+//     }
+
+//     std::cout << response_buffer << "\n";
+
+//     close(sock);
+//     return 0;
+// }
+
+
 #include <arpa/inet.h>
-#include <unistd.h>
+#include <stdio.h>
 
 int main() {
-    int sock = socket(AF_INET, SOCK_STREAM, 0);
-    if (sock < 0) {
-        std::cerr << "Failed to create socket\n";
-        return 1;
-    }
+    uint16_t host_short = 0x1234;
+    uint16_t net_short = htons(host_short);
 
-    struct sockaddr_in server_address;
-    server_address.sin_family = AF_INET;
-    server_address.sin_port = htons(80); // connect to port 80 on the remote server
-    server_address.sin_addr.s_addr = inet_addr("93.184.216.34"); // connect to the IP address of example.com
+    printf("Host byte order: 0x%04x\n", host_short);
+    printf("Network byte order: 0x%04x\n", net_short);
 
-    if (connect(sock, (struct sockaddr *)&server_address, sizeof(server_address)) < 0) {
-        std::cerr << "Failed to connect to server\n";
-        return 1;
-    }
-
-    std::string message = "GET / HTTP/1.1\r\nHost: www.example.com\r\n\r\n";
-    if (send(sock, message.c_str(), message.length(), 0) < 0) {
-        std::cerr << "Failed to send message to server\n";
-        return 1;
-    }
-
-    char response_buffer[1024] = {0};
-    if (recv(sock, response_buffer, sizeof(response_buffer), 0) < 0) {
-        std::cerr << "Failed to receive response from server\n";
-        return 1;
-    }
-
-    std::cout << response_buffer << "\n";
-
-    close(sock);
     return 0;
 }
-

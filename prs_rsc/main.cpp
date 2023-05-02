@@ -25,7 +25,7 @@ int main(int ac, char **av)
 //    }  
 //     for (size_t i = 0; i < all_ports.size(); i++)
 //             std::cout << all_ports[i] << "\n";
-    http::http_sever server1(all_ports, "127.0.0.1");
+    http::http_sever server1(servers);
     server1.run();
 return (0);
 }

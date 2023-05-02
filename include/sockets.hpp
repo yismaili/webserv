@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/15 01:41:51 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 03:00:28 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,14 @@
 #include<fstream>
 #include <arpa/inet.h>
 #include <map>
+#include "../prs_rsc/server.hpp"
 
 namespace http{
     class sockets{
         public: 
             sockets(); 
             ~sockets();
-            sockets &init_data(int port_, std::string ip_add);
+            sockets &init_data(int port_, std::string ip_add, int conf_);
             int git_sockfd()const;
             unsigned int &get_sock_addr_len();
             sockaddr_in &git_serv_addr();
@@ -40,6 +41,7 @@ namespace http{
             struct sockaddr_in serv_addr;
             unsigned int sock_addr_len;
             std::string ip_addr;
+           int conf;
             
     };
 }
