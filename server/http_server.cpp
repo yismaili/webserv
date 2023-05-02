@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 02:58:33 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 03:29:10 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,7 +35,19 @@ namespace http{
             it++;
         }
     }
-
+    std::vector<http::sockets>::iterator http_sever::find_conf(int sockfd) 
+    {
+        std::vector<http::sockets>::iterator it = socket_id.begin();
+        while (it != socket_id.end())
+        {
+            if (it->sockfd == sockfd)
+            {
+                return (it);
+            }
+            it++;
+        }
+         return (socket_id.begin());
+    }
     void http_sever::run() 
     {
         int poll_ret, new_socket, recv_ret, sent_ret;
@@ -66,6 +78,7 @@ namespace http{
                     {
                         // Accept incoming connection
                         new_socket = accept_connection(clients[i].fd);
+                        conf_fd.insert(std::make_pair(new_socket, find_conf(clients[i].fd)));
                         std::cout << "ACCEPTING...\n";
                         // Add new socket to poll list
                         pollfd new_client_pollfd;
@@ -86,7 +99,8 @@ namespace http{
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                    std::cout<<requist_data[clients[i].fd]<<std::endl;
+                    //std::cout<<requist_data[clients[i].fd]<<std::endl;
+                    std::cout<<"------"<<conf_fd[clients[i].fd]->conf<<"------"<<std::endl;
                     request r(requist_data[clients[i].fd]);
                    // r.parse_request(requist_data[clients[i].fd]);
                     std::vector<pollfd>::iterator it = clients.begin() + i;

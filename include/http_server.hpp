@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 02:35:46 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 03:26:58 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,12 +57,13 @@ namespace http{
             void unchunk(int sockfd);
             int transfer_encoding_chunked(int sockfd);
             std::string generate_cookie_value(int length);
+            std::vector<http::sockets>::iterator find_conf(int sockfd);
         public:
             int clint;
             http::sockets sock;
             
             std::vector<http::sockets> socket_id;
-             std::map<int, server> conf;
+            std::map<int, std::vector<http::sockets>::iterator> conf_fd;
             std::vector<pollfd> clients;
             std::map<int, std::string> requist_data;
             std::map<int, bool> read_info;
