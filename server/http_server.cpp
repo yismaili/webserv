@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 21:28:08 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 21:30:46 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,6 +103,7 @@ namespace http{
                 {
                   //std::cout<<requist_data[clients[i].fd]<<std::endl;
                   std::cout << "------" <<conf[conf_fd[clients[i].fd]->index].get_root() << "------" << std::endl;
+
                     // request r(requist_data[clients[i].fd]);
                    // r.parse_request(requist_data[clients[i].fd]);
                     std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
