@@ -3,23 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/30 23:14:40 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/02 19:08:49 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/http_server.hpp"
+#include "../prs_rsc/server.hpp"
 
 namespace http{
-   http_sever::http_sever(std::vector<int> port_, std::string ip_add) :sock()
+   http_sever::http_sever(std::vector<server> conf) :sock()
    {
-        std::vector<int>::iterator it = port_.begin();
-        while (it < port_.end())
+        for (size_t i = 0; i < conf.size(); i++)
         {
-           socket_id.push_back(sock.init_data(*it, ip_add));
-            it++;
+            for (size_t j = 0; j < conf[i]._listen.size(); j++)
+            {
+               socket_id.push_back(sock.init_data(conf[i]._listen[j], conf[i].get_host(), conf));
+            }
         }
     }
     
@@ -32,7 +34,21 @@ namespace http{
             it++;
         }
     }
-
+    
+    std::vector<http::sockets>::iterator http_sever::find_conf(int sockfd) 
+    {
+        std::vector<http::sockets>::iterator it = socket_id.begin();
+        while (it != socket_id.end())
+        {
+            if (it->sockfd == sockfd)
+            {
+                return (it);
+            }
+            it++;
+        }
+        return (socket_id.begin());
+    }
+    
     void http_sever::run() 
     {
         int poll_ret, new_socket, recv_ret, sent_ret;
@@ -63,6 +79,7 @@ namespace http{
                     {
                         // Accept incoming connection
                         new_socket = accept_connection(clients[i].fd);
+                        conf_fd.insert(std::make_pair(new_socket, find_conf(clients[i].fd)));
                         std::cout << "ACCEPTING...\n";
                         // Add new socket to poll list
                         pollfd new_client_pollfd;
@@ -83,19 +100,28 @@ namespace http{
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                    std::cout<<requist_data[clients[i].fd]<<std::endl;
-                    r.parse_request(requist_data[clients[i].fd]);
+                  //std::cout<<requist_data[clients[i].fd]<<std::endl;
+                  std::cout << "------" <<conf_fd[clients[i].fd]->conf[0].get_root() << "------" << std::endl;
+                    // request r(requist_data[clients[i].fd]);
+                   // r.parse_request(requist_data[clients[i].fd]);
+                    std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
+                    std::cout<< Connection<<std::endl;
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     sent_ret = send_data(clients[i].fd);
-                    if (sent_ret == 0){
+                    if (sent_ret == 0)
+                    {
                         clients[i].events = POLLIN;
+                        if (Connection == std::string::npos)
+                        {
+                            close(clients[i].fd);
+                        }
                         clients.erase(it);
                         i--;
                     }
                     else if (sent_ret == -2)
                     {
-                        clients.erase(it);
                         close(clients[i].fd);
+                        clients.erase(it);
                         i--;
                     }
                 }
@@ -228,6 +254,7 @@ namespace http{
         {
             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
         }
+       // request r(requist_data[sockfd]);
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
@@ -289,7 +316,19 @@ namespace http{
     
     std::string http_sever::build_response()
     {
-       // Insert html page or ...
+        // time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::seconds(10));
+        // std::stringstream ss;
+        // ss << generate_cookie_value(60) << std::put_time(gmtime(&now), "%a, %d %b %Y %H:%M:%S GMT") << "; path=/";
+        // std::string cookie_str = ss.str();
+
+        // std::string response = "HTTP/1.1 200 OK\r\n";
+        // response += "Content-Type: text/plain\r\n";
+        // response += "Set-Cookie: " + cookie_str + "\r\n";
+        // response += "Content-Length: 5\r\n";
+        // response += "\r\n";
+        // response += "Hello";
+        // return (response);
+          // Insert html page or ...
         std::ostringstream response; //create the output string stream
         
         response << "HTTP/1.1 200 OK\r\n";

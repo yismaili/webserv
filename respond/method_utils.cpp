@@ -6,18 +6,23 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/01 20:09:06 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/30 18:06:19 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "respond.hpp"
+
+void    Respond::ft_handle_redirection()
+{
+    
+}
 
 void    Respond::ft_handle_cgi()
 {
     
 }
 
-int    ft_check_file(std::vector<server> server)
+int    ft_check_file()
 {
     struct stat st;
     if (stat(server.get_root().c_str(), &st) == 0)
@@ -64,7 +69,7 @@ Here's how it works:
 In other words, the std::string constructor reads the entire contents of the file into a std::string object. The resulting std::string object contains all the characters from the file, including any whitespace characters and newline characters.
 */
 
-void    Respond::ft_handle_index(std::vector<server> server)
+void    Respond::ft_handle_index()
 {
     std::string index;
     
@@ -77,7 +82,9 @@ void    Respond::ft_handle_index(std::vector<server> server)
                 if (!server[i]._location[j].get_index())
                 {
                     if (!server[i].get_index())
-                        handle_error_response(403);
+                    {
+                        // show forbidden result
+                    }
                     else
                     {
                         index = server[i].get_index();
@@ -98,33 +105,9 @@ void    Respond::ft_handle_index(std::vector<server> server)
 
 void    Respond::ft_handle_index_2()
 {
-    std::ifstream file;
-    if (_rooted_path != "")
-    {
-        file.open(_rooted_path.c_str());
-        if (file.is_open())
-        {
-            _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            _status_code = 200;
-            _status_message = "OK";
-            _headers["Content-Type"] = "text/html";
-            _headers["Content-Length"] = std::to_string(_response_body.length());
-            _headers["Connection"] = "keep-alive";
-        }
-        else
-        {
-            _status_code = 404;
-            _status_message = "Not Found";
-        }
-    }
-    else
-    {
-        _status_code = 404;
-        _status_message = "Not Found";
-    }
 }
 
-void    Respond::ft_handle_autoindex(std::vector<server> server)
+void    Respond::ft_handle_autoindex()
 {
     for (int i = 0; i < server.size(); i++)
     {
@@ -152,7 +135,7 @@ void    Respond::ft_handle_autoindex(std::vector<server> server)
 void    Respond::ft_handle_error(int error_code)
 {
     _response_body = "<html><head><title>403 Forbidden</title></head><body><h1>Forbidden</h1><p>You don't have permission to access " + this->_uri + " on this server.</p></body></html>";
-    _status_code = 403;
+    _status_code = "403";
     _status_message = "Forbidden";
     _headers["Content-Type"] = "text/html";
     _headers["Content-Length"] = _response_body.length();

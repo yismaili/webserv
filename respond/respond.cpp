@@ -14,7 +14,7 @@ Respond::Respond()
 {
     _http_version = "HTTP/1.1";
     _response_body = "";
-    _status_code = 200;
+    _status_code = "200";
     _status_message = "OK";
     // _document_root = "./www";
     _path_found = "";
@@ -102,7 +102,7 @@ std::string Respond::get_document_root()
     return (_document_root);
 }
 
-int Respond::ft_parse_root_path(std::vector<server> server)
+int Respond::ft_parse_root_path()
 {
     struct stat file_stats;
     _rooted_path = server.get_root() + _path_found;

@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/30 23:10:53 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/30 18:28:34 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -236,20 +236,8 @@ void request::parse_request(std::string request)
             }
         
     }
-
-    print_request();
 }
 
-void    request::print_request()
-{
-    std::cout << "Method: " << this->_method << std::endl;
-    std::cout << "URI: " << this->_uri << std::endl;
-    std::cout << "Version: " << this->_version << std::endl;
-    std::cout << "Headers:" << std::endl;
-    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
-        std::cout << it->first << ": " << it->second << std::endl;
-    std::cout << "Body: " << this->_body << std::endl;
-}
 
 void    request::handle_chunked_encoding(std::string &body)
 {

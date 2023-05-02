@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/26 04:24:13 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 17:29:49 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,31 +14,33 @@
 #include <fcntl.h>
 namespace http{
     
-    sockets::sockets(/* args */)
-    {
-    }
-        
-    sockets::~sockets()
-    {
-    }
-    
-    sockets &sockets::init_data(int port_, std::string ip_add)
-    {
-        sockfd =  -1;
-        port = port_;
-        sock_addr_len = 0;
-        ip_addr = ip_add;
-        // AF stands for Address Family and PF stands for Protocol Family
-        // This construct holds the information about the address family, port number, Internet address
-        serv_addr.sin_family = AF_INET; // Address family // IPv4 Internet protocols    !!!get add info
-        serv_addr.sin_addr.s_addr = inet_addr(ip_addr.c_str());  // Internet "address inet_addr(ip_addr.c_str());"
-        serv_addr.sin_port = htons(port); // Port number // Network to Host Shor
-        if(start_server() == false){
-            std::cout<<"Failed to start server "<<std::endl;
-            exit(1);
+        sockets::sockets(/* args */)
+        {
         }
-        return (*this);
-    }
+        
+        sockets::~sockets()
+        {
+        }
+    
+    //Assign a port to socket
+        sockets &sockets::init_data(int port_, std::string ip_add,  std::vector<server> conf_)
+        {
+            sockfd =  -1;
+            port = port_;
+            sock_addr_len = 0;
+            ip_addr = ip_add;
+            conf = conf_;
+            // AF stands for Address Family and PF stands for Protocol Family
+            // This construct holds the information about the address family, port number, Internet address
+            serv_addr.sin_family = AF_INET; // Address family // IPv4 Internet protocols    !!!get add info
+            serv_addr.sin_addr.s_addr = inet_addr(ip_addr.c_str());  // Internet "address inet_addr(ip_addr.c_str());"
+            serv_addr.sin_port = htons(port); // Port number // Network to Host Shor
+            if(start_server() == false){
+                std::cout<<"Failed to start server "<<std::endl;
+                exit(1);
+            }
+            return (*this);
+        }
             
         int sockets::git_sockfd()const
         {
@@ -57,7 +59,7 @@ namespace http{
         bool sockets::start_server() 
         {
             // Socket System Call
-            //Creates a socket and returns a Socket Descriptor (like file descriptor) which is an integer value
+            //Creates a TCP socket and returns a Socket Descriptor (like file descriptor) which is an integer value
             sockfd = socket(AF_INET, SOCK_STREAM, 0); 
             //domain: specifies the communication domain, such as AF_INET for IPv4 or AF_INET6 for IPv6.
             //type: specifies the type of socket, such as SOCK_STREAM for a TCP socket or SOCK_DGRAM for a UDP socket.
@@ -76,13 +78,16 @@ namespace http{
                 exit(EXIT_FAILURE);
             }
             sock_addr_len = sizeof(serv_addr);
+            // set the O_NONBLOCK flag for the socket file descriptor
             fcntl(sockfd, F_SETFL, O_NONBLOCK);
             // Bind System Call
             //associate a socket with a specific address and port number
             if (bind(sockfd, (struct sockaddr *) &serv_addr, sock_addr_len) < 0) {
                 //the second is a pointer to a struct sockaddr structure that contains the address
+                  std::cout<<"hey\n";
                 return (false);
             }
+          //  Set socket to listen
             if (listen(sockfd, SOMAXCONN) < 0){
             //The second parameter specifies the number of requests that the system queues before it executes the accept()
                 std::cout<<"Socket listen failed"<<std::endl;

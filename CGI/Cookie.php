@@ -16,4 +16,3 @@ echo "Cookie is set.";
 </body>
 </html>
 ?>
-

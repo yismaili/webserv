@@ -6,45 +6,52 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/01 18:32:55 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/04/30 15:29:13 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "respond.hpp"
 
-void    Respond::response_root(std::vector<server> servers)
+void    Respond::response_root()
 {
     // step 1 :check the location
-    if (ft_parse_location(servers))
+    if (ft_parse_location())
     {
         handle_error_response(_status_code);
         return ;
     }
 
     // step 2 : check the redirectation
-    if (!ft_parse_url_forwarding(servers))
-        return ; 
+    if (ft_parse_url_forwarding())
+    {
+        handle_error_response(_status_code);
+        return ;
+    } 
 
     // step 3 : check the validation of rooted path
-    if (ft_parse_root_path(servers))
+    if (ft_parse_root_path())
     {
         handle_error_response(_status_code);
         return ;
     }
-
+    
     // step 4 : check the allowed methods
-    if (ft_check_allowed_methods(servers))
+    if (ft_check_allowed_methods())
     {
         handle_error_response(_status_code);
         return ;
     }
 
     // step 5 : check the autoindex
-    ft_check_autoindex(servers);
+    ft_check_autoindex();
+
+    // handle redirection in case it's true
+    if (_is_redirection == true)
+        ft_handle_redirection();
 
     // methods area
     if (r.get_method() == "Get")
-        handle_get_response(servers);
+        handle_get_response();
     else if (r.get_method() == "Post")
         handle_post_response();
     else if (r.get_method() == "Delete")
@@ -52,11 +59,11 @@ void    Respond::response_root(std::vector<server> servers)
     else // unsupported http method
         handle_error_response(405);
     
-    // cout the response
+    // set the response
     print_response();
 }
 
-int Respond::ft_parse_location(std::vector<server> server)
+int Respond::ft_parse_location()
 {
     // exact location body code
     std::string path = r.get_uri();
@@ -107,7 +114,7 @@ int Respond::ft_parse_location(std::vector<server> server)
     // root location
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0; j < server[i]._location.size(); j++)
+        for (int j = 0; j < server._location.size(); j++)
         {
             if (server[i]._location[j].location_name == "/")
             {
@@ -121,23 +128,24 @@ int Respond::ft_parse_location(std::vector<server> server)
     return (1);
 }
 
-int Respond::ft_parse_url_forwarding(std::vector<server> server)
+int Respond::ft_parse_url_forwarding()
 {
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0;  j < server[i]._location.size(); j++)
+        for (int j = 0;  j < server._location.size(); j++)
         {
             if (_path_found == server[i]._location[j].location_name)
             {
                 // check for redirection ===== where redirection is make_pair
-                if (!server[i]._location[j].get_redirection().second.empty())
+                if (!server[i]._location[j].redirection.first.first.empty() &&
+                    !server[i]._location[j].redirection.first.second.empty())
                 {
-                    int status_code = server[i]._location[j].get_redirection().first;
+                    int status_code = server[i]._location[j].redirection.second;
                     // search for message of the status_code
                     std::string message = get_response_status(status_code);
                     set_status_code(status_code);
                     set_status_message(message);
-                    set_header("Location", server[i]._location[j].get_redirection().second);
+                    set_header("Location", server[i]._location[j].redirection.first);
                     _is_redirection = true;
                     return (0);
                 }
@@ -152,18 +160,18 @@ int Respond::ft_parse_url_forwarding(std::vector<server> server)
     }
 }
 
-int Respond::ft_check_allowed_methods(std::vector<server> server)
+int Respond::ft_check_allowed_methods()
 {
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0; server[i]._location.size(); j++)
+        for (int j = 0; server._location.size(); j++)
         {
             if (_path_found == server[i]._location[j].location_name)
             {
                 // get the autoindex
                 // _autoindex = server[i]._location[j].autoindex;
                 // check for allowed methods
-                std::vector<std::string> allowed_methods = server[i]._location[j].get_allow_methods();
+                std::vector<std::string> allowed_methods = server[i]._location[j].allowed_methods;
                 for (int k = 0; k < allowed_methods.size(); k++)
                 {
                     if (allowed_methods[k] == r.get_method())
@@ -175,22 +183,21 @@ int Respond::ft_check_allowed_methods(std::vector<server> server)
             }
         }
     }
-    return (1);
 
     set_status_code(405);
     return (1);
 }
 
-void    Respond::ft_check_autoindex(std::vector<server> server)
+void    Respond::ft_check_autoindex()
 {
     for (int i = 0; i < server.size(); i++)
     {
-        for (int j = 0; server[i]._location.size(); j++)
+        for (int j = 0; server._location.size(); j++)
         {
             if (_path_found == server[i]._location[j].location_name)
             {
                 // check for autoindex
-                if (server[i]._location[j].get_autoindex() == true)
+                if (server[i]._location[j].autoindex == true)
                 {
                     _is_autoindex = true;
                     return ;

@@ -32,10 +32,10 @@ std::string Respond::get_mime_type(std::string file_extension)
 {
     for (int i = 0; i < sizeof(mime_type); i++)
     {
-        if (mime_type[i].second == file_extension)
-            return (mime_type[i].first);
+        if (mime_type[i].first == file_extension)
+            return (mime_type[i].second);
     }
-    return (mime_type[sizeof(mime_type) - 1].first);
+    return (mime_type[sizeof(mime_type) - 1].second);
 }
 
 const std::pair<int, std::string> response_status[] =
