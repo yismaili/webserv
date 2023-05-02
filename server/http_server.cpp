@@ -83,6 +83,7 @@ namespace http{
                         conf_fd.insert(std::make_pair(new_socket, find_conf(clients[i].fd)));
                         std::cout << "ACCEPTING...\n";
                         // Add new socket to poll list
+                        //+++++
                         pollfd new_client_pollfd;
                         new_client_pollfd.fd = new_socket;
                         new_client_pollfd.events = POLLOUT | POLLIN;
