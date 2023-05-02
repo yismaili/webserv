@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 17:29:49 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 21:13:31 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,13 @@ namespace http{
         }
     
     //Assign a port to socket
-        sockets &sockets::init_data(int port_, std::string ip_add,  std::vector<server> conf_)
+        sockets &sockets::init_data(int port_, std::string ip_add, int index_)
         {
             sockfd =  -1;
             port = port_;
             sock_addr_len = 0;
             ip_addr = ip_add;
-            conf = conf_;
+            index = index_;
             // AF stands for Address Family and PF stands for Protocol Family
             // This construct holds the information about the address family, port number, Internet address
             serv_addr.sin_family = AF_INET; // Address family // IPv4 Internet protocols    !!!get add info

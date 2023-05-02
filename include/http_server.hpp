@@ -67,6 +67,7 @@ namespace http{
             std::map<int, std::string> requist_data;
             std::map<int, bool> read_info;
             std::map<int, bool> write_info;
+            std::vector<server> conf;
     };
 }
 #endif

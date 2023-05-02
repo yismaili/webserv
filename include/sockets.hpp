@@ -30,7 +30,8 @@ namespace http{
         public: 
             sockets(); 
             ~sockets();
-            sockets &init_data(int port_, std::string ip_add, std::vector<server> conf_);
+            sockets &init_data(int port_, std::string ip_add,int index_);
+
             int git_sockfd()const;
             unsigned int &get_sock_addr_len();
             sockaddr_in &git_serv_addr();
@@ -41,8 +42,7 @@ namespace http{
             struct sockaddr_in serv_addr;
             unsigned int sock_addr_len;
             std::string ip_addr;
-            std::vector<server> conf;
-            
+            int index;
     };
 }
 #endif

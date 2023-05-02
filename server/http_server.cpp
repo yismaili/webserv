@@ -14,7 +14,7 @@
 #include "../prs_rsc/server.hpp"
 
 namespace http{
-   http_sever::http_sever(std::vector<server> conf) :sock()
+   http_sever::http_sever(std::vector<server> conf_) :sock()
    {
         for (size_t i = 0; i < conf.size(); i++)
         {
@@ -23,6 +23,7 @@ namespace http{
                socket_id.push_back(sock.init_data(conf[i]._listen[j], conf[i].get_host(), conf));
             }
         }
+        conf = conf_;
     }
     
     http_sever::~http_sever()
@@ -101,7 +102,8 @@ namespace http{
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
                   //std::cout<<requist_data[clients[i].fd]<<std::endl;
-                  std::cout << "------" <<conf_fd[clients[i].fd]->conf[0].get_root() << "------" << std::endl;
+                  std::cout << "------" <<conf[conf_fd[clients[i].fd]->index].get_root() << "------" << std::endl;
+
                     // request r(requist_data[clients[i].fd]);
                    // r.parse_request(requist_data[clients[i].fd]);
                     std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
