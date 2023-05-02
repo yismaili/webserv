@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 13:14:43 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 21:13:51 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,6 +67,7 @@ namespace http{
             std::map<int, std::string> requist_data;
             std::map<int, bool> read_info;
             std::map<int, bool> write_info;
+            std::vector<server> conf;
     };
 }
 #endif
