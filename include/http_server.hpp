@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 03:26:58 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 13:14:43 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,7 @@ namespace http{
             std::vector<http::sockets>::iterator find_conf(int sockfd);
         public:
             int clint;
-            http::sockets sock;
-            
+            http::sockets sock;  
             std::vector<http::sockets> socket_id;
             std::map<int, std::vector<http::sockets>::iterator> conf_fd;
             std::vector<pollfd> clients;

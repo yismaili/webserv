@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 03:29:10 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 15:18:01 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,10 +18,9 @@ namespace http{
    {
         for (size_t i = 0; i < conf.size(); i++)
         {
-            for (size_t j = 0; j < conf[i]._listen.size(); j++){
+            for (size_t j = 0; j < conf[i]._listen.size(); j++)
+            {
                socket_id.push_back(sock.init_data(conf[i]._listen[j], conf[i].get_host(), conf[i]._listen[j]));
-               
-                std::cout<<conf[i]._listen[j]<<"-----"<<conf[i].get_host()<<std::endl;
             }
         }
     }
@@ -35,6 +34,7 @@ namespace http{
             it++;
         }
     }
+    
     std::vector<http::sockets>::iterator http_sever::find_conf(int sockfd) 
     {
         std::vector<http::sockets>::iterator it = socket_id.begin();
@@ -46,8 +46,9 @@ namespace http{
             }
             it++;
         }
-         return (socket_id.begin());
+        return (socket_id.begin());
     }
+    
     void http_sever::run() 
     {
         int poll_ret, new_socket, recv_ret, sent_ret;
@@ -99,14 +100,19 @@ namespace http{
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                    //std::cout<<requist_data[clients[i].fd]<<std::endl;
+                    std::cout<<requist_data[clients[i].fd]<<std::endl;
                     std::cout<<"------"<<conf_fd[clients[i].fd]->conf<<"------"<<std::endl;
-                    request r(requist_data[clients[i].fd]);
+                    // request r(requist_data[clients[i].fd]);
                    // r.parse_request(requist_data[clients[i].fd]);
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     sent_ret = send_data(clients[i].fd);
                     if (sent_ret == 0){
                         clients[i].events = POLLIN;
+                        std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
+                        if (Connection != std::string::npos)
+                        {
+                            close(clients[i].fd);
+                        }
                         clients.erase(it);
                         i--;
                     }
@@ -246,6 +252,7 @@ namespace http{
         {
             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
         }
+        request r(requist_data[sockfd]);
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
