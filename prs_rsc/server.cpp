@@ -564,6 +564,39 @@ std::string server::get_upload_store() const
     return(_upload_store);
 }
 
+std::map<std::string ,std::string> server::get_path_info() const
+{
+    return (_path_info);
+}
+
+
+server& server::operator=(const server& o)
+{
+    if(this != &o)
+    {
+        this->_server_name = o._server_name;
+        this->_index = o._index;
+        this->_host = o._host;
+        this->_root = o._root;
+        this->_client_max_body_size = o._client_max_body_size;
+        this->_error_page = o._error_page;
+        this->_allow_methods = o._allow_methods;
+        this->_rediriction = o._rediriction;
+        this->_path_info = o._path_info;
+        this->_upload_store = o._upload_store;
+        this->_autoindex = o._autoindex;
+        this->_upload = o._upload;
+        this->_listen = o._listen;
+        this->_location = o._location;
+    }
+    return (*this);
+}
+
+server::server(const server& o)
+{
+    *this = o;
+}
+
 server::~server()
 {
 

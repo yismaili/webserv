@@ -35,6 +35,8 @@ public:
     std::vector<int> _listen; /*s*/
     std::vector<location> _location;
     server(Data_config data, bool check_location);
+    server& operator=(const server& o);
+    server(const server& o);
     server();
     ~server();
     void display_sever();
@@ -49,6 +51,8 @@ public:
     bool get_autoindex () const;
     std::pair <int , std::string> get_rediriction() const;
     std::string get_upload_store() const;
+    std::map<std::string ,std::string> get_path_info() const;
+
 };
 
 int is_world(std::string str, std::string tmp);
