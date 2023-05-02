@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 15:18:01 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 19:08:49 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ namespace http{
         {
             for (size_t j = 0; j < conf[i]._listen.size(); j++)
             {
-               socket_id.push_back(sock.init_data(conf[i]._listen[j], conf[i].get_host(), conf[i]._listen[j]));
+               socket_id.push_back(sock.init_data(conf[i]._listen[j], conf[i].get_host(), conf));
             }
         }
     }
@@ -100,16 +100,18 @@ namespace http{
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                    std::cout<<requist_data[clients[i].fd]<<std::endl;
-                    std::cout<<"------"<<conf_fd[clients[i].fd]->conf<<"------"<<std::endl;
+                  //std::cout<<requist_data[clients[i].fd]<<std::endl;
+                  std::cout << "------" <<conf_fd[clients[i].fd]->conf[0].get_root() << "------" << std::endl;
                     // request r(requist_data[clients[i].fd]);
                    // r.parse_request(requist_data[clients[i].fd]);
+                    std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
+                    std::cout<< Connection<<std::endl;
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     sent_ret = send_data(clients[i].fd);
-                    if (sent_ret == 0){
+                    if (sent_ret == 0)
+                    {
                         clients[i].events = POLLIN;
-                        std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
-                        if (Connection != std::string::npos)
+                        if (Connection == std::string::npos)
                         {
                             close(clients[i].fd);
                         }
@@ -118,8 +120,8 @@ namespace http{
                     }
                     else if (sent_ret == -2)
                     {
-                        clients.erase(it);
                         close(clients[i].fd);
+                        clients.erase(it);
                         i--;
                     }
                 }
@@ -252,7 +254,7 @@ namespace http{
         {
             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
         }
-        request r(requist_data[sockfd]);
+       // request r(requist_data[sockfd]);
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
