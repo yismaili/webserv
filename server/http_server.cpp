@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 19:08:49 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/02 20:02:13 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ namespace http{
         {
             for (size_t j = 0; j < conf[i]._listen.size(); j++)
             {
-               socket_id.push_back(sock.init_data(conf[i]._listen[j], conf[i].get_host(), conf));
+               socket_id.push_back(sock.init_data(conf[i]._listen[j], conf[i].get_host(), conf, i));
             }
         }
     }
@@ -101,7 +101,7 @@ namespace http{
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
                   //std::cout<<requist_data[clients[i].fd]<<std::endl;
-                  std::cout << "------" <<conf_fd[clients[i].fd]->conf[0].get_root() << "------" << std::endl;
+                  std::cout << "------" <<conf_fd[clients[i].fd]->conf[conf_fd[clients[i].fd]->index].get_root() << "------" << std::endl;
                     // request r(requist_data[clients[i].fd]);
                    // r.parse_request(requist_data[clients[i].fd]);
                     std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
