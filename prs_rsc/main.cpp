@@ -12,17 +12,17 @@ int main(int ac, char **av)
     std::vector<int> all_ports;
     servers = ft_fill_servers(av);
     all_ports = get_all_ports(servers);
-//    for (size_t i = 0; i < servers.size(); i++)
-//    {
-//         servers[i].display_sever();
-//         std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
-//         for (size_t j = 0; j < servers[i]._location.size(); j++)
-//         {
-//             std::cout << "location : " << servers[i]._location[j].location_name << std::endl;
-//             servers[i]._location[j].display_sever();
-//         }
-//         std::cout << "++++++++++++++++++++++\n";
-//    }  
+   for (size_t i = 0; i < servers.size(); i++)
+   {
+        //servers[i].display_sever();
+        std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
+        for (size_t j = 0; j < servers[i]._location.size(); j++)
+        {
+            std::cout << "location : " << servers[i]._location[j].location_name << std::endl;
+            //servers[i]._location[j].display_sever();
+        }
+        std::cout << "++++++++++++++++++++++\n";
+   }  
 //     for (size_t i = 0; i < all_ports.size(); i++)
 //             std::cout << all_ports[i] << "\n";
     http::http_sever server1(servers);

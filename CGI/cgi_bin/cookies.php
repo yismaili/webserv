@@ -4,7 +4,7 @@ $cookies = array(
     "USER" => "ADMIN"
 );
 foreach ($cookies as $name => $value) {
-    setcookie($name, $value, time() + (86400 * 30), "/");
+    setcookie($name, $value, time() - (86400 * 30), "/");
 }
 
 ?>

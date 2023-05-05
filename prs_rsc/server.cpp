@@ -249,6 +249,7 @@ server::server(Data_config data, bool check_location)
                 exit (1);
             }
             line.erase(line.size() - 1);
+            line = trimString(line);
         }
         else if ((search_char(line, '}') || search_char(line, '{') ))
         {
@@ -279,7 +280,7 @@ server::server(Data_config data, bool check_location)
             if(c_host)
                 ft_error(line, "Duplicated");
             is_empty_value(value, line);
-            if (ft_numbers_value(iss) || !isIpAddress(value))
+            if (ft_numbers_value(iss) || (!isIpAddress(value) && value != "localhost"))
                 ft_error(line, "Error");
             c_host++;
             _host = value;
