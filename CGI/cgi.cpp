@@ -88,7 +88,7 @@ void put_cookie(std::string output, Respond &res)
         res.set_header("Set-Cookie", token);
     }
 
-    std::cout <<"\ntoken : " << token << std::endl;
+    // std::cout <<"\ntoken : " << token << std::endl;
 }
 
 void set_headers_cgi(std::string output, Respond &res) {
@@ -96,6 +96,8 @@ void set_headers_cgi(std::string output, Respond &res) {
     std::string line;
     std::string body;
     bool headers_finished = false;
+
+    put_cookie(output, res);
     while (std::getline(ss, line)) {
         if (line.empty()) {
             headers_finished = true;
@@ -106,7 +108,8 @@ void set_headers_cgi(std::string output, Respond &res) {
             if (pos != std::string::npos) {
                 std::string key = line.substr(0, pos);
                 std::string value = line.substr(pos + 2);
-                res.set_header(key, value);
+                if(key != "Set-Cookie")
+                    res.set_header(key, value);
             }
         } else {
             body += line;
