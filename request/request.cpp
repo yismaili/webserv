@@ -6,29 +6,11 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/30 18:28:34 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/05 16:33:19 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "request.hpp"
-
-typedef void (request::*encoding_handler)(std::string &body);
-
-encoding_handler    handlers[] = 
-{
-    &request::handle_chunked_encoding,
-    &request::handle_compress_encoding,
-    &request::handle_deflate_encoding,
-    &request::handle_gzip_encoding
-};
-
-const std::string  supported_encodings[] = 
-{
-    "chunked",
-    "compress",
-    "deflate",
-    "gzip"
-};
 
 request::request()
 {
@@ -190,41 +172,41 @@ void request::parse_request(std::string request)
     {
         size_t content_len = std::stoi(content_len_str);
         this->_body = lines.back().substr(0, content_len);
-        std::string transfer_encoding = this->get_header("Accept-Encoding");
-        if (!transfer_encoding.empty())
-        {
-            // using pointers to member functions to call the functions handlers
-            std::vector<std::string> encoding_types;
-            size_t startPos = 0;
-            size_t endPos = transfer_encoding.find(',');
-            while (endPos != std::string::npos)
-            {
-                encoding_types.push_back(transfer_encoding.substr(startPos, endPos - startPos));
-                startPos = endPos + 1;
-                endPos = transfer_encoding.find(',', startPos);
-            }
-            encoding_types.push_back(transfer_encoding.substr(startPos, endPos - startPos));
-            for (std::vector<std::string>::const_iterator it = encoding_types.begin(); it != encoding_types.end(); ++it)
-            {
-                std::string type_tmp = *it;
-                // Trim leading and trailing whitespaces from the value
-                // type_tmp.erase(0, type_tmp.find_first_not_of(" \t"));
-                // type_tmp.erase(type_tmp.find_first_not_of(" \t") + 1);
-                bool supported = false;
-                for (size_t i = 0; i < sizeof(handlers) / sizeof(handlers[0]); ++i)
-                {
-                    if (type_tmp == supported_encodings[i])
-                    {
-                        (this->*handlers[i])(this->_body);
-                        supported = true;
-                        break;
-                    }
-                }
-                if (!supported)
-                    std::cerr << "Unsupported encoding type: " << type_tmp << std::endl;
-            }
+        // std::string transfer_encoding = this->get_header("Accept-Encoding");
+        // if (!transfer_encoding.empty())
+        // {
+        //     // using pointers to member functions to call the functions handlers
+        //     std::vector<std::string> encoding_types;
+        //     size_t startPos = 0;
+        //     size_t endPos = transfer_encoding.find(',');
+        //     while (endPos != std::string::npos)
+        //     {
+        //         encoding_types.push_back(transfer_encoding.substr(startPos, endPos - startPos));
+        //         startPos = endPos + 1;
+        //         endPos = transfer_encoding.find(',', startPos);
+        //     }
+        //     encoding_types.push_back(transfer_encoding.substr(startPos, endPos - startPos));
+        //     for (std::vector<std::string>::const_iterator it = encoding_types.begin(); it != encoding_types.end(); ++it)
+        //     {
+        //         std::string type_tmp = *it;
+        //         // Trim leading and trailing whitespaces from the value
+        //         // type_tmp.erase(0, type_tmp.find_first_not_of(" \t"));
+        //         // type_tmp.erase(type_tmp.find_first_not_of(" \t") + 1);
+        //         bool supported = false;
+        //         for (size_t i = 0; i < sizeof(handlers) / sizeof(handlers[0]); ++i)
+        //         {
+        //             if (type_tmp == supported_encodings[i])
+        //             {
+        //                 (this->*handlers[i])(this->_body);
+        //                 supported = true;
+        //                 break;
+        //             }
+        //         }
+        //         if (!supported)
+        //             std::cerr << "Unsupported encoding type: " << type_tmp << std::endl;
+        //     }
             
-        }
+        // }
     }
     else
     {
@@ -236,42 +218,17 @@ void request::parse_request(std::string request)
             }
         
     }
+
+    // print_request();
 }
 
-
-void    request::handle_chunked_encoding(std::string &body)
+void    request::print_request()
 {
-    std::stringstream ss(body);
-    std::string line;
-    std::stringstream decoded;
-    while (std::getline(ss, line))
-    {
-        std::stringstream size_ss(line);
-        int chunk_size;
-        size_ss >> std::hex >> chunk_size;
-        if (chunk_size == 0) // end of chunks
-            break;
-        std::string chunk(chunk_size, ' ');
-        ss.read(&chunk[0], chunk_size);
-        decoded << chunk;
-    }
-    body = decoded.str();
-}
-
-void    request::handle_gzip_encoding(std::string &body)
-{
-    (void)body;
-    std::cerr << "Unsupport gzip encoding" << std::endl;
-}
-
-void    request::handle_compress_encoding(std::string &body)
-{
-    (void)body;
-    std::cerr << "Unsupport compress encoding" << std::endl;
-}
-
-void    request::handle_deflate_encoding(std::string &body)
-{
-    (void)body;
-    std::cerr << "Unsupport deflate encoding" << std::endl;
+    std::cout << "Method: " << this->_method << std::endl;
+    std::cout << "URI: " << this->_uri << std::endl;
+    std::cout << "Version: " << this->_version << std::endl;
+    std::cout << "Headers:" << std::endl;
+    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
+        std::cout << it->first << ": " << it->second << std::endl;
+    std::cout << "Body: " << this->_body << std::endl;
 }

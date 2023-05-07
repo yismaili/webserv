@@ -70,6 +70,9 @@ std::vector<server> ft_fill_servers(char **av)
                 while (!file.eof())
                 {
                     std::getline(file, line);
+                    line = trimString(line);
+                    if(line.empty() || line[0] == '#')
+                        continue;
                     c  += search_char(line, '{');
                     map += line + '\n';
                     if (search_char (line, '}'))

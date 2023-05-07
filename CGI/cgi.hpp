@@ -7,7 +7,11 @@
 #include <vector>
 #include <map>
 #include <string>
-#include "/Users/snouae/Desktop/server/request/request.hpp"
-std::string run_cgi(char *file, char *path, request &r);
+#include "../request/request.hpp"
+#include "../respond/respond.hpp"
+
+class Respond;
+
+std::string run_cgi(request &r,  Respond &res);
 
 #endif
