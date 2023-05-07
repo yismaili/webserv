@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/07 16:49:35 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/07 21:58:40 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,7 +74,15 @@ namespace http{
             //Check for events on server socket
             while (i != clients.size())
             {
-                if (clients[i].revents & POLLIN)
+                if (clients[i].revents & POLLERR)
+                {
+                    std::vector<pollfd>::iterator it = clients.begin() + i;
+                    std::cout<<"error\n"<<std::endl;
+                    close(clients[i].fd);
+                    clients.erase(it);
+                    i--;
+                }
+                else if (clients[i].revents & POLLIN)
                 {
                     if (is_server(clients[i].fd))
                     {
@@ -95,22 +103,14 @@ namespace http{
                         recv_ret = recv_data(clients[i].fd);
                      
                         if (!recv_ret)
-                        { std::cout<<"--**---"<<std::endl;
-                        std::cout <<requist_data[clients[i].fd]<<std::endl;
+                        {
                             unchunk(clients[i].fd);
                         }
                     }
                 }
-                if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
+               else if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                  //std::cout<<requist_data[clients[i].fd]<<std::endl;
-                 // std::cout << "------" <<conf[conf_fd[clients[i].fd]->index].get_root() << "------" << std::endl;
-                //   Respond   rep(requist_data[clients[i].fd]);
-                  
-                    // request r(requist_data[clients[i].fd]);
-                   // r.parse_request(requist_data[clients[i].fd]);
                     std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
-                   // std::cout<< Connection<<std::endl;
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     sent_ret = send_data(clients[i].fd);
                     if (sent_ret == 0)
@@ -129,14 +129,6 @@ namespace http{
                         clients.erase(it);
                         i--;
                     }
-                }
-                if (clients[i].revents & POLLERR)
-                {
-                    std::vector<pollfd>::iterator it = clients.begin() + i;
-                    std::cout<<"error\n"<<std::endl;
-                    close(clients[i].fd);
-                    clients.erase(it);
-                    i--;
                 }
                 i++;
             }
@@ -222,7 +214,6 @@ namespace http{
             std::cout<<"connection was closed\n";
             return (-2);
         }
-         std::cout <<bytes_received<<std::endl;
         requist_data[sockfd].append(std::string(buffer, bytes_received));
         if (requist_data[sockfd].find("\r\n\r\n") != std::string::npos)
         {
@@ -260,9 +251,9 @@ namespace http{
         {
             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
         }
-        request req(requist_data[sockfd]);
-        Respond   res(req, conf_fd[sockfd]->index);
-       requist_data[sockfd] =  res.response_root(conf);
+    //     request req(requist_data[sockfd]);
+    //     Respond   res(req, conf_fd[sockfd]->index);
+    //    requist_data[sockfd] =  res.response_root(conf);
  std::cout<<"--**---"<<requist_data[sockfd]<<"---***"<<std::endl;
         
     }
@@ -343,6 +334,7 @@ namespace http{
         
         response << "HTTP/1.1 200 OK\r\n";
         response << "Content-Type: text/html; charset=UTF-8\r\n";
+        
         response << "\r\n";
         response << "<html><body><h1>Hello younes </h1>";
         response << "<h1>from HTTP server!</h4>";
