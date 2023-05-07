@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/07 16:25:40 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/07 16:49:35 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,8 +93,10 @@ namespace http{
                     else
                     {
                         recv_ret = recv_data(clients[i].fd);
+                     
                         if (!recv_ret)
-                        {
+                        { std::cout<<"--**---"<<std::endl;
+                        std::cout <<requist_data[clients[i].fd]<<std::endl;
                             unchunk(clients[i].fd);
                         }
                     }
@@ -102,13 +104,13 @@ namespace http{
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
                   //std::cout<<requist_data[clients[i].fd]<<std::endl;
-                  std::cout << "------" <<conf[conf_fd[clients[i].fd]->index].get_root() << "------" << std::endl;
+                 // std::cout << "------" <<conf[conf_fd[clients[i].fd]->index].get_root() << "------" << std::endl;
                 //   Respond   rep(requist_data[clients[i].fd]);
                   
                     // request r(requist_data[clients[i].fd]);
                    // r.parse_request(requist_data[clients[i].fd]);
                     std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
-                    std::cout<< Connection<<std::endl;
+                   // std::cout<< Connection<<std::endl;
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     sent_ret = send_data(clients[i].fd);
                     if (sent_ret == 0)
@@ -220,6 +222,7 @@ namespace http{
             std::cout<<"connection was closed\n";
             return (-2);
         }
+         std::cout <<bytes_received<<std::endl;
         requist_data[sockfd].append(std::string(buffer, bytes_received));
         if (requist_data[sockfd].find("\r\n\r\n") != std::string::npos)
         {
@@ -259,8 +262,9 @@ namespace http{
         }
         request req(requist_data[sockfd]);
         Respond   res(req, conf_fd[sockfd]->index);
-
-        res.response_root(conf);
+       requist_data[sockfd] =  res.response_root(conf);
+ std::cout<<"--**---"<<requist_data[sockfd]<<"---***"<<std::endl;
+        
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
