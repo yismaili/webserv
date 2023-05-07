@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   respond.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/07 13:47:01 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/07 15:35:35 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ class Respond
 {
     public:
         Respond();
-        Respond(request& req);
+        Respond(request& req, int index_);
         ~Respond();
 
         void set_http_version(std::string http_version);

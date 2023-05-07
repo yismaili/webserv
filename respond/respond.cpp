@@ -10,7 +10,7 @@ Content-Length: 1234\r\n
 #include "respond.hpp"
 #include "../request/request.hpp"
 
-Respond::Respond(request& req) : r(req)
+Respond::Respond(request& req, int index_) : r(req)
 {
     _http_version = "HTTP/1.1";
     _response_body = "";
@@ -25,7 +25,7 @@ Respond::Respond(request& req) : r(req)
     _is_index = false;
     _boundary = r.get_header("Content-Type").substr(r.get_header("Content-Type").find("boundary=") + 9);
     _upload_store = "";
-    _server_index = 0;
+    _server_index = index_;
     _location_index = 0;
     _removed_path = "";
     _path_info_founded = "";
