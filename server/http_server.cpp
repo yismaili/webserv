@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/07 21:58:40 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/07 22:47:38 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,6 +106,7 @@ namespace http{
                         {
                             unchunk(clients[i].fd);
                         }
+                        //  std::cout<<"--**---"<<requist_data[clients[i].fd]<<"---***"<<std::endl;
                     }
                 }
                else if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
@@ -171,7 +172,6 @@ namespace http{
     {
         std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
         std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
-
         
         if (content_length != std::string::npos && transfer_encoding != std::string::npos)
         {
@@ -180,7 +180,6 @@ namespace http{
             else
                 return (0);
         }
-        
         if (content_length == std::string::npos)
         {
             if (transfer_encoding != std::string::npos)
@@ -196,8 +195,10 @@ namespace http{
                 return (0);           
             }
         }
+        
         return (2);
     }
+        
 
     int http_sever::recv_data(int sockfd)
     {
@@ -223,6 +224,10 @@ namespace http{
             }
             else if (transfer_encoding_chunked(sockfd) == 0)
             {
+                if (read_info[sockfd] == true)
+                {
+                    return (0);
+                }
                 return (1);
             }
             else if (transfer_encoding_chunked(sockfd) == 2)
@@ -254,7 +259,7 @@ namespace http{
     //     request req(requist_data[sockfd]);
     //     Respond   res(req, conf_fd[sockfd]->index);
     //    requist_data[sockfd] =  res.response_root(conf);
- std::cout<<"--**---"<<requist_data[sockfd]<<"---***"<<std::endl;
+  std::cout<<"--**---"<<requist_data[sockfd]<<"---***"<<std::endl;
         
     }
     
@@ -334,7 +339,7 @@ namespace http{
         
         response << "HTTP/1.1 200 OK\r\n";
         response << "Content-Type: text/html; charset=UTF-8\r\n";
-        
+        response <<  "Content-Length: 76\r\n";
         response << "\r\n";
         response << "<html><body><h1>Hello younes </h1>";
         response << "<h1>from HTTP server!</h4>";
