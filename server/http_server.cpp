@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/07 16:49:35 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/07 17:02:34 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,6 +80,7 @@ namespace http{
                     {
                         // Accept incoming connection
                         new_socket = accept_connection(clients[i].fd);
+                         std::cout <<"---------"<<new_socket<<std::endl;
                         conf_fd.insert(std::make_pair(new_socket, find_conf(clients[i].fd)));
                         std::cout << "ACCEPTING...\n";
                         // Add new socket to poll list
@@ -94,11 +95,11 @@ namespace http{
                     {
                         recv_ret = recv_data(clients[i].fd);
                      
-                        if (!recv_ret)
-                        { std::cout<<"--**---"<<std::endl;
-                        std::cout <<requist_data[clients[i].fd]<<std::endl;
+                        // if (!recv_ret)
+                        // { std::cout<<"--**---"<<std::endl;
+                        // std::cout <<requist_data[clients[i].fd]<<std::endl;
                             unchunk(clients[i].fd);
-                        }
+                        // }
                     }
                 }
                 if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
@@ -222,8 +223,8 @@ namespace http{
             std::cout<<"connection was closed\n";
             return (-2);
         }
-         std::cout <<bytes_received<<std::endl;
         requist_data[sockfd].append(std::string(buffer, bytes_received));
+         std::cout <<sockfd<<std::endl;
         if (requist_data[sockfd].find("\r\n\r\n") != std::string::npos)
         {
             if (transfer_encoding_chunked(sockfd) == 1)
