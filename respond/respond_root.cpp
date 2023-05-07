@@ -6,13 +6,13 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/07 00:31:27 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/07 16:25:06 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "respond.hpp"
 
-void    Respond::response_root(std::vector<server> servers)
+std::string Respond::response_root(std::vector<server> servers)
 {
     // step 1 :check the location
     if (ft_parse_location(servers))
@@ -25,19 +25,19 @@ void    Respond::response_root(std::vector<server> servers)
 
     // step 2 : check the redirectation
     if (!ft_parse_url_forwarding(servers))
-        return ;
+       return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
     // step 3 : check the validation of rooted path
     if (ft_parse_root_path(servers))
     {
         handle_error_response(_status_code);
-        return ;
+        return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
     }
 
     // step 4 : check the allowed methods
     if (ft_check_allowed_methods(servers))
     {
         handle_error_response(_status_code);
-        return ;
+        return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
     }
 
     // step 5 : check the autoindex
@@ -52,25 +52,22 @@ void    Respond::response_root(std::vector<server> servers)
         handle_delete_response();
     else // unsupported http method
         handle_error_response(405);
-    // cout the response
-    print_response();
+
+    // rtn response
+    return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
 }
 
 int Respond::exact_location(std::vector<server> server, std::string path)
 {
-    for (size_t i = 0; i < server.size(); i++)
-    {
-        for (size_t j = 0; j < server[i]._location.size(); j++)
+        for (size_t j = 0; j < server[_server_index]._location.size(); j++)
         {
-            if (server[i]._location[j].location_name == path)
+            if (server[_server_index]._location[j].location_name == path)
             {
-                _server_index = i;
                 _location_index = j;
-                _path_found = server[i]._location[j].location_name;
+                _path_found = server[_server_index]._location[j].location_name;
                 return (0);
             }
         }
-    }
     return (1);
 }
 
@@ -81,22 +78,16 @@ int Respond::prefix_location(std::vector<server> server, std::string &path)
     if (path == "/")
         return (1);
 
-    for (size_t i = 0; i < server.size(); i++)
-    {
-        for (size_t j = 0; j < server[i]._location.size(); j++)
+        for (size_t j = 0; j < server[_server_index]._location.size(); j++)
         {
-            if (server[i]._location[j].location_name == path)
+            if (server[_server_index]._location[j].location_name == path)
             {
-                _server_index = i;
                 _location_index = j;
-                std::cout << ")_______----_-_--_--_-__-_--_--_" << std::endl;
-                std::cout << "server index: " << i << " and location index: " << j << std::endl;
-                _path_found = server[i]._location[j].location_name;
+                _path_found = server[_server_index]._location[j].location_name;
                 return (0);
             }
             
         }
-    }
     pos = path.find_last_of('/');
     if (pos != std::string::npos)
     {
@@ -115,9 +106,6 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
     if (pos != std::string::npos)
     {
         std::string extension = path.substr(pos);
-        // std::cout << "___________HERE________--_" << std::endl;
-        // std::cout << extension << std::endl;
-        // std::cout << "___________HERE________--_" << std::endl;
         if (!prefix_location(server, path))
         {
             // std::cout << path << std::endl;
@@ -126,10 +114,6 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
             for (std::map<std::string, std::string>::const_iterator it = path_info.begin();
                 it != path_info.end(); ++it)
             {
-            // std::string f = it->first;
-             //std::cout << it->first << " " << it->second << std::endl;
-            // puts("heeere");
-            // std::cout << extension << std::endl;
                 if (it->first == extension)
                 {
                     _path_info_founded = it->second;
@@ -215,28 +199,25 @@ int Respond::ft_parse_location(std::vector<server> server)
 
 int Respond::ft_parse_url_forwarding(std::vector<server> server)
 {
-    for (size_t i = 0; i < server.size(); i++)
+    for (size_t j = 0;  j < server[_server_index]._location.size(); j++)
     {
-        for (size_t j = 0;  j < server[i]._location.size(); j++)
+        if (_path_found == server[_server_index]._location[j].location_name)
         {
-            if (_path_found == server[i]._location[j].location_name)
+            // check for redirection ===== where redirection is make_pair
+            // std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
+            // std::cout << server[i]._location[j].get_redirection().first << std::endl;
+            // std::cout << server[i]._location[j].get_redirection().second << std::endl;
+            // std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
+            if (!server[_server_index]._location[j].get_redirection().second.empty())
             {
-                // check for redirection ===== where redirection is make_pair
-                // std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
-                // std::cout << server[i]._location[j].get_redirection().first << std::endl;
-                // std::cout << server[i]._location[j].get_redirection().second << std::endl;
-                // std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
-                if (!server[i]._location[j].get_redirection().second.empty())
-                {
-                    size_t status_code = server[i]._location[j].get_redirection().first;
-                    // search for message of the status_code
-                    std::string message = get_response_status(status_code);
-                    set_status_code(status_code);
-                    set_status_message(message);
-                    set_header("Location", server[i]._location[j].get_redirection().second);
-                    _is_redirection = true;
-                    return (0);
-                }
+                size_t status_code = server[_server_index]._location[j].get_redirection().first;
+                // search for message of the status_code
+                std::string message = get_response_status(status_code);
+                set_status_code(status_code);
+                set_status_message(message);
+                set_header("Location", server[_server_index]._location[j].get_redirection().second);
+                _is_redirection = true;
+                return (0);
             }
         }
     }
