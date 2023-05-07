@@ -18,8 +18,7 @@ protected:
     int _client_max_body_size; /*l*/
     std::map<int, std::string> _error_page;
     std::vector<std::string> _allow_methods;
-    std::pair <int , std::string> _rediriction;
-    std::map<std::string ,std::string> _path_info; 
+    std::pair <int , std::string> _redirection;
     std::string _upload_store;
     bool _autoindex;
     bool _upload;
@@ -31,6 +30,7 @@ protected:
     // std::string _ssl_certificate_key;
     // std::string _ssl_protocols;
     // std::string _ssl_ciphers;
+    std::map<std::string ,std::string> _path_info; 
 public:
     std::vector<int> _listen; /*s*/
     std::vector<location> _location;
@@ -49,7 +49,7 @@ public:
     std::map<int, std::string> get_error_page() const;
     std::vector<std::string> get_allow_methods() const;
     bool get_autoindex () const;
-    std::pair <int , std::string> get_rediriction() const;
+    std::pair <int , std::string> get_redirection() const;
     std::string get_upload_store() const;
     std::map<std::string ,std::string> get_path_info() const;
 

@@ -233,7 +233,7 @@ server::server(Data_config data, bool check_location)
     int c_listen = 0;
     int c_index = 0;
     int c_error_page = 0;
-    int c_rediriction = 0;
+    int c_redirection = 0;
     int c_upload = 0;
     int c_upload_store = 0;
     while (getline(ss, line))
@@ -249,6 +249,7 @@ server::server(Data_config data, bool check_location)
                 exit (1);
             }
             line.erase(line.size() - 1);
+            line = trimString(line);
         }
         else if ((search_char(line, '}') || search_char(line, '{') ))
         {
@@ -279,7 +280,7 @@ server::server(Data_config data, bool check_location)
             if(c_host)
                 ft_error(line, "Duplicated");
             is_empty_value(value, line);
-            if (ft_numbers_value(iss) || !isIpAddress(value))
+            if (ft_numbers_value(iss) || (!isIpAddress(value) && value != "localhost"))
                 ft_error(line, "Error");
             c_host++;
             _host = value;
@@ -378,7 +379,7 @@ server::server(Data_config data, bool check_location)
         }
         else if (key == "return" && !check_location)
         {
-            if (c_rediriction)
+            if (c_redirection)
                 ft_error(line, "Error duplicated rederiction");
             is_empty_value(value, line);
             int status = ft_number(value, line);
@@ -388,8 +389,8 @@ server::server(Data_config data, bool check_location)
             is_empty_value(value, line);
             if (ft_numbers_value(iss) )
                 ft_error(line, "Error");
-            _rediriction = std::make_pair(status, value);
-            c_rediriction++;
+            _redirection = std::make_pair(status, value);
+            c_redirection++;
         }
         else if (key == "path_info" && !check_location)
         {
@@ -505,8 +506,11 @@ void server::display_sever()
         std::cout << "on\n";
     else
          std::cout << "of\n";
-    std::cout << "rederiction : " << _rediriction.first << ", " << _rediriction.second << '\n';
-    std::cout << "upload_store :"<< _upload_store << "\n"; 
+    std::cout << "rederiction : " << _redirection.first << ", " << _redirection.second << '\n';
+    std::cout << "upload_store :"<< _upload_store << "\n";
+    std::cout << "path_info : \n";
+    for(std::map<std::string, std::string>::const_iterator it = _path_info.begin(); it != _path_info.end(); ++it)
+        std::cout << it->first << "  "<< it->second<< "\n";
 }
 
 std::string server::get_index() const
@@ -554,9 +558,9 @@ int server::get_client_max_body_size() const
     return(_client_max_body_size);
 }
 
-std::pair <int , std::string> server::get_rediriction() const
+std::pair <int , std::string> server::get_redirection() const
 {
-    return (_rediriction);
+    return (_redirection);
 }
 
 std::string server::get_upload_store() const
@@ -581,7 +585,7 @@ server& server::operator=(const server& o)
         this->_client_max_body_size = o._client_max_body_size;
         this->_error_page = o._error_page;
         this->_allow_methods = o._allow_methods;
-        this->_rediriction = o._rediriction;
+        this->_redirection = o._redirection;
         this->_path_info = o._path_info;
         this->_upload_store = o._upload_store;
         this->_autoindex = o._autoindex;

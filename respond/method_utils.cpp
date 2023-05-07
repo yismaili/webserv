@@ -6,35 +6,91 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/30 18:06:19 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/07 00:35:46 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 # include "respond.hpp"
 
-void    Respond::ft_handle_redirection()
-{
-    
-}
-
-void    Respond::ft_handle_cgi()
-{
-    
-}
-
-int    ft_check_file()
+int    Respond::ft_check_file()
 {
     struct stat st;
-    if (stat(server.get_root().c_str(), &st) == 0)
+    if (stat(_rooted_path.c_str(), &st) == 0)
     {
         if (S_ISREG(st.st_mode)) // This macro returns non-zero if the file is a regular file.
-            return (true);
+            return (1);
     }
-    else
-        return (false);
+    return (0);
 }
 
 void    Respond::ft_handle_file()
+{
+    std::ifstream file;
+    if (strcmp(_rooted_path.c_str(), ""))
+    {
+        file.open(_rooted_path.c_str());
+        if (file.is_open())
+        {
+            _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+            _status_code = 200;
+            _status_message = "OK";
+            _headers["Content-Type"] = "text/html";
+            _headers["Content-Length"] = std::to_string(_response_body.length());
+            _headers["Connection"] = "keep-alive";
+        }
+        else
+        {
+            _status_code = 404;
+            _status_message = "Not Found";
+        }
+    }
+    else
+    {
+        _status_code = 404;
+        _status_message = "Not Found";
+    }
+}
+/*
+Here's how it works:
+• std::istreambuf_iterator<char>(file) constructs an input iterator that reads successive characters from the std::basic_streambuf object associated with the file object. This iterator is used to read the contents of the file.
+• std::istreambuf_iterator<char>() constructs a default-constructed end-of-stream iterator. This iterator is used to indicate the end of the input sequence.
+• The two iterators are passed as arguments to the std::string constructor, which constructs a new std::string object initialized with the characters read from the input sequence.
+In other words, the std::string constructor reads the entire contents of the file into a std::string object. The resulting std::string object contains all the characters from the file, including any whitespace characters and newline characters.
+*/
+
+void    Respond::ft_handle_index(std::vector<server> server)
+{
+    std::string index;
+    
+    for (size_t i = 0; i < server.size(); i++)
+    {
+        for (size_t j = 0; j < server[i]._location.size(); j++)
+        {
+            if (_path_found == server[i]._location[j].location_name)
+            {
+                if (server[i]._location[j].get_index().empty())
+                {
+                    if (server[i].get_index().empty())
+                        handle_error_response(403);
+                    else
+                    {
+                        index = server[i].get_index();
+                        _rooted_path = server[i].get_root() + _removed_path + index;
+                        ft_handle_index_2();
+                    }
+                }
+                else
+                {
+                    index = server[i]._location[j].get_index();
+                    _rooted_path = server[i].get_root() + _removed_path + index;
+                    ft_handle_index_2();
+                }
+            }
+        }
+    }
+}
+
+void    Respond::ft_handle_index_2()
 {
     std::ifstream file;
     if (_rooted_path != "")
@@ -51,67 +107,22 @@ void    Respond::ft_handle_file()
         }
         else
         {
-            _status_code = "404";
+            _status_code = 404;
             _status_message = "Not Found";
         }
     }
     else
     {
-        _status_code = "404";
+        _status_code = 404;
         _status_message = "Not Found";
     }
 }
-/*
-Here's how it works:
-• std::istreambuf_iterator<char>(file) constructs an input iterator that reads successive characters from the std::basic_streambuf object associated with the file object. This iterator is used to read the contents of the file.
-• std::istreambuf_iterator<char>() constructs a default-constructed end-of-stream iterator. This iterator is used to indicate the end of the input sequence.
-• The two iterators are passed as arguments to the std::string constructor, which constructs a new std::string object initialized with the characters read from the input sequence.
-In other words, the std::string constructor reads the entire contents of the file into a std::string object. The resulting std::string object contains all the characters from the file, including any whitespace characters and newline characters.
-*/
 
-void    Respond::ft_handle_index()
+void    Respond::ft_handle_autoindex(std::vector<server> server)
 {
-    std::string index;
-    
-    for (int i = 0; i < server.size(); i++)
+    for (size_t i = 0; i < server.size(); i++)
     {
-        for (int j = 0; j < server[i]._location.size(); j++)
-        {
-            if (_path_found == server[i]._location[j].location_name)
-            {
-                if (!server[i]._location[j].get_index())
-                {
-                    if (!server[i].get_index())
-                    {
-                        // show forbidden result
-                    }
-                    else
-                    {
-                        index = server[i].get_index();
-                        _rooted_path = server[i].get_root() + _path_found + index;
-                        ft_handle_index_2();
-                    }
-                }
-                else
-                {
-                    index = server[i]._location[j].get_index();
-                    _rooted_path = server[i].get_root() + _path_found + index;
-                    ft_handle_index_2();
-                }
-            }
-        }
-    }
-}
-
-void    Respond::ft_handle_index_2()
-{
-}
-
-void    Respond::ft_handle_autoindex()
-{
-    for (int i = 0; i < server.size(); i++)
-    {
-        for (int j = 0; j < server[i]._location.size(); j++)
+        for (size_t j = 0; j < server[i]._location.size(); j++)
         {
             if (_path_found == server[i]._location[j].location_name)
             {
@@ -134,9 +145,9 @@ void    Respond::ft_handle_autoindex()
 
 void    Respond::ft_handle_error(int error_code)
 {
-    _response_body = "<html><head><title>403 Forbidden</title></head><body><h1>Forbidden</h1><p>You don't have permission to access " + this->_uri + " on this server.</p></body></html>";
-    _status_code = "403";
-    _status_message = "Forbidden";
+    _status_code = error_code;
+    _response_body = "<html><head><title " + std::to_string(error_code) + " Forbidden</title></head><body><h1>Forbidden</h1><p>You don't have permission to access " + r.get_uri() + " on this server.</p></body></html>";
+    _status_message = get_response_status(_status_code);
     _headers["Content-Type"] = "text/html";
     _headers["Content-Length"] = _response_body.length();
     _headers["Connection"] = "keep-alive";
@@ -166,7 +177,7 @@ void    Respond::ft_show_autoindex()
     std::string file_name;
     std::string file_size;
 
-    while ((entry == readdir(dir)) != NULL)
+    while ((entry = readdir(dir)) != NULL)
     {
         if (entry->d_name[0] != '.')
         {
@@ -193,12 +204,14 @@ void    Respond::ft_show_autoindex()
 
 void    Respond::handle_error_response(int error_code)
 {
-    _response_body = "<html><head><title>" + std::to_string(error_code) + " " + _status_message + "</title></head><body><h1>" + std::to_string(error_code) + " " + _status_message + "</h1><p>You don't have permission to access " + this->_uri + " on this server.</p></body></html>";
     set_status_code(_status_code);
     set_status_message(get_response_status(_status_code));
     set_header("Content-Type", "text/html");
-    set_header("Content-Length", std::to_string(_response_body.length()));
     set_header("Connection", "keep-alive");
+    set_date();
+    set_last_modified();
+    _response_body = "<html><head><title>" + std::to_string(error_code) + " " + _status_message + "</title></head><body><h1>" + std::to_string(error_code) + " " + _status_message + "</h1><p>You don't have permission to access " + r.get_uri() + " on this server.</p></body></html>";
+    set_header("Content-Length", std::to_string(_response_body.length()));
 
     print_response();
 }
@@ -209,6 +222,6 @@ void    Respond::print_response()
     for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
         std::cout << it->first << ": " << it->second << "\r\n";
     std::cout << "\r\n";
-    if (get_response_body() != "")
-        std::cout << _response_body;
+   // if (get_response_body() != "")
+        std::cout << "response body: " << _response_body << std::endl;;
 }
