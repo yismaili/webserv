@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 21:30:46 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/07 15:36:30 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,8 @@ namespace http{
                 {
                   //std::cout<<requist_data[clients[i].fd]<<std::endl;
                   std::cout << "------" <<conf[conf_fd[clients[i].fd]->index].get_root() << "------" << std::endl;
-
+                //   Respond   rep(requist_data[clients[i].fd]);
+                  
                     // request r(requist_data[clients[i].fd]);
                    // r.parse_request(requist_data[clients[i].fd]);
                     std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
@@ -256,7 +257,11 @@ namespace http{
         {
             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
         }
-       // request r(requist_data[sockfd]);
+        request req(requist_data[sockfd]);
+        Respond   res(req, conf_fd[sockfd]->index);
+
+        res.response_root(conf);
+        res.
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
