@@ -153,3 +153,15 @@ void    Respond::set_cache_control(std::string cache)
 {
     _cache_control = cache;
 }
+
+std::string Respond::rtn_response()
+{
+    std::string response;
+
+    response = _http_version + " " + std::to_string(_status_code) + " " + _status_message + "\r\n";
+    for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
+        response += it->first + ": " + it->second + "\r\n";
+    response += "\r\n";
+    response += _response_body;
+    return (response);
+}

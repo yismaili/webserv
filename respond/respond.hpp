@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   respond.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/07 15:35:35 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/07 16:09:14 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,8 +66,9 @@ class Respond
         
         
         void print_respond();
+        std::string rtn_response();
 
-        void        response_root(std::vector<server> server);
+        std::string response_root(std::vector<server> server);
         std::string response_autoindex(request &r);
         std::string response_cgi(request &r);
         int         ft_parse_location(std::vector<server> server);
