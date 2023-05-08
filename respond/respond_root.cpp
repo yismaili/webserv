@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/08 18:03:36 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/08 18:52:50 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,23 +25,23 @@ std::string Respond::response_root(std::vector<server> servers)
             // direct it to the GET response and see if i can read the file concatenated with the root using `stat`
     }
     // step 2 : check the redirectation
-    if (!ft_parse_url_forwarding(servers))
-        return (rtn_response());
-    // step 3 : check the validation of rooted path
-    if (ft_parse_root_path(servers))
-    {
-        handle_error_response(_status_code);
-        return (rtn_response());
-    }
+    // if (!ft_parse_url_forwarding(servers))
+    //     return (rtn_response());
+    // // step 3 : check the validation of rooted path
+    // if (ft_parse_root_path(servers))
+    // {
+    //     handle_error_response(_status_code);
+    //     return (rtn_response());
+    // }
 
-    // step 4 : check the allowed methods
-    if (ft_check_allowed_methods(servers))
-    {
-        handle_error_response(_status_code);
-        return (rtn_response());
-    }
-    // step 5 : check the autoindex
-    ft_check_autoindex(servers);
+    // // step 4 : check the allowed methods
+    // if (ft_check_allowed_methods(servers))
+    // {
+    //     handle_error_response(_status_code);
+    //     return (rtn_response());
+    // }
+    // // step 5 : check the autoindex
+    // ft_check_autoindex(servers);
 
     // methods area
     if (r.get_method() == "GET")

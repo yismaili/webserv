@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/08 18:03:27 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/08 18:59:58 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -204,16 +204,15 @@ void    Respond::ft_show_autoindex()
 
 void    Respond::handle_error_response(int error_code)
 {
-    set_status_code(_status_code);
-    set_status_message(get_response_status(get_status_code()));
+    set_status_code(200);
+    set_status_message(get_response_status(200));
     set_header("Content-Type", "text/html");
     set_header("Connection", "keep-alive");
     set_date();
     set_last_modified();
-    _response_body = "<html><head><title>" + std::to_string(error_code) + " " + _status_message + "</title></head><body><h1>" + std::to_string(error_code) + " " + _status_message + "</h1><p>You don't have permission to access " + r.get_uri() + " on this server.</p></body></html>";
+    _response_body = "<html><head><title>" + std::to_string(error_code) + " " + std::to_string(get_status_code()) + "</title></head><body><h1>" + std::to_string(error_code) + " " + std::to_string(get_status_code()) + "</h1><p>You don't have permission to access " + r.get_uri() + " on this server.</p></body></html>";
     set_header("Content-Length", std::to_string(_response_body.length()));
-
-    print_response();
+    // print_response();
 }
 
 void    Respond::print_response()

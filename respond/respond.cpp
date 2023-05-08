@@ -126,14 +126,16 @@ std::string Respond::get_document_root()
 
 int Respond::ft_parse_root_path(std::vector<server> server)
 {
-    // struct stat file_stats;
+    struct stat file_stats;
     _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path;
-    // if (!stat(_rooted_path.c_str(), &file_stats))
-    _file_cgi = _rooted_path;
+    if (!stat(_rooted_path.c_str(), &file_stats))
+    {
+        _file_cgi = _rooted_path;
         return (0);
-
+    }
     set_status_code(403);
     set_status_message(get_response_status(get_status_code()));
+    std::cout << "___--__--__-_----___HEREEE__---------__-_-_-__--" << std::endl;
     return (1);
 }
 
