@@ -23,7 +23,9 @@ Respond::Respond(request& req, int index_) : r(req)
     _is_autoindex = false;
     _is_redirection = false;
     _is_index = false;
-    _boundary = r.get_header("Content-Type").substr(r.get_header("Content-Type").find("boundary=") + 9);
+    std::cout << r.get_header("Content-Type") << std::endl;
+    _boundary = "";
+    // _boundary = r.get_header("Content-Type").substr(r.get_header("Content-Type").find("boundary=") + 9);
     _upload_store = "";
     _server_index = index_;
     _location_index = 0;
@@ -131,6 +133,7 @@ int Respond::ft_parse_root_path(std::vector<server> server)
         return (0);
 
     set_status_code(403);
+    set_status_message(get_response_status(get_status_code()));
     return (1);
 }
 

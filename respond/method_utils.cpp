@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/07 00:35:46 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/08 18:03:27 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,8 +99,8 @@ void    Respond::ft_handle_index_2()
         if (file.is_open())
         {
             _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            _status_code = 200;
-            _status_message = "OK";
+            set_status_code(200);
+            set_status_message(get_response_status(get_status_code()));
             _headers["Content-Type"] = "text/html";
             _headers["Content-Length"] = std::to_string(_response_body.length());
             _headers["Connection"] = "keep-alive";
@@ -205,7 +205,7 @@ void    Respond::ft_show_autoindex()
 void    Respond::handle_error_response(int error_code)
 {
     set_status_code(_status_code);
-    set_status_message(get_response_status(_status_code));
+    set_status_message(get_response_status(get_status_code()));
     set_header("Content-Type", "text/html");
     set_header("Connection", "keep-alive");
     set_date();

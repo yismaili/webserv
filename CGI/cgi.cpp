@@ -149,6 +149,7 @@ std::string run_cgi(request &r,  Respond &res)
     if (pid == -1) 
     {
         res.set_status_code(500);
+        res.set_status_message(res.get_response_status(res.get_status_code()));
         return NULL;
     }
     else if (pid == 0)
@@ -176,8 +177,11 @@ std::string run_cgi(request &r,  Respond &res)
 
     int status;
     waitpid(pid, &status, 0);
-    if (WIFSIGNALED(status) || status != 0) 
+    if (WIFSIGNALED(status) || status != 0)
+    {
         res.set_status_code(500);
+        res.set_status_message(res.get_response_status(res.get_status_code()));
+    }
     char buf[1];
     std::string content;
     int byt;

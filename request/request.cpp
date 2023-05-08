@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/05 16:33:19 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/08 16:17:03 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,6 +119,7 @@ void request::parse_request(std::string request)
         lines.push_back(line);
     }
     // Parse the request line
+    // std::cout << lines[0] << std::endl;
     std::istringstream request_line(lines[0]);
     request_line >> this->_method >> this->_uri >> this->_version;
     // i need to call a function to check if the request line content is suitable or not
@@ -164,62 +165,25 @@ void request::parse_request(std::string request)
         exit(1);
     }
     ft_parse_port(this->get_header("Host"));
-    ft_parse_language_charset();
+    // ft_parse_language_charset();
 
     // Parse the request body
     std::string content_len_str = this->get_header("Content-Length");
-    if (!content_len_str.empty())
+    if (content_len_str != "")
     {
         size_t content_len = std::stoi(content_len_str);
         this->_body = lines.back().substr(0, content_len);
-        // std::string transfer_encoding = this->get_header("Accept-Encoding");
-        // if (!transfer_encoding.empty())
-        // {
-        //     // using pointers to member functions to call the functions handlers
-        //     std::vector<std::string> encoding_types;
-        //     size_t startPos = 0;
-        //     size_t endPos = transfer_encoding.find(',');
-        //     while (endPos != std::string::npos)
-        //     {
-        //         encoding_types.push_back(transfer_encoding.substr(startPos, endPos - startPos));
-        //         startPos = endPos + 1;
-        //         endPos = transfer_encoding.find(',', startPos);
-        //     }
-        //     encoding_types.push_back(transfer_encoding.substr(startPos, endPos - startPos));
-        //     for (std::vector<std::string>::const_iterator it = encoding_types.begin(); it != encoding_types.end(); ++it)
-        //     {
-        //         std::string type_tmp = *it;
-        //         // Trim leading and trailing whitespaces from the value
-        //         // type_tmp.erase(0, type_tmp.find_first_not_of(" \t"));
-        //         // type_tmp.erase(type_tmp.find_first_not_of(" \t") + 1);
-        //         bool supported = false;
-        //         for (size_t i = 0; i < sizeof(handlers) / sizeof(handlers[0]); ++i)
-        //         {
-        //             if (type_tmp == supported_encodings[i])
-        //             {
-        //                 (this->*handlers[i])(this->_body);
-        //                 supported = true;
-        //                 break;
-        //             }
-        //         }
-        //         if (!supported)
-        //             std::cerr << "Unsupported encoding type: " << type_tmp << std::endl;
-        //     }
-            
-        // }
     }
     else
     {
-        if (this->_headers.find("Content-Length") != this->_headers.end() || this->_method == "POST" || this->_method == "PUT"
-            || this->_headers.find("Content-Type") != this->_headers.end())
+        // std::cout << "____----_-_-_-_--_-_____-_-_-_-____-_-_-_-_-------" << std::endl;
+        if (content_len_str == "" || this->_method == "POST")
             {
-                std::cerr << "Body request is missing" << std::endl;
-                exit(1);
+                set_body("");
+                return ;
             }
         
     }
-
-    // print_request();
 }
 
 void    request::print_request()
