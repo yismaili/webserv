@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/07 16:25:06 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/08 18:03:36 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,27 +19,27 @@ std::string Respond::response_root(std::vector<server> servers)
     {
         // considering the location of the root directory is indeed the final step in handling requests when no specific location matches the requested URI.
         // if (root_location(servers) == 0)
-        root_location(servers);
+        if (root_location(servers) == 1)
+            handle_error_response(404);
+            return (rtn_response());
             // direct it to the GET response and see if i can read the file concatenated with the root using `stat`
     }
-
     // step 2 : check the redirectation
     if (!ft_parse_url_forwarding(servers))
-       return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
+        return (rtn_response());
     // step 3 : check the validation of rooted path
     if (ft_parse_root_path(servers))
     {
         handle_error_response(_status_code);
-        return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
+        return (rtn_response());
     }
 
     // step 4 : check the allowed methods
     if (ft_check_allowed_methods(servers))
     {
         handle_error_response(_status_code);
-        return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
+        return (rtn_response());
     }
-
     // step 5 : check the autoindex
     ft_check_autoindex(servers);
 
@@ -214,7 +214,7 @@ int Respond::ft_parse_url_forwarding(std::vector<server> server)
                 // search for message of the status_code
                 std::string message = get_response_status(status_code);
                 set_status_code(status_code);
-                set_status_message(message);
+                set_status_message(get_response_status(get_status_code()));
                 set_header("Location", server[_server_index]._location[j].get_redirection().second);
                 _is_redirection = true;
                 return (0);

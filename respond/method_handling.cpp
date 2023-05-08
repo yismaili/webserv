@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/07 00:31:03 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/08 18:04:33 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,14 +16,13 @@ void    Respond::handle_get_response(std::vector<server> servers)
 {
     
     // step 2: check if it's a CGI or not (like if `index` of the configuration file has .py or .php...etc)
-    
     // step 3: check if it's a file or not
     if (ft_check_file() == true)
         ft_handle_file();
-
+    else
+        handle_error_response(404);
     // step 4 : check the index in the configuration file and render it
-    if (_is_index == true)
-        ft_handle_index(servers);
+    ft_handle_index(servers);
     
     // step 5: check if the autoindex if on or off
     ft_handle_autoindex(servers);
@@ -34,6 +33,12 @@ void    Respond::handle_get_response(std::vector<server> servers)
 
 void    Respond::handle_post_response(std::vector<server> server)
 {
+    // step 1: check if the request body is empty or not
+    if (r.get_body().empty())
+    {
+        set_response_body("Body request is missing");
+        return ;
+    }
     struct stat st;
     (void)server;
     // if (_is_cgi == false && (server[_server_index].get_upload_store().empty() || server[_server_index].get_upload() == "off"))

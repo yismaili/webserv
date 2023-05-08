@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/07 21:58:40 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/08 18:19:59 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -102,10 +102,10 @@ namespace http{
                     {
                         recv_ret = recv_data(clients[i].fd);
                      
-                        if (!recv_ret)
-                        {
+                        // if (!recv_ret)
+                        // {
                             unchunk(clients[i].fd);
-                        }
+                        // }
                     }
                 }
                else if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
@@ -251,9 +251,9 @@ namespace http{
         {
             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
         }
-    //     request req(requist_data[sockfd]);
-    //     Respond   res(req, conf_fd[sockfd]->index);
-    //    requist_data[sockfd] =  res.response_root(conf);
+        request req(requist_data[sockfd]);
+        Respond   res(req, conf_fd[sockfd]->index);
+       requist_data[sockfd] =  res.response_root(conf);
  std::cout<<"--**---"<<requist_data[sockfd]<<"---***"<<std::endl;
         
     }
@@ -357,7 +357,7 @@ namespace http{
             std::cout << " Response  sended "<<std::endl;
         }
         // Send the data to the client
-        requist_data[socket] = response;
+        // requist_data[socket] = response;
         std::string data_to_send = requist_data[socket].substr(sent_data[socket], 1024);
         long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
         // Check for errors while sending data
