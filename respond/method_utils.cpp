@@ -23,32 +23,27 @@ int    Respond::ft_check_file()
     return (0);
 }
 
-void    Respond::ft_handle_file()
+void Respond::ft_handle_file()
 {
     std::ifstream file;
-    if (strcmp(_rooted_path.c_str(), ""))
+    if (!strcmp(_rooted_path.c_str(), ""))
     {
-        file.open(_rooted_path.c_str());
-        if (file.is_open())
-        {
-            _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            _status_code = 200;
-            _status_message = "OK";
-            _headers["Content-Type"] = "text/html";
-            _headers["Content-Length"] = std::to_string(_response_body.length());
-            _headers["Connection"] = "keep-alive";
-        }
-        else
-        {
-            _status_code = 404;
-            _status_message = "Not Found";
-        }
+        handle_error_response(404);
+        return;
+    }
+
+    file.open(_rooted_path.c_str(), std::ifstream::in);
+    if (file.is_open())
+    {
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        _response_body = buffer.str();
+        file.close();
+        set_status_code(200);
+        set_status_message(get_response_status(200));
     }
     else
-    {
-        _status_code = 404;
-        _status_message = "Not Found";
-    }
+        handle_error_response(403);
 }
 /*
 Here's how it works:
@@ -58,32 +53,34 @@ Here's how it works:
 In other words, the std::string constructor reads the entire contents of the file into a std::string object. The resulting std::string object contains all the characters from the file, including any whitespace characters and newline characters.
 */
 
-void    Respond::ft_handle_index(std::vector<server> server)
+int Respond::ft_handle_index(std::vector<server> server)
 {
     std::string index;
-    
-    for (size_t i = 0; i < server.size(); i++)
-    {
-        for (size_t j = 0; j < server[i]._location.size(); j++)
-        {
-            if (_path_found == server[i]._location[j].location_name)
+
+            if (_path_found == server[_server_index]._location[_location_index].location_name)
             {
-                if (server[i]._location[j].get_index().empty())
+                if (server[_server_index]._location[_location_index].get_index().empty())
                 {
-                    if (server[i].get_index().empty())
-                        handle_error_response(403);
+                    if (server[_server_index].get_index().empty())
+                        return (handle_error_response(403));
                     else
                     {
-                        index = server[i].get_index();
-                        _rooted_path = server[i].get_root() + _removed_path + index;
-                        ft_handle_index_2();
+                        index = server[_server_index].get_index();
+                        _rooted_path = server[_server_index].get_root() + _removed_path + index;
+                        if (ft_handle_index_2())
+                            return (1);
+                        else
+                            return (0);
                     }
                 }
                 else
                 {
-                    index = server[i]._location[j].get_index();
-                    _rooted_path = server[i].get_root() + _removed_path + index;
-                    ft_handle_index_2();
+                    index = server[_server_index]._location[_location_index].get_index();
+                    _rooted_path = server[_location_index].get_root() + _removed_path + index;
+                    if (ft_handle_index_2())
+                        return (1);
+                    else
+                        return (0);
                 }
             }
         }
@@ -100,21 +97,23 @@ void    Respond::ft_handle_index_2()
         {
             _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
             set_status_code(200);
-            set_status_message(get_response_status(get_status_code()));
+            set_status_message(get_response_status(200));
             _headers["Content-Type"] = "text/html";
             _headers["Content-Length"] = std::to_string(_response_body.length());
             _headers["Connection"] = "keep-alive";
+            set_date();
+            set_cache_control("no cache");
         }
         else
         {
-            _status_code = 404;
-            _status_message = "Not Found";
+            handle_error_response(403);
+            return (1);
         }
     }
     else
     {
-        _status_code = 404;
-        _status_message = "Not Found";
+        handle_error_response(404);
+        return (1);
     }
 }
 
@@ -151,6 +150,8 @@ void    Respond::ft_handle_error(int error_code)
     _headers["Content-Type"] = "text/html";
     _headers["Content-Length"] = _response_body.length();
     _headers["Connection"] = "keep-alive";
+    set_date();
+    set_cache_control("no cache");
 }
 
 void    Respond::ft_show_autoindex()

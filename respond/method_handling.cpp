@@ -14,13 +14,17 @@
 
 void    Respond::handle_get_response(std::vector<server> servers)
 {
-    
     // step 2: check if it's a CGI or not (like if `index` of the configuration file has .py or .php...etc)
+    if (_is_cgi == true)
+    {
+        run_cgi(r, *this);
+        return ;
+    }
     // step 3: check if it's a file or not
     if (ft_check_file() == true)
-        ft_handle_file();
+        return (ft_handle_file());
     else
-        handle_error_response(404);
+        return (handle_error_response(404));
     // step 4 : check the index in the configuration file and render it
     ft_handle_index(servers);
     

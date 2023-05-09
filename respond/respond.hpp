@@ -87,7 +87,7 @@ class Respond
         void        ft_handle_autoindex(std::vector<server> servers);
         void        ft_check_cgi();
         int         ft_check_file();
-        void        ft_handle_index(std::vector<server> servers);
+        int         ft_handle_index(std::vector<server> servers);
         void        ft_handle_index_2();
         void        ft_show_autoindex();
 
