@@ -12,12 +12,14 @@
 
 #include "request.hpp"
 
-request::request()
+request::request() : _method(""), _uri(""), _version(""),
+    _body(""), _port(80), _query("")
 {
     return ;
 }
 
-request::request(std::string request)
+request::request(std::string request) : _method(""), _uri(""), _version(""),
+    _body(""), _port(80), _query("")
 {
     this->parse_request(request);
     return ;
@@ -43,6 +45,8 @@ request &request::operator=(const request &src)
         this->_version = src._version;
         this->_headers = src._headers;
         this->_body = src._body;
+        this->_port = src._port;
+        this->_query = src._query;
     }
     return (*this);
 }

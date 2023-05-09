@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/08 18:59:58 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/09 19:09:29 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,32 +23,26 @@ int    Respond::ft_check_file()
     return (0);
 }
 
-void    Respond::ft_handle_file()
+void Respond::ft_handle_file()
 {
     std::ifstream file;
-    if (strcmp(_rooted_path.c_str(), ""))
+    if (!strcmp(_rooted_path.c_str(), ""))
     {
-        file.open(_rooted_path.c_str());
-        if (file.is_open())
-        {
-            _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            _status_code = 200;
-            _status_message = "OK";
-            _headers["Content-Type"] = "text/html";
-            _headers["Content-Length"] = std::to_string(_response_body.length());
-            _headers["Connection"] = "keep-alive";
-        }
-        else
-        {
-            _status_code = 404;
-            _status_message = "Not Found";
-        }
+        handle_error_response(404);
+        return;
+    }
+    file.open(_rooted_path.c_str(), std::ifstream::in);
+    if (file.is_open())
+    {
+        std::stringstream buffer;
+        buffer << file.rdbuf();
+        _response_body = buffer.str();
+        file.close();
+        set_status_code(200);
+        set_status_message(get_response_status(200));
     }
     else
-    {
-        _status_code = 404;
-        _status_message = "Not Found";
-    }
+        handle_error_response(403);
 }
 /*
 Here's how it works:
@@ -58,67 +52,73 @@ Here's how it works:
 In other words, the std::string constructor reads the entire contents of the file into a std::string object. The resulting std::string object contains all the characters from the file, including any whitespace characters and newline characters.
 */
 
-void    Respond::ft_handle_index(std::vector<server> server)
+int Respond::ft_handle_index(std::vector<server> server)
 {
     std::string index;
-    
-    for (size_t i = 0; i < server.size(); i++)
+    if (server[_server_index]._location[_location_index].get_index().empty())
     {
-        for (size_t j = 0; j < server[i]._location.size(); j++)
+        if (server[_server_index].get_index().empty())
         {
-            if (_path_found == server[i]._location[j].location_name)
-            {
-                if (server[i]._location[j].get_index().empty())
-                {
-                    if (server[i].get_index().empty())
-                        handle_error_response(403);
-                    else
-                    {
-                        index = server[i].get_index();
-                        _rooted_path = server[i].get_root() + _removed_path + index;
-                        ft_handle_index_2();
-                    }
-                }
-                else
-                {
-                    index = server[i]._location[j].get_index();
-                    _rooted_path = server[i].get_root() + _removed_path + index;
-                    ft_handle_index_2();
-                }
-            }
-        }
-    }
-}
-
-void    Respond::ft_handle_index_2()
-{
-    std::ifstream file;
-    if (_rooted_path != "")
-    {
-        file.open(_rooted_path.c_str());
-        if (file.is_open())
-        {
-            _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
-            set_status_code(200);
-            set_status_message(get_response_status(get_status_code()));
-            _headers["Content-Type"] = "text/html";
-            _headers["Content-Length"] = std::to_string(_response_body.length());
-            _headers["Connection"] = "keep-alive";
+            handle_error_response(403);
+            return (1);
         }
         else
         {
-            _status_code = 404;
-            _status_message = "Not Found";
+            puts("klhdsfjdkhfkjsdfh");
+            index = server[_server_index]._location[_location_index].get_index();
+            _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
+            if (ft_handle_index_2(index))
+                return (1);
         }
     }
     else
     {
-        _status_code = 404;
-        _status_message = "Not Found";
+        puts("dkhl please");
+        index = server[_server_index]._location[_location_index].get_index();
+        std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
+        std::cout << file << std::endl;
+        _rooted_path = server[_location_index].get_root() + _removed_path + index;
+        std::cout << "rooted path:" << _rooted_path <<  std::endl;
+        if (ft_handle_index_2(file))
+            return (1);
     }
+    return (0);
 }
 
-void    Respond::ft_handle_autoindex(std::vector<server> server)
+int Respond::ft_handle_index_2(std::string index)
+{
+    std::ifstream file;
+    if (index != "")
+    {
+        file.open(index.c_str());
+        if (file.is_open())
+        {
+            _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+            set_status_code(200);
+            set_status_message(get_response_status(200));
+            _headers["Content-Type"] = "text/html";
+            _headers["Content-Length"] = std::to_string(_response_body.length());
+            _headers["Connection"] = "keep-alive";
+            set_date();
+            set_cache_control("no cache");
+            return (0);
+        }
+        // else
+        // {
+        //     std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
+        //     handle_error_response(403);
+        //     return (1);
+        // }
+    }
+    else
+    {
+        handle_error_response(404);
+        return (1);
+    }
+    return (0);
+}
+
+int     Respond::ft_handle_autoindex(std::vector<server> server)
 {
     for (size_t i = 0; i < server.size(); i++)
     {
@@ -129,18 +129,22 @@ void    Respond::ft_handle_autoindex(std::vector<server> server)
                 if (!server[i]._location[j].get_autoindex())
                 {
                     if (!server[i].get_autoindex())
-                    {
-                        // show forbidden result
-                        ft_handle_error(403);
-                    }
+                        return (1);
                     else
+                    {
                         ft_show_autoindex();
+                        return (0);
+                    }
                 }
                 else
+                {
                     ft_show_autoindex();
+                    return (0);
+                }
             }
         }
     }
+    return (1);
 }
 
 void    Respond::ft_handle_error(int error_code)
@@ -151,6 +155,8 @@ void    Respond::ft_handle_error(int error_code)
     _headers["Content-Type"] = "text/html";
     _headers["Content-Length"] = _response_body.length();
     _headers["Connection"] = "keep-alive";
+    set_date();
+    set_cache_control("no cache");
 }
 
 void    Respond::ft_show_autoindex()
@@ -204,15 +210,16 @@ void    Respond::ft_show_autoindex()
 
 void    Respond::handle_error_response(int error_code)
 {
-    set_status_code(200);
-    set_status_message(get_response_status(200));
+    set_status_code(error_code);
+    set_status_message(get_response_status(get_status_code()));
     set_header("Content-Type", "text/html");
     set_header("Connection", "keep-alive");
     set_date();
     set_last_modified();
-    _response_body = "<html><head><title>" + std::to_string(error_code) + " " + std::to_string(get_status_code()) + "</title></head><body><h1>" + std::to_string(error_code) + " " + std::to_string(get_status_code()) + "</h1><p>You don't have permission to access " + r.get_uri() + " on this server.</p></body></html>";
+    _response_body = "<html><head><title>" + std::to_string(error_code) + " " + _status_message + "</title></head><body><h1>" + std::to_string(error_code) + " " + _status_message + "</h1><p>You don't have permission to access " + r.get_uri() + " on this server.</p></body></html>";
     set_header("Content-Length", std::to_string(_response_body.length()));
-    // print_response();
+
+    print_response();
 }
 
 void    Respond::print_response()

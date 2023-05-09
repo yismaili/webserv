@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/08 18:52:50 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/09 23:49:36 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,35 +14,36 @@
 
 std::string Respond::response_root(std::vector<server> servers)
 {
+    std::cout << "request uri : " << r.get_uri() << std::endl;
+    std::cout << r.get_method() << std::endl;
+    init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     if (ft_parse_location(servers))
     {
-        // considering the location of the root directory is indeed the final step in handling requests when no specific location matches the requested URI.
-        // if (root_location(servers) == 0)
         if (root_location(servers) == 1)
+        {
             handle_error_response(404);
-            return (rtn_response());
-            // direct it to the GET response and see if i can read the file concatenated with the root using `stat`
+            return (rtn_response()); 
+        }
     }
+
     // step 2 : check the redirectation
-    // if (!ft_parse_url_forwarding(servers))
-    //     return (rtn_response());
-    // // step 3 : check the validation of rooted path
-    // if (ft_parse_root_path(servers))
-    // {
-    //     handle_error_response(_status_code);
-    //     return (rtn_response());
-    // }
-
-    // // step 4 : check the allowed methods
-    // if (ft_check_allowed_methods(servers))
-    // {
-    //     handle_error_response(_status_code);
-    //     return (rtn_response());
-    // }
-    // // step 5 : check the autoindex
-    // ft_check_autoindex(servers);
-
+    if (!ft_parse_url_forwarding(servers))
+        return (rtn_response());
+    // step 3 : check the validation of rooted path
+    if (ft_parse_root_path(servers))
+    {
+        handle_error_response(_status_code);
+        return (rtn_response());
+    }
+    // step 4 : check the allowed methods
+    if (ft_check_allowed_methods(servers))
+    {
+        handle_error_response(_status_code);
+        return (rtn_response());
+    }
+    // step 5 : check the autoindex
+    ft_check_autoindex(servers);
     // methods area
     if (r.get_method() == "GET")
         handle_get_response(servers);
@@ -63,7 +64,10 @@ int Respond::exact_location(std::vector<server> server, std::string path)
         {
             if (server[_server_index]._location[j].location_name == path)
             {
+                
                 _location_index = j;
+                std::cout << "location index: " << _location_index << std::endl;
+                std::cout << "path: " << std::endl;
                 _path_found = server[_server_index]._location[j].location_name;
                 return (0);
             }
@@ -84,6 +88,8 @@ int Respond::prefix_location(std::vector<server> server, std::string &path)
             {
                 _location_index = j;
                 _path_found = server[_server_index]._location[j].location_name;
+                std::cout << "path found: " << _path_found << std::endl;
+                std::cout << "removed path: " << _removed_path << std::endl;
                 return (0);
             }
             
@@ -100,7 +106,6 @@ int Respond::prefix_location(std::vector<server> server, std::string &path)
 
 int Respond::dynamic_location(std::vector<server> server, std::string path)
 {
-    std::cout << path << std::endl;
     std::string::size_type pos = path.find(".");
     std::cout << pos << std::endl;
     if (pos != std::string::npos)
@@ -189,7 +194,7 @@ int Respond::ft_parse_location(std::vector<server> server)
     // regex location body code
     if (dynamic_location(server, path) == 0)
         return (0);
-
+    _removed_path = "";
     // prefix location body code
     if (prefix_location(server, path) == 0)
         return (0);
@@ -212,10 +217,10 @@ int Respond::ft_parse_url_forwarding(std::vector<server> server)
             {
                 size_t status_code = server[_server_index]._location[j].get_redirection().first;
                 // search for message of the status_code
-                std::string message = get_response_status(status_code);
                 set_status_code(status_code);
-                set_status_message(get_response_status(get_status_code()));
+                set_status_message(get_response_status(status_code));
                 set_header("Location", server[_server_index]._location[j].get_redirection().second);
+                set_cache_control("cache");
                 _is_redirection = true;
                 return (0);
             }

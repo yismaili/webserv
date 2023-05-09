@@ -13,7 +13,6 @@ Content-Length: 1234\r\n
 Respond::Respond(request& req, int index_) : r(req)
 {
     _http_version = "HTTP/1.1";
-    _response_body = "";
     _status_code = 200;
     _status_message = "OK";
     _path_found = "";
@@ -23,7 +22,6 @@ Respond::Respond(request& req, int index_) : r(req)
     _is_autoindex = false;
     _is_redirection = false;
     _is_index = false;
-    std::cout << r.get_header("Content-Type") << std::endl;
     _boundary = "";
     // _boundary = r.get_header("Content-Type").substr(r.get_header("Content-Type").find("boundary=") + 9);
     _upload_store = "";
@@ -135,7 +133,6 @@ int Respond::ft_parse_root_path(std::vector<server> server)
     }
     set_status_code(403);
     set_status_message(get_response_status(get_status_code()));
-    std::cout << "___--__--__-_----___HEREEE__---------__-_-_-__--" << std::endl;
     return (1);
 }
 
@@ -169,4 +166,22 @@ std::string Respond::rtn_response()
     response += "\r\n";
     response += _response_body;
     return (response);
+}
+
+void    Respond::init_response_body(std::string file, std::string _root)
+{
+    std::ifstream file_;
+    std::string line;
+
+    std::string f;
+    f = _root + "/" + file;
+    file_.open(f);
+    if (file_.is_open())
+    {
+        while (getline(file_, line))
+            _response_body += line + "\n";
+        file_.close();
+    }
+    else
+        std::cout << "Unable to open file" << std::endl;
 }

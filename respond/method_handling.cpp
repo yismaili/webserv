@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/08 18:51:34 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/10 00:53:07 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,33 @@
 
 void    Respond::handle_get_response(std::vector<server> servers)
 {
-    std::cout << "GET DKHLE LIHAAAAAAAAA____________" << std::endl;
     // step 2: check if it's a CGI or not (like if `index` of the configuration file has .py or .php...etc)
+    if (_is_cgi == true)
+    {
+        run_cgi(r, *this);
+        return ;
+    }
     // step 3: check if it's a file or not
     if (ft_check_file() == true)
+    {
         ft_handle_file();
-    else
-        handle_error_response(404);
+        return ;
+    }
+    // else
+    // {
+    //     std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
+    //     handle_error_response(404);
+    //     return ;
+    // }
     // step 4 : check the index in the configuration file and render it
-    ft_handle_index(servers);
-    
+    if (!ft_handle_index(servers))
+        return ;
     // step 5: check if the autoindex if on or off
-    ft_handle_autoindex(servers);
-    
-    // ft_handle_error(404);
+    if (ft_handle_autoindex(servers))
+    {
+        handle_error_response(403);
+        return ;
+    }
 
 }
 
@@ -40,14 +53,9 @@ void    Respond::handle_post_response(std::vector<server> server)
         return ;
     }
     struct stat st;
-    (void)server;
-    // if (_is_cgi == false && (server[_server_index].get_upload_store().empty() || server[_server_index].get_upload() == "off"))
-    // if (_is_cgi == false && (server[_server_index].get_upload_store().empty()))
-    //     return ;
+    if (_is_cgi == false && (server[_server_index]._location[_location_index].get_upload_store().empty() || server[_server_index]._location[_location_index].get_upload() == "off"))
+        return ;
     _upload_store_path = _rooted_path;
-    // std::cout << "___________________papapa-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
-    // std::cout << _upload_store_path << std::endl;
-    // std::cout << "___________________papapa-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
     _upload_store.append(_upload_store);
     if (stat(_upload_store_path.c_str(), &st) != 0)
     {
@@ -58,6 +66,7 @@ void    Respond::handle_post_response(std::vector<server> server)
     {
         if (_is_cgi == true)
         {
+            // khasni n7t query homa request body
             run_cgi(r, *this);
         }
         else
