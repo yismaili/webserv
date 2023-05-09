@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/07 16:09:14 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/09 17:44:26 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,11 +84,11 @@ class Respond
         // GET RESPONSE
         void        ft_handle_cgi();
         void        ft_handle_file();
-        void        ft_handle_autoindex(std::vector<server> servers);
+        int         ft_handle_autoindex(std::vector<server> servers);
         void        ft_check_cgi();
         int         ft_check_file();
         int         ft_handle_index(std::vector<server> servers);
-        void        ft_handle_index_2();
+        int         ft_handle_index_2();
         void        ft_show_autoindex();
 
         // POST RESPONSE
@@ -129,6 +129,7 @@ class Respond
 
         void        handle_get_response(std::vector<server> servers);
         void        print_response();
+        void        init_response_body(std::string file, std::string _root);
 
         request& r;
         void        create_decode_files();

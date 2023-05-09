@@ -13,7 +13,6 @@ Content-Length: 1234\r\n
 Respond::Respond(request& req, int index_) : r(req)
 {
     _http_version = "HTTP/1.1";
-    _response_body = "";
     _status_code = 200;
     _status_message = "OK";
     _path_found = "";
@@ -167,4 +166,23 @@ std::string Respond::rtn_response()
     response += "\r\n";
     response += _response_body;
     return (response);
+}
+
+void    Respond::init_response_body(std::string file, std::string _root)
+{
+    std::ifstream file_;
+    std::string line;
+
+    std::string f;
+    f = _root + "/" + file;
+    file_.open(f);
+    std::cout << "file path: " <<  f << std::endl;
+    if (file_.is_open())
+    {
+        while (getline(file_, line))
+            _response_body += line + "\n";
+        file_.close();
+    }
+    else
+        std::cout << "Unable to open file" << std::endl;
 }

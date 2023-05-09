@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/08 18:04:33 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/09 17:50:06 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,16 +22,25 @@ void    Respond::handle_get_response(std::vector<server> servers)
     }
     // step 3: check if it's a file or not
     if (ft_check_file() == true)
-        return (ft_handle_file());
-    else
-        return (handle_error_response(404));
+    {
+        ft_handle_file();
+        return ;
+    }
+    // else
+    // {
+    //     std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
+    //     handle_error_response(404);
+    //     return ;
+    // }
     // step 4 : check the index in the configuration file and render it
-    ft_handle_index(servers);
-    
+    if (ft_handle_index(servers))
+        return ;
     // step 5: check if the autoindex if on or off
-    ft_handle_autoindex(servers);
-    
-    // ft_handle_error(404);
+    if (ft_handle_autoindex(servers))
+    {
+        handle_error_response(403);
+        return ;
+    }
 
 }
 

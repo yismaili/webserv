@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/08 18:03:27 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/09 17:29:24 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@ void Respond::ft_handle_file()
         handle_error_response(404);
         return;
     }
-
     file.open(_rooted_path.c_str(), std::ifstream::in);
     if (file.is_open())
     {
@@ -62,15 +61,16 @@ int Respond::ft_handle_index(std::vector<server> server)
                 if (server[_server_index]._location[_location_index].get_index().empty())
                 {
                     if (server[_server_index].get_index().empty())
-                        return (handle_error_response(403));
+                    {
+                        handle_error_response(403);
+                        return (1);
+                    }
                     else
                     {
                         index = server[_server_index].get_index();
                         _rooted_path = server[_server_index].get_root() + _removed_path + index;
                         if (ft_handle_index_2())
                             return (1);
-                        else
-                            return (0);
                     }
                 }
                 else
@@ -79,15 +79,12 @@ int Respond::ft_handle_index(std::vector<server> server)
                     _rooted_path = server[_location_index].get_root() + _removed_path + index;
                     if (ft_handle_index_2())
                         return (1);
-                    else
-                        return (0);
                 }
             }
-        }
-    }
+    return (0);
 }
 
-void    Respond::ft_handle_index_2()
+int Respond::ft_handle_index_2()
 {
     std::ifstream file;
     if (_rooted_path != "")
@@ -103,21 +100,24 @@ void    Respond::ft_handle_index_2()
             _headers["Connection"] = "keep-alive";
             set_date();
             set_cache_control("no cache");
+            return (0);
         }
-        else
-        {
-            handle_error_response(403);
-            return (1);
-        }
+        // else
+        // {
+        //     std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
+        //     handle_error_response(403);
+        //     return (1);
+        // }
     }
     else
     {
         handle_error_response(404);
         return (1);
     }
+    return (0);
 }
 
-void    Respond::ft_handle_autoindex(std::vector<server> server)
+int     Respond::ft_handle_autoindex(std::vector<server> server)
 {
     for (size_t i = 0; i < server.size(); i++)
     {
@@ -128,18 +128,22 @@ void    Respond::ft_handle_autoindex(std::vector<server> server)
                 if (!server[i]._location[j].get_autoindex())
                 {
                     if (!server[i].get_autoindex())
-                    {
-                        // show forbidden result
-                        ft_handle_error(403);
-                    }
+                        return (1);
                     else
+                    {
                         ft_show_autoindex();
+                        return (0);
+                    }
                 }
                 else
+                {
                     ft_show_autoindex();
+                    return (0);
+                }
             }
         }
     }
+    return (1);
 }
 
 void    Respond::ft_handle_error(int error_code)
@@ -205,7 +209,7 @@ void    Respond::ft_show_autoindex()
 
 void    Respond::handle_error_response(int error_code)
 {
-    set_status_code(_status_code);
+    set_status_code(error_code);
     set_status_message(get_response_status(get_status_code()));
     set_header("Content-Type", "text/html");
     set_header("Connection", "keep-alive");
