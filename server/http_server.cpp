@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/08 23:29:35 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/09 18:29:03 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -211,7 +211,7 @@ namespace http{
         int bytes_received;
         std::size_t header_end = 0;
         std::size_t content_len = 0;
-        static  std::size_t cont_ = 0;
+        // static  std::size_t cont_ = 0;
             
         bytes_received = recv(sockfd, buffer, sizeof(buffer), 0);
         if (bytes_received <= 0)
@@ -237,7 +237,7 @@ namespace http{
             }
             else if (transfer_encoding_chunked(sockfd) == 2)
             {
-                cont_+= bytes_received;
+                // cont_+= bytes_received;
                 header_end = requist_data[sockfd].find("\r\n\r\n");
                 content_len = std::strtol(requist_data[sockfd].substr(requist_data[sockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
                 if ((content_len +  header_end + 4) <= requist_data[sockfd].size())
@@ -354,7 +354,7 @@ namespace http{
             std::cout << " Response  sended "<<std::endl;
         }
         // Send the data to the client
-        requist_data[socket] = response;
+      //  requist_data[socket] = response;
         std::string data_to_send = requist_data[socket].substr(sent_data[socket], 12);
         //  std::cout<<"-----"<<sent_data[socket] <<std::endl;
         long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);

@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/08 18:03:36 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/09 17:57:45 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,14 +14,18 @@
 
 std::string Respond::response_root(std::vector<server> servers)
 {
+    init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     if (ft_parse_location(servers))
     {
         // considering the location of the root directory is indeed the final step in handling requests when no specific location matches the requested URI.
         // if (root_location(servers) == 0)
         if (root_location(servers) == 1)
+        {
+            std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
             handle_error_response(404);
-            return (rtn_response());
+            return (rtn_response()); 
+        }
             // direct it to the GET response and see if i can read the file concatenated with the root using `stat`
     }
     // step 2 : check the redirectation
@@ -42,7 +46,6 @@ std::string Respond::response_root(std::vector<server> servers)
     }
     // step 5 : check the autoindex
     ft_check_autoindex(servers);
-
     // methods area
     if (r.get_method() == "GET")
         handle_get_response(servers);
@@ -212,10 +215,10 @@ int Respond::ft_parse_url_forwarding(std::vector<server> server)
             {
                 size_t status_code = server[_server_index]._location[j].get_redirection().first;
                 // search for message of the status_code
-                std::string message = get_response_status(status_code);
                 set_status_code(status_code);
-                set_status_message(get_response_status(get_status_code()));
+                set_status_message(get_response_status(status_code));
                 set_header("Location", server[_server_index]._location[j].get_redirection().second);
+                set_cache_control("cache");
                 _is_redirection = true;
                 return (0);
             }
