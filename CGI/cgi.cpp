@@ -109,7 +109,7 @@ void set_headers_cgi(std::string output, Respond &res) {
         } 
         else 
         {
-            std::cout << line << "\n";
+         //   std::cout << line << "\n";
             body += line + "\n";
         }
     }
@@ -119,11 +119,11 @@ void set_headers_cgi(std::string output, Respond &res) {
 
 std::string run_cgi(request &r,  Respond &res)
 {
-     puts("heeeeeeeeerererere");
+    // puts("heeeeeeeeerererere");
     char *file, *path;
     file = strdup(res.get_file_cgi().c_str());
     path = strdup(res.get_path_info_founded().c_str()); 
-    std::cout << path << " " << file << std::endl;
+   // std::cout << path << " " << file << std::endl;
     char *cmd[3] = {path, file, NULL};
 
     std::string cgi_str;
@@ -204,9 +204,9 @@ std::string run_cgi(request &r,  Respond &res)
     close(fdtemp1);
 
     //put_cookie(content, res);
-    std::cout << "Content :::::::::::\n" << content << std::endl;
+   // std::cout << "Content :::::::::::\n" << content << std::endl;
     set_headers_cgi(content, res);
-    std::cout << "body :: \n" << res.get_response_body() << std::endl;
+   // std::cout << "body :: \n" << res.get_response_body() << std::endl;
     //std::cout << content << std::endl;
     return (content);
 }

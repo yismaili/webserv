@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_handling.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/11 02:49:43 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/11 18:47:21 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,9 +85,9 @@ void    Respond::handle_post_response(std::vector<server> server)
 
 void    Respond::handle_urlencoded()
 {
-    std::cout << "/* ************************************************************************** */" << std::endl;
-    std::cout << r.get_body() << std::endl;
-    std::cout << "/* ************************************************************************** */" << std::endl;
+   // std::cout << "/* ************************************************************************** */" << std::endl;
+    // std::cout << r.get_body() << std::endl;
+    // std::cout << "/* ************************************************************************** */" << std::endl;
     std::string line = r.get_body();
     Url_encoded encoded_form;
     std::string::size_type pos = 0;

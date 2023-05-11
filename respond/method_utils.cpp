@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/11 13:15:16 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/11 18:54:10 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,12 @@ int Respond::ft_handle_index(std::vector<server> server)
     }
     else
     {
-        puts("dkhl please");
+       // puts("dkhl please");
         index = server[_server_index]._location[_location_index].get_index();
         std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
-        std::cout << file << std::endl;
+      //  std::cout << file << std::endl;
         _rooted_path = server[_location_index].get_root() + _removed_path + index;
-        std::cout << "rooted path:" << _rooted_path <<  std::endl;
+      //  std::cout << "rooted path:" << _rooted_path <<  std::endl;
         if (ft_handle_index_2(file))
             return (1);
     }

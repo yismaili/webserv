@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/11 13:26:36 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/11 18:53:13 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -101,10 +101,11 @@ namespace http{
                     else
                     {
                         recv_ret = recv_data(clients[i].fd);
-                     
+                        
                         if (!recv_ret)
                         {
                             unchunk(clients[i].fd);
+                            std::cout << "-------WRITEING.....-----\n";
                             clients[i].events = POLLOUT;
                         }
                     }
@@ -257,7 +258,6 @@ namespace http{
         {
             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
         }
-        std::cout << "REQEUEST SENDED ___-_--__-___-------------" << std::endl;
         request req(requist_data[sockfd]);
         Respond   res(req, conf_fd[sockfd]->index);
        requist_data[sockfd] =  res.response_root(conf);        
