@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Add Element to Database</title>
+	<link rel="stylesheet" type="text/css" href="styleadd.css">
+</head>
+<body>
+	<div class="container">
+		<h1>Add Element to Database</h1>
+		<form action="app.php" method="post" enctype="multipart/form-data">
+			<label for="title">Title:</label>
+			<input type="text" name="title" required>
+
+			<label for="image">Image:</label>
+			<input type="file" name="image" accept="image/*" required>
+
+			<label for="about">About:</label>
+			<textarea name="about" required></textarea>
+
+			<input type="submit" value="Add Element">
+		</form>
+	</div>
+</body>
+</html>
