@@ -71,7 +71,6 @@ void    Respond::handle_post_response(std::vector<server> server)
         }
         else
         {
-            std::cout << "/* ************************************************************************** */" << std::endl;
             // need to create a file that has `Key` as it's name and the content of it as `value`
             handle_urlencoded();
             create_decode_files();
@@ -86,6 +85,9 @@ void    Respond::handle_post_response(std::vector<server> server)
 
 void    Respond::handle_urlencoded()
 {
+    std::cout << "/* ************************************************************************** */" << std::endl;
+    std::cout << r.get_body() << std::endl;
+    std::cout << "/* ************************************************************************** */" << std::endl;
     std::string line = r.get_body();
     Url_encoded encoded_form;
     std::string::size_type pos = 0;
