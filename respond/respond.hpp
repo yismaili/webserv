@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/09 17:44:26 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/09 19:01:46 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ class Respond
         void        ft_check_cgi();
         int         ft_check_file();
         int         ft_handle_index(std::vector<server> servers);
-        int         ft_handle_index_2();
+        int         ft_handle_index_2(std::string index);
         void        ft_show_autoindex();
 
         // POST RESPONSE

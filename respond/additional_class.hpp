@@ -11,6 +11,23 @@ class FormData
         {
             return (!name.empty() && !data.empty());
         }
+        // getters
+        std::string get_name() const
+        {
+            return (name);
+        }
+        std::string get_content_type() const
+        {
+            return (content_type);
+        }
+        std::string get_data() const
+        {
+            return (data);
+        }
+        std::string get_file_name() const
+        {
+            return (file_name);
+        }
 };
 class Url_encoded
 {

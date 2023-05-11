@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/09 17:29:24 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/09 19:09:29 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,41 +55,42 @@ In other words, the std::string constructor reads the entire contents of the fil
 int Respond::ft_handle_index(std::vector<server> server)
 {
     std::string index;
-
-            if (_path_found == server[_server_index]._location[_location_index].location_name)
-            {
-                if (server[_server_index]._location[_location_index].get_index().empty())
-                {
-                    if (server[_server_index].get_index().empty())
-                    {
-                        handle_error_response(403);
-                        return (1);
-                    }
-                    else
-                    {
-                        index = server[_server_index].get_index();
-                        _rooted_path = server[_server_index].get_root() + _removed_path + index;
-                        if (ft_handle_index_2())
-                            return (1);
-                    }
-                }
-                else
-                {
-                    index = server[_server_index]._location[_location_index].get_index();
-                    _rooted_path = server[_location_index].get_root() + _removed_path + index;
-                    if (ft_handle_index_2())
-                        return (1);
-                }
-            }
+    if (server[_server_index]._location[_location_index].get_index().empty())
+    {
+        if (server[_server_index].get_index().empty())
+        {
+            handle_error_response(403);
+            return (1);
+        }
+        else
+        {
+            puts("klhdsfjdkhfkjsdfh");
+            index = server[_server_index]._location[_location_index].get_index();
+            _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
+            if (ft_handle_index_2(index))
+                return (1);
+        }
+    }
+    else
+    {
+        puts("dkhl please");
+        index = server[_server_index]._location[_location_index].get_index();
+        std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
+        std::cout << file << std::endl;
+        _rooted_path = server[_location_index].get_root() + _removed_path + index;
+        std::cout << "rooted path:" << _rooted_path <<  std::endl;
+        if (ft_handle_index_2(file))
+            return (1);
+    }
     return (0);
 }
 
-int Respond::ft_handle_index_2()
+int Respond::ft_handle_index_2(std::string index)
 {
     std::ifstream file;
-    if (_rooted_path != "")
+    if (index != "")
     {
-        file.open(_rooted_path.c_str());
+        file.open(index.c_str());
         if (file.is_open())
         {
             _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());

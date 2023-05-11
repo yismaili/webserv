@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/07 22:47:38 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/10 18:15:06 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ namespace http{
         {
             for (size_t j = 0; j < conf_[i]._listen.size(); j++)
             {
-               socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i));
+                socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i));
             }
         }
         conf = conf_;
@@ -102,10 +102,11 @@ namespace http{
                     {
                         recv_ret = recv_data(clients[i].fd);
                      
-                        // if (!recv_ret)
-                        // {
+                        if (!recv_ret)
+                        {
                             unchunk(clients[i].fd);
-                        //}
+                            clients[i].events = POLLOUT;
+                        }
                         //  std::cout<<"--**---"<<requist_data[clients[i].fd]<<"---***"<<std::endl;
 
                     }
@@ -260,7 +261,7 @@ namespace http{
         request req(requist_data[sockfd]);
         Respond   res(req, conf_fd[sockfd]->index);
        requist_data[sockfd] =  res.response_root(conf);
- std::cout<<"--**---"<<requist_data[sockfd]<<"---***"<<std::endl;
+//  std::cout<<"--**---"<<requist_data[sockfd]<<"---***"<<std::endl;
         
     }
     
