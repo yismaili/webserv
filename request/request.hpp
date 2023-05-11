@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 18:00:51 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/30 19:25:11 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/10 19:01:41 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ class request
         std::map<std::string, std::string> _charset;
         int         _port;
         std::string _query;
+        std::string _boundary;
 
     public:
         request();
@@ -54,6 +55,7 @@ class request
         std::string get_version() const;
         std::string get_body() const;
         std::string get_query() const;
+        std::string get_boundary() const;
         // int     ft_get_port() const;
 
         void set_method(std::string method);

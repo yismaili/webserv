@@ -22,8 +22,7 @@ Respond::Respond(request& req, int index_) : r(req)
     _is_autoindex = false;
     _is_redirection = false;
     _is_index = false;
-    std::cout << r.get_header("Content-Type") << std::endl;
-    _boundary = "";
+    _boundary = r.get_boundary();
     // _boundary = r.get_header("Content-Type").substr(r.get_header("Content-Type").find("boundary=") + 9);
     _upload_store = "";
     _server_index = index_;
@@ -125,12 +124,13 @@ std::string Respond::get_document_root()
 
 int Respond::ft_parse_root_path(std::vector<server> server)
 {
-    // struct stat file_stats;
+    struct stat file_stats;
     _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path;
-    // if (!stat(_rooted_path.c_str(), &file_stats))
-    _file_cgi = _rooted_path;
+    if (!stat(_rooted_path.c_str(), &file_stats))
+    {
+        _file_cgi = _rooted_path;
         return (0);
-
+    }
     set_status_code(403);
     set_status_message(get_response_status(get_status_code()));
     return (1);
@@ -176,7 +176,6 @@ void    Respond::init_response_body(std::string file, std::string _root)
     std::string f;
     f = _root + "/" + file;
     file_.open(f);
-    std::cout << "file path: " <<  f << std::endl;
     if (file_.is_open())
     {
         while (getline(file_, line))
