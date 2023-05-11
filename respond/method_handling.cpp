@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/10 00:53:07 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/11 16:48:22 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,17 +52,17 @@ void    Respond::handle_post_response(std::vector<server> server)
         set_response_body("Body request is missing");
         return ;
     }
-    struct stat st;
-    if (_is_cgi == false && (server[_server_index]._location[_location_index].get_upload_store().empty() || server[_server_index]._location[_location_index].get_upload() == "off"))
+    if (_is_cgi == false && (server[_server_index]._location[_location_index].get_upload_store().empty() && server[_server_index]._location[_location_index].get_upload() == false))
         return ;
     _upload_store_path = _rooted_path;
     _upload_store.append(_upload_store);
+    struct stat st;
     if (stat(_upload_store_path.c_str(), &st) != 0)
     {
         mkdir(_upload_store_path.c_str(), 0777);
         // or return error
     }
-    if (check_post_type() == "x-www-form-urlencoded" && _is_cgi == true)
+    if (check_post_type() == "x-www-form-urlencoded")
     {
         if (_is_cgi == true)
         {
@@ -71,7 +71,6 @@ void    Respond::handle_post_response(std::vector<server> server)
         }
         else
         {
-            
             // need to create a file that has `Key` as it's name and the content of it as `value`
             handle_urlencoded();
             create_decode_files();
@@ -86,6 +85,9 @@ void    Respond::handle_post_response(std::vector<server> server)
 
 void    Respond::handle_urlencoded()
 {
+    std::cout << "/* ************************************************************************** */" << std::endl;
+    std::cout << r.get_body() << std::endl;
+    std::cout << "/* ************************************************************************** */" << std::endl;
     std::string line = r.get_body();
     Url_encoded encoded_form;
     std::string::size_type pos = 0;
@@ -131,24 +133,37 @@ void    Respond::create_decode_files()
 
 void    Respond::handle_form_data()
 {
+    // std::cout << r.get_body() << std::endl;
     // Find the first boundary
     size_t  pos = r.get_body().find(_boundary);
-    if (pos == std::string::npos)
+    if (!pos)
         return ;
-
     // Loop through the form data, locating boundaries and reading data betweem them
     while (true)
     {
         // find the next boundary
-        size_t  next = r.get_body().find(_boundary, pos + _boundary.length());
-        if (next == std::string::npos)
+        pos = r.get_body().find(_boundary, pos);
+        if (pos == std::string::npos)
             break;
-        
+
         // Read the data between the boundaries
-        FormData formData = read_form_data(next);
+        FormData formData = read_form_data(pos); // escape /r/n
         if (formData.isValid())
             _form_data.push_back(formData); // Add the form data to the list
+        // std::cout << "pos before: " << pos << std::endl;
+        pos += _boundary.length() + 2;
     }
+    // iterat over formData class and print it's attributes
+    // std::vector<FormData>::iterator it = _form_data.begin();
+    // while (it != _form_data.end())
+    // {
+    //     std::cout << "name: " << it->get_name() << std::endl;
+    //     std::cout << "filename: " << it->get_file_name() << std::endl;
+    //     std::cout << "content-type: " << it->get_content_type() << std::endl;
+    //     std::cout << "data: " << it->get_data() << std::endl;
+    //     it++;
+    // }
+    
 }
 
 // Helper function to locate the next boundary in the form data
@@ -163,20 +178,20 @@ FormData Respond::read_form_data(size_t pos)
     FormData form_data;
     std::string line;
     std::string data;
+    bool        first = false;
+    bool        second = false;
 
     // Find the starting position of the form data
     size_t start = r.get_body().find(_boundary, pos);
     if (start == std::string::npos)
         return (form_data); // Boundary not found
-    
-    // Skip the boundary line
+    // // Skip the boundary line
     start += _boundary.length() + 2;
 
     // Read the form data until the next boundary
     size_t end = r.get_body().find(_boundary, start);
     if (end == std::string::npos)
         return (form_data); // Boundary not found
-    
     // Extract the form data section
     std::string section = r.get_body().substr(start, end - start);
     
@@ -186,8 +201,9 @@ FormData Respond::read_form_data(size_t pos)
     {
         if (line.empty())
             continue;
-        if (line.find("Content-Disposition: form-data;") != std::string::npos)
+        if (first == false && line.find("Content-Disposition: form-data;") != std::string::npos)
         {
+            first = true;
             // Extracts the form name and filename from the line
             size_t pos = line.find("name=\"") + sizeof("name=\"") - 1; // similar to line.find() + 6
             size_t end = line.find("\"", pos);
@@ -200,8 +216,9 @@ FormData Respond::read_form_data(size_t pos)
                 form_data.file_name = line.substr(pos, end - pos);
             
         }
-        else if (line.find("Content-Type: ") != std::string::npos)
+        else if (second == false && line.find("Content-Type: ") != std::string::npos)
         {
+            second = true;
             // Extracts the content type from the line
             size_t pos = line.find("Content-Type: ") + sizeof("Content-Type: ") - 1;
             form_data.content_type = line.substr(pos);
@@ -212,7 +229,6 @@ FormData Respond::read_form_data(size_t pos)
             form_data.data += line + "\n";
         }
     }
-    
     return (form_data);
 }
 

@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/09 23:49:36 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/11 01:23:52 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,10 @@
 
 std::string Respond::response_root(std::vector<server> servers)
 {
-    std::cout << "request uri : " << r.get_uri() << std::endl;
-    std::cout << r.get_method() << std::endl;
+    // std::cout << "boundary: " << r.get_boundary() << std::endl;
+    // std::cout << "content type: " << r.get_header("Content-Type") << std::endl;
+    // std::cout << "content length: " << r.get_header("Content-Length") << std::endl;
+    // std::cout << "request body: " << r.get_body() << std::endl;
     init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     if (ft_parse_location(servers))
@@ -23,7 +25,7 @@ std::string Respond::response_root(std::vector<server> servers)
         if (root_location(servers) == 1)
         {
             handle_error_response(404);
-            return (rtn_response()); 
+           return (rtn_response()); 
         }
     }
 
@@ -66,8 +68,6 @@ int Respond::exact_location(std::vector<server> server, std::string path)
             {
                 
                 _location_index = j;
-                std::cout << "location index: " << _location_index << std::endl;
-                std::cout << "path: " << std::endl;
                 _path_found = server[_server_index]._location[j].location_name;
                 return (0);
             }
@@ -88,8 +88,6 @@ int Respond::prefix_location(std::vector<server> server, std::string &path)
             {
                 _location_index = j;
                 _path_found = server[_server_index]._location[j].location_name;
-                std::cout << "path found: " << _path_found << std::endl;
-                std::cout << "removed path: " << _removed_path << std::endl;
                 return (0);
             }
             
@@ -107,7 +105,6 @@ int Respond::prefix_location(std::vector<server> server, std::string &path)
 int Respond::dynamic_location(std::vector<server> server, std::string path)
 {
     std::string::size_type pos = path.find(".");
-    std::cout << pos << std::endl;
     if (pos != std::string::npos)
     {
         std::string extension = path.substr(pos);
@@ -121,7 +118,10 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
             {
                 if (it->first == extension)
                 {
-                    _path_info_founded = it->second;
+                    if(it->first == ".php")
+                        _path_info_founded = server[_server_index]._location[_location_index].get_root() + it->second;
+                    else
+                        _path_info_founded = it->second;
                     std::string::size_type end_pos = _removed_path.find_last_of('/');
                     if (end_pos == std::string::npos)
                         return (1);

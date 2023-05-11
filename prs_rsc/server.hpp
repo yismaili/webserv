@@ -49,6 +49,7 @@ public:
     std::map<int, std::string> get_error_page() const;
     std::vector<std::string> get_allow_methods() const;
     bool get_autoindex () const;
+    bool get_upload() const;
     std::pair <int , std::string> get_redirection() const;
     std::string get_upload_store() const;
     std::map<std::string ,std::string> get_path_info() const;

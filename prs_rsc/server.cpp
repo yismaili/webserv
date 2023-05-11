@@ -596,6 +596,11 @@ server& server::operator=(const server& o)
     return (*this);
 }
 
+bool server::get_upload() const
+{
+    return(_upload);
+}
+
 server::server(const server& o)
 {
     *this = o;

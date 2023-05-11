@@ -22,7 +22,7 @@ Respond::Respond(request& req, int index_) : r(req)
     _is_autoindex = false;
     _is_redirection = false;
     _is_index = false;
-    _boundary = "";
+    _boundary = r.get_boundary();
     // _boundary = r.get_header("Content-Type").substr(r.get_header("Content-Type").find("boundary=") + 9);
     _upload_store = "";
     _server_index = index_;

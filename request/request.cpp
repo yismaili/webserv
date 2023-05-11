@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/08 16:17:03 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/10 23:56:28 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,6 +111,9 @@ std::map<std::string, std::string> request::get_headers() const
 
 void request::parse_request(std::string request)
 {
+    // std::cout << "___________33______" << std::endl;
+    // std::cout << request << std::endl;
+    //     std::cout << "________55_________" << std::endl;
     // Split the request into lines
     std::vector<std::string> lines;
     std::istringstream iss(request);
@@ -141,7 +144,8 @@ void request::parse_request(std::string request)
         // Trim leading and trailing whitespaces from the value
         value.erase(0, value.find_first_not_of(" \t\r"));
         value.erase(value.find_last_not_of(" \t\r") + 1);
-        this->_headers[key] = value;
+        if (this->_headers.find(key) == this->_headers.end())
+            this->_headers[key] = value;
     }
 
     // function that checks if the request is POST or PUT to see if there is no content-length to return error
@@ -176,11 +180,18 @@ void request::parse_request(std::string request)
     if (content_len_str != "")
     {
         size_t content_len = std::stoi(content_len_str);
-        this->_body = lines.back().substr(0, content_len);
+        if (content_len > request.size())
+        {
+            std::cerr << "Invalid Content-Length" << std::endl;
+            exit(1);
+        }
+        this->_body = request.substr(request.size() - content_len);
+        // std::cout << "S T A R T     O F     REQUEST     B O D Y" << std::endl;
+        // std::cout << this->_body << std::endl;
+        // std::cout << "E N D     O F     REQUEST     B O D Y" << std::endl;
     }
     else
     {
-        // std::cout << "____----_-_-_-_--_-_____-_-_-_-____-_-_-_-_-------" << std::endl;
         if (content_len_str == "" || this->_method == "POST")
             {
                 set_body("");
@@ -199,4 +210,9 @@ void    request::print_request()
     for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
         std::cout << it->first << ": " << it->second << std::endl;
     std::cout << "Body: " << this->_body << std::endl;
+}
+
+std::string request::get_boundary() const
+{
+    return (this->_boundary);
 }

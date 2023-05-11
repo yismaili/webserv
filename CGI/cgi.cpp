@@ -94,7 +94,7 @@ void set_headers_cgi(std::string output, Respond &res) {
 
     put_cookie(output, res);
     while (std::getline(ss, line)) {
-        if (line.empty()) {
+        if (line == "\r") {
             headers_finished = true;
             continue;
         }
@@ -105,10 +105,12 @@ void set_headers_cgi(std::string output, Respond &res) {
                 std::string value = line.substr(pos + 2);
                 if(key != "Set-Cookie")
                     res.set_header(key, value);
-                    //puts("heeeeere");
             }
-        } else {
-            body += line;
+        } 
+        else 
+        {
+            std::cout << line << "\n";
+            body += line + "\n";
         }
     }
     res.set_response_body(body);
@@ -117,11 +119,11 @@ void set_headers_cgi(std::string output, Respond &res) {
 
 std::string run_cgi(request &r,  Respond &res)
 {
-    // puts("heeeeeeeeerererere");
+     puts("heeeeeeeeerererere");
     char *file, *path;
     file = strdup(res.get_file_cgi().c_str());
     path = strdup(res.get_path_info_founded().c_str()); 
-    //std::cout << path << " " << file << std::endl;
+    std::cout << path << " " << file << std::endl;
     char *cmd[3] = {path, file, NULL};
 
     std::string cgi_str;
@@ -202,7 +204,9 @@ std::string run_cgi(request &r,  Respond &res)
     close(fdtemp1);
 
     //put_cookie(content, res);
+    std::cout << "Content :::::::::::\n" << content << std::endl;
     set_headers_cgi(content, res);
+    std::cout << "body :: \n" << res.get_response_body() << std::endl;
     //std::cout << content << std::endl;
     return (content);
 }
