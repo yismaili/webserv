@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/11 16:48:22 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/11 02:49:43 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -163,7 +163,6 @@ void    Respond::handle_form_data()
     //     std::cout << "data: " << it->get_data() << std::endl;
     //     it++;
     // }
-    
 }
 
 // Helper function to locate the next boundary in the form data
