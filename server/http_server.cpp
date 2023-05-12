@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/12 01:30:36 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/12 14:58:59 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -353,7 +353,14 @@ namespace http{
         std::string data_to_send = requist_data[socket].substr(sent_data[socket], 1024);
         long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
         // Check for errors while sending data
-        if (bytes_sent > 0)
+        if (bytes_sent == -1)
+        {
+            std::cout << "Error: Failed to send data to the socket\n";
+            close(socket);
+            sent_data[socket] = 0;
+            return (-2);
+        }
+        else
         {
             // Update the amount of data that has been sent to the socket
             sent_data[socket] += bytes_sent;
@@ -361,7 +368,7 @@ namespace http{
             if (sent_data[socket] >= requist_data[socket].size())
             {
                 requist_data.erase(socket);
-                sent_data.erase(0);
+                sent_data[socket] = 0;
                 return (0);
             }
             // If there is still data to send, return 1
@@ -370,14 +377,6 @@ namespace http{
                 return (1);
             }
         }
-        else if (bytes_sent == -1)
-        {
-            std::cout << "Error: Failed to send data to the socket\n";
-            close(socket);
-            sent_data[socket] = 0;
-            return (-2);
-        }
-        return (1);
     }
     
     int http_sever::accept_connection(int sockfd)
