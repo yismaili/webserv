@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/11 18:47:21 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/12 12:41:09 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,7 +92,13 @@ void    Respond::handle_urlencoded()
     Url_encoded encoded_form;
     std::string::size_type pos = 0;
     std::string::size_type end_pos = 0;
-
+    size_t index = 0;
+    while ((index = line.find("%20", index)) != std::string::npos)
+    {
+        std::cout << index << std::endl;
+        line = line.substr(0, index) + " " + line.substr(index + 3);
+        index += 1; // Move past the inserted space
+    }
     while (pos != std::string::npos)
     {
         end_pos = line.find('&', pos);
@@ -102,12 +108,11 @@ void    Respond::handle_urlencoded()
         {
             encoded_form.key = pair.substr(0, pivot);
             encoded_form.value = pair.substr(pivot + 1);
-
             _url_decode.push_back(encoded_form);
         }
-        if (pos == std::string::npos)
+
+        if (end_pos == std::string::npos)
             break;
-        
         pos = end_pos + 1;
     }
 }
@@ -115,6 +120,7 @@ void    Respond::handle_urlencoded()
 void    Respond::create_decode_files()
 {
     std::string path = _upload_store_path;
+    std::cout << "upload store path:" << _upload_store_path << std::endl;
     std::string file_name;
     std::string file_content;
     std::ofstream file;
