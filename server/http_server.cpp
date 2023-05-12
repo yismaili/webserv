@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
 /*   Updated: 2023/05/12 12:43:00 by aoumad           ###   ########.fr       */
@@ -101,22 +101,24 @@ namespace http{
                     else
                     {
                         recv_ret = recv_data(clients[i].fd);
-                     
+                        
                         if (!recv_ret)
                         {
                             unchunk(clients[i].fd);
+                            std::cout << "-------WRITEING.....-----\n";
                             clients[i].events = POLLOUT;
                         }
-                        //  std::cout<<"--**---"<<requist_data[clients[i].fd]<<"---***"<<std::endl;
-
                     }
                 }
                else if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                    std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
+                   std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     sent_ret = send_data(clients[i].fd);
-                    if (sent_ret == 0)
+                    if (sent_ret == 1){
+                        clients[i].events = POLLOUT;
+                    }
+                    else if (sent_ret == 0)
                     {
                         clients[i].events = POLLIN;
                         if (Connection == std::string::npos)
@@ -208,8 +210,7 @@ namespace http{
         int bytes_received;
         std::size_t header_end = 0;
         std::size_t content_len = 0;
-        static  std::size_t cont_ = 0;
-            
+        
         bytes_received = recv(sockfd, buffer, sizeof(buffer), 0);
         if (bytes_received <= 0)
         {
@@ -234,7 +235,6 @@ namespace http{
             }
             else if (transfer_encoding_chunked(sockfd) == 2)
             {
-                cont_+= bytes_received;
                 header_end = requist_data[sockfd].find("\r\n\r\n");
                 content_len = std::strtol(requist_data[sockfd].substr(requist_data[sockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
                 if ((content_len +  header_end + 4) <= requist_data[sockfd].size())
@@ -260,9 +260,7 @@ namespace http{
         }
         request req(requist_data[sockfd]);
         Respond   res(req, conf_fd[sockfd]->index);
-       requist_data[sockfd] =  res.response_root(conf);
-//  std::cout<<"--**---"<<requist_data[sockfd]<<"---***"<<std::endl;
-        
+       requist_data[sockfd] =  res.response_root(conf);        
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
@@ -324,24 +322,11 @@ namespace http{
     
     std::string http_sever::build_response()
     {
-        // time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now() + std::chrono::seconds(10));
-        // std::stringstream ss;
-        // ss << generate_cookie_value(60) << std::put_time(gmtime(&now), "%a, %d %b %Y %H:%M:%S GMT") << "; path=/";
-        // std::string cookie_str = ss.str();
-
-        // std::string response = "HTTP/1.1 200 OK\r\n";
-        // response += "Content-Type: text/plain\r\n";
-        // response += "Set-Cookie: " + cookie_str + "\r\n";
-        // response += "Content-Length: 5\r\n";
-        // response += "\r\n";
-        // response += "Hello";
-        // return (response);
-          // Insert html page or ...
         std::ostringstream response; //create the output string stream
         
         response << "HTTP/1.1 200 OK\r\n";
         response << "Content-Type: text/html; charset=UTF-8\r\n";
-        response <<  "Content-Length: 76\r\n";
+        response <<  "Content-Length: 75\r\n";
         response << "\r\n";
         response << "<html><body><h1>Hello younes </h1>";
         response << "<h1>from HTTP server!</h4>";
@@ -364,8 +349,7 @@ namespace http{
             std::cout << " Response  sended "<<std::endl;
         }
         // Send the data to the client
-        // requist_data[socket] = response;
-        std::string data_to_send = requist_data[socket].substr(sent_data[socket], 1024);
+        std::string data_to_send = requist_data[socket].substr(sent_data[socket], 12);
         long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
         // Check for errors while sending data
         if (bytes_sent == -1)

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_utils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/09 19:09:29 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/11 18:54:10 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,12 +73,12 @@ int Respond::ft_handle_index(std::vector<server> server)
     }
     else
     {
-        puts("dkhl please");
+       // puts("dkhl please");
         index = server[_server_index]._location[_location_index].get_index();
         std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
-        std::cout << file << std::endl;
+      //  std::cout << file << std::endl;
         _rooted_path = server[_location_index].get_root() + _removed_path + index;
-        std::cout << "rooted path:" << _rooted_path <<  std::endl;
+      //  std::cout << "rooted path:" << _rooted_path <<  std::endl;
         if (ft_handle_index_2(file))
             return (1);
     }
@@ -224,10 +224,10 @@ void    Respond::handle_error_response(int error_code)
 
 void    Respond::print_response()
 {
-    std::cout << "HTTP/1.1 " << get_status_code() << " " << get_status_message() << "\r\n";
-    for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
-        std::cout << it->first << ": " << it->second << "\r\n";
+    // std::cout << "HTTP/1.1 " << get_status_code() << " " << get_status_message() << "\r\n";
+    // for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
+    //     std::cout << it->first << ": " << it->second << "\r\n";
     std::cout << "\r\n";
-   // if (get_response_body() != "")
-        std::cout << "response body: " << _response_body << std::endl;;
+//    if (get_response_body() != "")
+//         std::cout << "response body: " << _response_body << std::endl;;
 }
