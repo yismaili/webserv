@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/11 16:19:46 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/12 11:11:41 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -258,7 +258,6 @@ namespace http{
         {
             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
         }
-        std::cout << "REQEUEST SENDED ___-_--__-___-------------" << std::endl;
         request req(requist_data[sockfd]);
         Respond   res(req, conf_fd[sockfd]->index);
        requist_data[sockfd] =  res.response_root(conf);

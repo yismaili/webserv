@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/11 16:48:22 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/12 12:35:27 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,14 +85,17 @@ void    Respond::handle_post_response(std::vector<server> server)
 
 void    Respond::handle_urlencoded()
 {
-    std::cout << "/* ************************************************************************** */" << std::endl;
-    std::cout << r.get_body() << std::endl;
-    std::cout << "/* ************************************************************************** */" << std::endl;
     std::string line = r.get_body();
     Url_encoded encoded_form;
     std::string::size_type pos = 0;
     std::string::size_type end_pos = 0;
-
+    size_t index = 0;
+    while ((index = line.find("%20", index)) != std::string::npos)
+    {
+        std::cout << index << std::endl;
+        line = line.substr(0, index) + " " + line.substr(index + 3);
+        index += 1; // Move past the inserted space
+    }
     while (pos != std::string::npos)
     {
         end_pos = line.find('&', pos);
@@ -102,12 +105,11 @@ void    Respond::handle_urlencoded()
         {
             encoded_form.key = pair.substr(0, pivot);
             encoded_form.value = pair.substr(pivot + 1);
-
             _url_decode.push_back(encoded_form);
         }
-        if (pos == std::string::npos)
+
+        if (end_pos == std::string::npos)
             break;
-        
         pos = end_pos + 1;
     }
 }
@@ -115,6 +117,7 @@ void    Respond::handle_urlencoded()
 void    Respond::create_decode_files()
 {
     std::string path = _upload_store_path;
+    std::cout << "upload store path:" << _upload_store_path << std::endl;
     std::string file_name;
     std::string file_content;
     std::ofstream file;
@@ -154,15 +157,15 @@ void    Respond::handle_form_data()
         pos += _boundary.length() + 2;
     }
     // iterat over formData class and print it's attributes
-    // std::vector<FormData>::iterator it = _form_data.begin();
-    // while (it != _form_data.end())
-    // {
-    //     std::cout << "name: " << it->get_name() << std::endl;
-    //     std::cout << "filename: " << it->get_file_name() << std::endl;
-    //     std::cout << "content-type: " << it->get_content_type() << std::endl;
-    //     std::cout << "data: " << it->get_data() << std::endl;
-    //     it++;
-    // }
+    std::vector<FormData>::iterator it = _form_data.begin();
+    while (it != _form_data.end())
+    {
+        std::cout << "name: " << it->get_name() << std::endl;
+        std::cout << "filename: " << it->get_file_name() << std::endl;
+        std::cout << "content-type: " << it->get_content_type() << std::endl;
+        std::cout << "data: " << it->get_data() << std::endl;
+        it++;
+    }
     
 }
 
