@@ -6,11 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2023/05/12 12:35:27 by aoumad           ###   ########.fr       */
-=======
-/*   Updated: 2023/05/11 02:49:43 by aoumad           ###   ########.fr       */
->>>>>>> cc9eb78f65ee6c41a0f0c34963a33dd463462d1f
+/*   Updated: 2023/05/12 12:41:09 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,18 +157,6 @@ void    Respond::handle_form_data()
         pos += _boundary.length() + 2;
     }
     // iterat over formData class and print it's attributes
-<<<<<<< HEAD
-    std::vector<FormData>::iterator it = _form_data.begin();
-    while (it != _form_data.end())
-    {
-        std::cout << "name: " << it->get_name() << std::endl;
-        std::cout << "filename: " << it->get_file_name() << std::endl;
-        std::cout << "content-type: " << it->get_content_type() << std::endl;
-        std::cout << "data: " << it->get_data() << std::endl;
-        it++;
-    }
-    
-=======
     // std::vector<FormData>::iterator it = _form_data.begin();
     // while (it != _form_data.end())
     // {
@@ -182,7 +166,6 @@ void    Respond::handle_form_data()
     //     std::cout << "data: " << it->get_data() << std::endl;
     //     it++;
     // }
->>>>>>> cc9eb78f65ee6c41a0f0c34963a33dd463462d1f
 }
 
 // Helper function to locate the next boundary in the form data
