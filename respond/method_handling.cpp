@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_handling.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/12 12:41:09 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/12 15:39:05 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -139,6 +139,7 @@ void    Respond::create_decode_files()
 
 void    Respond::handle_form_data()
 {
+    std::cout << "____--__----____-_2___-____-_-__-_-________-_----_-_-_-_-_-_--_--_-_--_-__-_--" << std::endl;
     // std::cout << r.get_body() << std::endl;
     // Find the first boundary
     size_t  pos = r.get_body().find(_boundary);
@@ -168,7 +169,7 @@ void    Respond::handle_form_data()
     //     std::cout << "content-type: " << it->get_content_type() << std::endl;
     //     std::cout << "data: " << it->get_data() << std::endl;
     //     it++;
-    // }
+    }
 }
 
 // Helper function to locate the next boundary in the form data

@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/11 01:23:52 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/12 15:27:10 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 std::string Respond::response_root(std::vector<server> servers)
 {
+    std::cout << "____--__----____-_1___-____-_-__-_-________-_----_-_-_-_-_-_--_--_-_--_-__-_--" << std::endl;
     // std::cout << "boundary: " << r.get_boundary() << std::endl;
     // std::cout << "content type: " << r.get_header("Content-Type") << std::endl;
     // std::cout << "content length: " << r.get_header("Content-Length") << std::endl;
