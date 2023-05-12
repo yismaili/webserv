@@ -1,7 +1,7 @@
 NAME = webserv
 CC = c++
 # CFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
-CFLAGS = -Wall -Wextra -Werror -std=c++98
+CFLAGS = -Wall -Wextra -Werror -std=c++98 -g -fsanitize=address
 SRCS =  prs_rsc/main.cpp prs_rsc/server.cpp prs_rsc/location.cpp prs_rsc/server_utils.cpp \
 		request/request.cpp request/request_utils.cpp respond/respond.cpp respond/respond_root.cpp respond/pairs_def.cpp respond/method_utils.cpp \
 		respond/method_handling.cpp CGI/cgi.cpp server/sockets.cpp server/http_server.cpp 

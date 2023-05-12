@@ -93,6 +93,7 @@ void set_headers_cgi(std::string output, Respond &res) {
     bool headers_finished = false;
 
     put_cookie(output, res);
+    body =+ "<!DOCTYPE html>";
     while (std::getline(ss, line)) {
         if (line == "\r") {
             headers_finished = true;

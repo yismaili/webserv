@@ -93,7 +93,7 @@ namespace http{
                         // Add new socket to poll list
                         pollfd new_client_pollfd;
                         new_client_pollfd.fd = new_socket;
-                        new_client_pollfd.events = POLLOUT | POLLIN;
+                        new_client_pollfd.events = POLLIN;
                         read_info.insert(std::make_pair(new_socket, false));
                         requist_data.insert(std::make_pair(new_socket, ""));
                         clients.push_back(new_client_pollfd);
@@ -111,14 +111,14 @@ namespace http{
                     }
                 }
                else if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
-                {
+                {   //std::cout << "-------.....-----\n";
                    std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     sent_ret = send_data(clients[i].fd);
-                    if (sent_ret == 1){
-                        clients[i].events = POLLOUT;
-                    }
-                    else if (sent_ret == 0)
+                    // if (sent_ret == 1){
+                    //     clients[i].events = POLLOUT;
+                    // }
+                    if (sent_ret == 0)
                     {
                         clients[i].events = POLLIN;
                         if (Connection == std::string::npos)
@@ -126,6 +126,8 @@ namespace http{
                             close(clients[i].fd);
                         }
                         clients.erase(it);
+                        //read_info[clients[i].fd] = 0;
+                       // requist_data.erase(clients[i].fd);
                         i--;
                     }
                     else if (sent_ret == -2)
@@ -260,7 +262,8 @@ namespace http{
         }
         request req(requist_data[sockfd]);
         Respond   res(req, conf_fd[sockfd]->index);
-       requist_data[sockfd] =  res.response_root(conf);        
+       requist_data[sockfd] =  res.response_root(conf);
+       //std::cout<<"-----"<< requist_data[sockfd] <<std::endl;     
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
@@ -338,8 +341,6 @@ namespace http{
     
     int http_sever::send_data(int socket)
     {
-        // Get the response to be sent to the client
-        std::string response = build_response();
         // Keep track of how much data has been sent to a particular socket
         static std::map<int, std::size_t> sent_data;
 
@@ -349,7 +350,7 @@ namespace http{
             std::cout << " Response  sended "<<std::endl;
         }
         // Send the data to the client
-        std::string data_to_send = requist_data[socket].substr(sent_data[socket], 12);
+        std::string data_to_send = requist_data[socket].substr(sent_data[socket], 1024);
         long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
         // Check for errors while sending data
         if (bytes_sent == -1)
