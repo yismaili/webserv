@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/13 22:32:31 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/13 23:58:14 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,8 +113,8 @@ namespace http{
                         else if (!recv_ret)
                         {
                             std::cout << "-------WRITEING.....-----\n";
-                          std::cout<<"-----"<< requist_data[clients[i].fd] <<std::endl;
-                              exit(1);
+                        //   std::cout<<"-----"<< requist_data[clients[i].fd] <<std::endl;
+                        //       exit(1);
                             unchunk(clients[i].fd);
                             clients[i].events = POLLOUT;
                         }
@@ -274,12 +274,11 @@ namespace http{
         if (Transfer_encoding != std::string::npos && Transfer_encoding < requist_data[sockfd].find("\r\n\r\n"))
         {
             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
-        }
-     //  std::cout<<"-----"<< requist_data[sockfd] <<std::endl;     
-        // request req(requist_data[sockfd]);
-        // Respond   res(req, conf_fd[sockfd]->index);
-    //    requist_data[sockfd] =  res.response_root(conf);
-     requist_data[sockfd] =  build_response();
+        }  
+        request req(requist_data[sockfd]);
+        Respond   res(req, conf_fd[sockfd]->index);
+       requist_data[sockfd] =  res.response_root(conf);
+    //  requist_data[sockfd] =  build_response();
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
@@ -302,21 +301,10 @@ namespace http{
         pos = 0;
         while (true)
         {
-            pos = chunks.find("\r\n",  pos) + 4;
-            result.append(chunks.substr(pos, sizeof_chunk));
+            pos = chunks.find("\r\n",  pos);
+            result.append(chunks.substr(pos += 2, sizeof_chunk));
             pos += sizeof_chunk + 2;
-            try
-            {
-            subchunk = chunks.substr(pos , 3);
-            
-                std::cout<<pos<<std::endl;
-            }
-            catch(const std::exception& e)
-            {
-                std::cout<<"-----"<<subchunk<<std::endl;
-               exit(1);
-            }
-            
+            subchunk = chunks.substr(pos , 9);
             sizeof_chunk = strtol(subchunk.c_str(), NULL, 16);
             if (sizeof_chunk == 0 && requist_data[sockfd].size() )
             {
