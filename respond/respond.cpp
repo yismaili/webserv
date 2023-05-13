@@ -31,6 +31,8 @@ Respond::Respond(request& req, int index_) : r(req)
     _path_info_founded = "";
     _file_cgi = "";
     _cache_control = "";
+    _last_boundary = false;
+    _mime_string = "";
 }
 
 Respond::~Respond()

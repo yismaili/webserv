@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/09 19:01:46 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/13 18:24:09 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,6 +98,7 @@ class Respond
         size_t      find_boundary(size_t pos);
         FormData    read_form_data(size_t pos);
         void        handle_urlencoded();
+        void        create_form_data();
 
         std::vector<FormData> _form_data;
         std::vector<Url_encoded> _url_decode;
@@ -121,11 +122,13 @@ class Respond
         std::string _path_info_founded;
         std::string _file_cgi;
         std::string _cache_control;
+        std::string _mime_string;
 
         bool        _is_cgi;
         bool        _is_allowed_method;
         bool        _is_redirection;
         bool        _is_index;
+        bool        _last_boundary;
 
         void        handle_get_response(std::vector<server> servers);
         void        print_response();
