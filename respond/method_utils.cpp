@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_utils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/11 18:54:10 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/13 18:47:13 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,21 +25,31 @@ int    Respond::ft_check_file()
 
 void Respond::ft_handle_file()
 {
+    std::string::size_type mime_index = _rooted_path.find_last_of('.');
+    if (mime_index != std::string::npos)
+    {
+        _mime_string = _rooted_path.substr(mime_index + 1);
+    }
     std::ifstream file;
     if (!strcmp(_rooted_path.c_str(), ""))
     {
         handle_error_response(404);
         return;
     }
-    file.open(_rooted_path.c_str(), std::ifstream::in);
+    file.open(_rooted_path.c_str());
     if (file.is_open())
     {
-        std::stringstream buffer;
-        buffer << file.rdbuf();
-        _response_body = buffer.str();
-        file.close();
+        _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+        // file.close();
         set_status_code(200);
         set_status_message(get_response_status(200));
+        set_header("Content-Type", get_mime_type(_mime_string));
+        std::cout << "mime _type: " << get_mime_type(_mime_string) << std::endl;
+         _headers["Content-Length"] = std::to_string(_response_body.length());
+         std::cout << std::to_string(_response_body.length()) << std::endl;
+        _headers["Connection"] = "keep-alive";
+        set_date();
+        set_cache_control("cache");
     }
     else
         handle_error_response(403);
@@ -64,7 +74,6 @@ int Respond::ft_handle_index(std::vector<server> server)
         }
         else
         {
-            puts("klhdsfjdkhfkjsdfh");
             index = server[_server_index]._location[_location_index].get_index();
             _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
             if (ft_handle_index_2(index))
@@ -73,12 +82,15 @@ int Respond::ft_handle_index(std::vector<server> server)
     }
     else
     {
-       // puts("dkhl please");
         index = server[_server_index]._location[_location_index].get_index();
+
+        std::string::size_type _mime_index= index.find_last_of('.');
+        if (_mime_index != std::string::npos)
+        {
+            _mime_string = index.substr(_mime_index + 1);
+        }
         std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
-      //  std::cout << file << std::endl;
         _rooted_path = server[_location_index].get_root() + _removed_path + index;
-      //  std::cout << "rooted path:" << _rooted_path <<  std::endl;
         if (ft_handle_index_2(file))
             return (1);
     }
@@ -96,19 +108,20 @@ int Respond::ft_handle_index_2(std::string index)
             _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
             set_status_code(200);
             set_status_message(get_response_status(200));
-            _headers["Content-Type"] = "text/html";
+            set_header("Content-Type", get_mime_type(_mime_string));
+            std::cout << "mime _type in index: " << get_mime_type(_mime_string) << std::endl;
             _headers["Content-Length"] = std::to_string(_response_body.length());
             _headers["Connection"] = "keep-alive";
             set_date();
             set_cache_control("no cache");
             return (0);
         }
-        // else
-        // {
-        //     std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
-        //     handle_error_response(403);
-        //     return (1);
-        // }
+        else
+        {
+    std::cout << "____WWWWW_--------______" << std::endl;
+            handle_error_response(404);
+            return (1);
+        }
     }
     else
     {
@@ -211,7 +224,7 @@ void    Respond::ft_show_autoindex()
 void    Respond::handle_error_response(int error_code)
 {
     set_status_code(error_code);
-    set_status_message(get_response_status(get_status_code()));
+    set_status_message(get_response_status(error_code));
     set_header("Content-Type", "text/html");
     set_header("Connection", "keep-alive");
     set_date();

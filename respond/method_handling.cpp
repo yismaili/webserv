@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/12 15:39:05 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/13 20:47:46 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 void    Respond::handle_get_response(std::vector<server> servers)
 {
+    // std::cout << "+++WE+wewew=+______-__--_--___" << std::endl;
     // step 2: check if it's a CGI or not (like if `index` of the configuration file has .py or .php...etc)
     if (_is_cgi == true)
     {
@@ -85,9 +86,6 @@ void    Respond::handle_post_response(std::vector<server> server)
 
 void    Respond::handle_urlencoded()
 {
-   // std::cout << "/* ************************************************************************** */" << std::endl;
-    // std::cout << r.get_body() << std::endl;
-    // std::cout << "/* ************************************************************************** */" << std::endl;
     std::string line = r.get_body();
     Url_encoded encoded_form;
     std::string::size_type pos = 0;
@@ -120,7 +118,6 @@ void    Respond::handle_urlencoded()
 void    Respond::create_decode_files()
 {
     std::string path = _upload_store_path;
-    std::cout << "upload store path:" << _upload_store_path << std::endl;
     std::string file_name;
     std::string file_content;
     std::ofstream file;
@@ -139,7 +136,6 @@ void    Respond::create_decode_files()
 
 void    Respond::handle_form_data()
 {
-    std::cout << "____--__----____-_2___-____-_-__-_-________-_----_-_-_-_-_-_--_--_-_--_-__-_--" << std::endl;
     // std::cout << r.get_body() << std::endl;
     // Find the first boundary
     size_t  pos = r.get_body().find(_boundary);
@@ -158,6 +154,8 @@ void    Respond::handle_form_data()
         if (formData.isValid())
             _form_data.push_back(formData); // Add the form data to the list
         // std::cout << "pos before: " << pos << std::endl;
+        if (_last_boundary == true)
+            break;
         pos += _boundary.length() + 2;
     }
     // iterat over formData class and print it's attributes
@@ -167,74 +165,92 @@ void    Respond::handle_form_data()
     //     std::cout << "name: " << it->get_name() << std::endl;
     //     std::cout << "filename: " << it->get_file_name() << std::endl;
     //     std::cout << "content-type: " << it->get_content_type() << std::endl;
-    //     std::cout << "data: " << it->get_data() << std::endl;
+    //     std::cout << "data: " << it->get_data() << " END"<< std::endl;
     //     it++;
-    }
+    // }
+    
+    create_form_data();
 }
 
+void    Respond::create_form_data()
+{
+    std::string path = _upload_store_path;
+    std::string file_name;
+    std::string file_content;
+    std::ofstream file;
+    std::vector<FormData>::iterator it = _form_data.begin();
+
+    while (it != _form_data.end())
+    {
+        if (it->get_content_type().empty())
+        {
+            it++;
+            continue;
+        }
+        file_name = path;
+        file_name.append(it->get_file_name());
+        file.open(file_name.c_str());
+        file << it->get_data();
+        file.close();
+        it++;
+    }
+}
 // Helper function to locate the next boundary in the form data
 size_t Respond::find_boundary(size_t pos)
 {
     return (r.get_body().find(_boundary, pos));
 }
 
-// Helper function to read the form data between two boundaries
 FormData Respond::read_form_data(size_t pos)
 {
     FormData form_data;
     std::string line;
     std::string data;
-    bool        first = false;
-    bool        second = false;
 
-    // Find the starting position of the form data
     size_t start = r.get_body().find(_boundary, pos);
     if (start == std::string::npos)
-        return (form_data); // Boundary not found
-    // // Skip the boundary line
-    start += _boundary.length() + 2;
+        return form_data; // boundary not found
 
-    // Read the form data until the next boundary
+    // skip the boundary line
+    start += _boundary.length() + 2;
+    std::string last_boundary = _boundary + "--";
     size_t end = r.get_body().find(_boundary, start);
     if (end == std::string::npos)
-        return (form_data); // Boundary not found
-    // Extract the form data section
-    std::string section = r.get_body().substr(start, end - start);
-    
-    // Process the section line by line
-    std::stringstream ss(section);
-    while (std::getline(ss, line))
-    {
-        if (line.empty())
-            continue;
-        if (first == false && line.find("Content-Disposition: form-data;") != std::string::npos)
-        {
-            first = true;
-            // Extracts the form name and filename from the line
-            size_t pos = line.find("name=\"") + sizeof("name=\"") - 1; // similar to line.find() + 6
-            size_t end = line.find("\"", pos);
-            if (end != std::string::npos)
-                form_data.name = line.substr(pos, end - pos);
+        return form_data; // Boundary not found
 
-            pos = line.find("filename=\"") + sizeof("filename=\"") - 1;
-            end = line.find("\"", pos);
-            if (end != std::string::npos)
-                form_data.file_name = line.substr(pos, end - pos);
-            
-        }
-        else if (second == false && line.find("Content-Type: ") != std::string::npos)
-        {
-            second = true;
-            // Extracts the content type from the line
-            size_t pos = line.find("Content-Type: ") + sizeof("Content-Type: ") - 1;
-            form_data.content_type = line.substr(pos);
-        }
-        else
-        {
-            // It's the form data value
-            form_data.data += line + "\n";
-        }
+    size_t end_last = r.get_body().find(last_boundary, start);
+    if (end_last != std::string::npos && end_last == end)
+    {
+        _last_boundary = true;
     }
+
+    // Extracts the form data section
+    std::string section = r.get_body().substr(start, end - start);
+    // Process the headers
+    size_t header_end = section.find("\r\n\r\n");
+    if (header_end != std::string::npos)
+    {
+        std::string header_section = section.substr(0, header_end);
+        // Find the form name in the headers
+        size_t name_start = header_section.find("name=\"") + sizeof("name=\"") - 1;
+        size_t name_end = header_section.find("\"", name_start);
+        if (name_end != std::string::npos)
+            form_data.name = header_section.substr(name_start, name_end - name_start);
+        
+        // Find the filename in the headers
+        size_t filename_start = header_section.find("filename=\"") + sizeof("filename=\"") - 1;
+        size_t filename_end = header_section.find("\"", filename_start);
+        if (filename_end != std::string::npos)
+            form_data.file_name = header_section.substr(filename_start, filename_end - filename_start);
+        
+        size_t content_type_start = header_section.find("Content-Type: ") + sizeof("Content-Type: ") - 1;
+        form_data.content_type = header_section.substr(content_type_start);
+    }
+
+    // Process the data content
+    std::string data_content = section.substr(header_end + 4); // Skip the CRLF delimiter
+    form_data.data = data_content;
+
     return (form_data);
 }
 
@@ -272,11 +288,12 @@ std::string Respond::check_post_type()
 
 void    Respond::handle_delete_response()
 {
+        std::cout << "DKHLAAAAAAAAAAT" << std::endl;
+        std::cout << "rooted path:" << _rooted_path << std::endl;
     if (std::remove(_rooted_path.c_str()) == 0)
     {
         _status_code = 200;
         _status_message = get_response_status(_status_code);
-        // set_response_body("File deleted successfully");
         set_header("Content-Type", r.get_header("Content-Type"));
         set_header("Content-Length", std::to_string(_response_body.length()));
         set_header("Connection", "keep-alive");
@@ -290,13 +307,4 @@ void    Respond::handle_delete_response()
         set_header("Content-Length", std::to_string(_response_body.length()));
         set_header("Connection", "keep-alive");
     }
-    // else
-    // {
-    //     _status_code = "404";
-    //     _status_message = "Not Found";
-    //     // set_response_body("File not found");
-    //     set_header("Content-Type", content_type);
-    //     set_header("Content-Length", std::to_string(_response_body.length()));
-    //     set_header("Connection", "keep-alive");
-    // }
 }
