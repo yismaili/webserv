@@ -393,15 +393,26 @@ Developer Network\r\n
 // }
 
 
-#include <arpa/inet.h>
-#include <stdio.h>
+// #include <arpa/inet.h>
+// #include <stdio.h>
 
-int main() {
-    uint16_t host_short = 0x1234;
-    uint16_t net_short = htons(host_short);
+// int main() {
+//     uint16_t host_short = 0x1234;
+//     uint16_t net_short = htons(host_short);
 
-    printf("Host byte order: 0x%04x\n", host_short);
-    printf("Network byte order: 0x%04x\n", net_short);
+//     printf("Host byte order: 0x%04x\n", host_short);
+//     printf("Network byte order: 0x%04x\n", net_short);
 
+//     return 0;
+// }
+
+#include <iostream>
+#include <string>
+
+int main()
+{
+    std::string original_string = "Hello, world!";
+    std::string substring = original_string.substr(7, 50);
+    std::cout << "Substring: " << substring << std::endl;
     return 0;
 }
