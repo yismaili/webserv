@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/13 23:58:14 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/14 16:18:11 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,7 +112,7 @@ namespace http{
                         }
                         else if (!recv_ret)
                         {
-                            std::cout << "-------WRITEING.....-----\n";
+                        //     std::cout << "-------WRITEING.....-----\n";
                         //   std::cout<<"-----"<< requist_data[clients[i].fd] <<std::endl;
                         //       exit(1);
                             unchunk(clients[i].fd);
@@ -125,9 +125,9 @@ namespace http{
                    std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     sent_ret = send_data(clients[i].fd);
-                    // if (sent_ret == 1){
-                    //     clients[i].events = POLLOUT;
-                    // }
+                    if (sent_ret == 1){
+                        clients[i].events = POLLOUT;
+                    }
                     if (sent_ret == 0)
                     {
                         clients[i].events = POLLIN;
@@ -234,35 +234,42 @@ namespace http{
         requist_data[sockfd].append(std::string(buffer, bytes_received));
         if (requist_data[sockfd].find("\r\n\r\n") != std::string::npos)
         {
-            if (transfer_encoding_chunked(sockfd) == -2)
-            {
-                return (-2);
-            }
-            if (transfer_encoding_chunked(sockfd) == 1)
-            {
-                return (0);
-            }
-            else if (transfer_encoding_chunked(sockfd) == 0)
-            {
-                if (read_info[sockfd] == true)
-                {
-                    return (0);
-                }
-                return (1);
-            }
-            else if (transfer_encoding_chunked(sockfd) == 2)
+            std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
+            int ret_transfer = transfer_encoding_chunked(sockfd);
+            if (content_length != std::string::npos)
             {
                 header_end = requist_data[sockfd].find("\r\n\r\n");
                 content_len = std::strtol(requist_data[sockfd].substr(requist_data[sockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
+                conf_fd[sockfd]->content_length = content_len;
                 if ((content_len +  header_end + 4) <= requist_data[sockfd].size())
                 {
+                    // std::cout<<"2-----"<<requist_data[sockfd].size()<<std::endl;
+                    //  std::cout<<"3-----"<<content_len +  header_end + 4<<std::endl;
                     read_info[sockfd] = true;
+                    // exit(1);
                     return (0);
                 }
                 else
                 {
                     return (1);
                 } 
+            }
+           else if (ret_transfer == -2)
+            {
+                return (-2);
+            }
+            else if (ret_transfer == 1)
+            {
+                std::cout<<"1\n";
+                return (0);
+            }
+            else if (ret_transfer == 0)
+            {
+                if (read_info[sockfd] == true)
+                {
+                    return (0);
+                }
+                return (1);
             }
         }
         return (1);
@@ -274,13 +281,19 @@ namespace http{
         if (Transfer_encoding != std::string::npos && Transfer_encoding < requist_data[sockfd].find("\r\n\r\n"))
         {
             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
+            std::size_t header_end = requist_data[sockfd].find("\r\n\r\n");
+            conf_fd[sockfd]->content_length = requist_data[sockfd].size() - (header_end + 4);
+            // std::cout<<"********"<<conf_fd[sockfd]->content_length<<std::endl;
+            //  std::cout<<"2-----"<<requist_data[sockfd]<<std::endl;
+           // exit(1);
         }  
-        request req(requist_data[sockfd]);
+            // std::cout<<"2-----"<<requist_data[sockfd]<<std::endl;
+        request req(requist_data[sockfd], conf_fd[sockfd]->content_length);
         Respond   res(req, conf_fd[sockfd]->index);
        requist_data[sockfd] =  res.response_root(conf);
-    //  requist_data[sockfd] =  build_response();
-
+    // requist_data[sockfd] =  build_response();
        std::cout << "A F T E R      R E S P O N S E" << std::endl;
+
        //std::cout<<"-----"<< requist_data[sockfd] <<std::endl;     
     }
     
@@ -307,7 +320,19 @@ namespace http{
             pos = chunks.find("\r\n",  pos);
             result.append(chunks.substr(pos += 2, sizeof_chunk));
             pos += sizeof_chunk + 2;
+            try
+            {
+            
             subchunk = chunks.substr(pos , 9);
+
+            }
+            catch(const std::exception& e)
+            {
+                
+                exit(1);
+                std::cerr << e.what() << '\n';
+            }
+            
             sizeof_chunk = strtol(subchunk.c_str(), NULL, 16);
             if (sizeof_chunk == 0 && requist_data[sockfd].size() )
             {
