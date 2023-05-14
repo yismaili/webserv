@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/12 15:27:10 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/13 20:47:24 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,11 +14,13 @@
 
 std::string Respond::response_root(std::vector<server> servers)
 {
-    std::cout << "____--__----____-_1___-____-_-__-_-________-_----_-_-_-_-_-_--_--_-_--_-__-_--" << std::endl;
+    // std::cout << "method: " << r.get_method() << std::endl;
     // std::cout << "boundary: " << r.get_boundary() << std::endl;
     // std::cout << "content type: " << r.get_header("Content-Type") << std::endl;
     // std::cout << "content length: " << r.get_header("Content-Length") << std::endl;
     // std::cout << "request body: " << r.get_body() << std::endl;
+    std::cout << "r method: " << r.get_method() << std::endl;
+    std::cout << "uri: " << r.get_uri() << std::endl;
     init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     if (ft_parse_location(servers))
@@ -135,37 +137,6 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
     }
     return (1);
 }
-
-// int Respond::dynamic_location(std::vector<server> server, std::string path)
-// {
-//     std::string::size_type pos = path.find(".");
-//     if (pos != std::string::npos)
-//     {
-//         // std::string extension = "*" + path.substr(pos);
-//         for (size_t i = 0; i < server.size(); i++)
-//         {
-//             for (size_t j = 0; j < server[i]._location.size(); j++)
-//             {
-//                 if (server[i]._location[j].location_name == path)
-//                 {
-                    
-//                 }
-//                 for (std::map<std::string, std::string>::iterator it = server[i]._location[j]._path_info.begin(); it != server[i]._location[j]._path_info.end(); it++)
-//                 {
-//                     if (it->first == extension)
-//                     {
-//                         _server_index = i;
-//                         // _path_found = it->second;
-//                         _is_cgi = true;
-//                         prefix_location(server, path);
-//                         return (0);
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     return (1);
-// }
 
 int Respond::root_location(std::vector<server> server)
 {

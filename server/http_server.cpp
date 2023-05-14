@@ -279,6 +279,9 @@ namespace http{
         Respond   res(req, conf_fd[sockfd]->index);
        requist_data[sockfd] =  res.response_root(conf);
     //  requist_data[sockfd] =  build_response();
+
+       std::cout << "A F T E R      R E S P O N S E" << std::endl;
+       //std::cout<<"-----"<< requist_data[sockfd] <<std::endl;     
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
