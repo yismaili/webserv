@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/14 16:18:11 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/14 18:50:46 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,6 +104,8 @@ namespace http{
                         recv_ret = recv_data(clients[i].fd);
                         if (recv_ret == -2)
                         {
+                            requist_data[clients[i].fd] = build_response();
+                            send_data(clients[i].fd);
                             requist_data[clients[i].fd].erase();
                             close(clients[i].fd);
                             std::vector<pollfd>::iterator it = clients.begin() + i;
@@ -112,8 +114,9 @@ namespace http{
                         }
                         else if (!recv_ret)
                         {
+                            
                         //     std::cout << "-------WRITEING.....-----\n";
-                        //   std::cout<<"-----"<< requist_data[clients[i].fd] <<std::endl;
+                        //    std::cout<<"-----"<< requist_data[clients[i].fd] <<std::endl;
                         //       exit(1);
                             unchunk(clients[i].fd);
                             clients[i].events = POLLOUT;
@@ -186,8 +189,8 @@ namespace http{
     int http_sever ::transfer_encoding_chunked(int sockfd)
     {
         std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
-        std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
-        if ((content_length == std::string::npos && transfer_encoding == std::string::npos ))
+        std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked\r\n");
+        if ((content_length == std::string::npos && transfer_encoding == std::string::npos ) || (content_length != std::string::npos && transfer_encoding != std::string::npos ))
         {
             return (-2);
         }
@@ -203,7 +206,9 @@ namespace http{
             if (transfer_encoding != std::string::npos)
             {
                 if (requist_data[sockfd].find("0\r\n\r\n") != std::string::npos)
+                {
                     return (1);
+                }
                 else
                     return (0);
             }
@@ -213,7 +218,6 @@ namespace http{
                 return (0);           
             }
         }
-        
         return (2);
     }
         
@@ -235,8 +239,9 @@ namespace http{
         if (requist_data[sockfd].find("\r\n\r\n") != std::string::npos)
         {
             std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
+             std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
             int ret_transfer = transfer_encoding_chunked(sockfd);
-            if (content_length != std::string::npos)
+            if (content_length != std::string::npos && transfer_encoding == std::string::npos)
             {
                 header_end = requist_data[sockfd].find("\r\n\r\n");
                 content_len = std::strtol(requist_data[sockfd].substr(requist_data[sockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
@@ -286,7 +291,7 @@ namespace http{
             // std::cout<<"********"<<conf_fd[sockfd]->content_length<<std::endl;
             //  std::cout<<"2-----"<<requist_data[sockfd]<<std::endl;
            // exit(1);
-        }  
+        }
             // std::cout<<"2-----"<<requist_data[sockfd]<<std::endl;
         request req(requist_data[sockfd], conf_fd[sockfd]->content_length);
         Respond   res(req, conf_fd[sockfd]->index);
@@ -328,7 +333,7 @@ namespace http{
             }
             catch(const std::exception& e)
             {
-                
+                   std::cout << "-------..abbourt...-----\n";
                 exit(1);
                 std::cerr << e.what() << '\n';
             }
