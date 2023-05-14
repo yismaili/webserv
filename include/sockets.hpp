@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 17:24:04 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/14 15:35:55 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,7 @@ namespace http{
             unsigned int sock_addr_len;
             std::string ip_addr;
             int index;
+            std::size_t content_length;
     };
 }
 #endif

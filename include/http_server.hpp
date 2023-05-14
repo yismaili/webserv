@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/07 14:57:24 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/14 15:37:39 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ namespace http{
             int clint;
             http::sockets sock;  
             std::vector<http::sockets> socket_id;
-            std::map<int, std::vector<http::sockets>::iterator> conf_fd;
+            std::map<int, std::vector<http::sockets>::iterator>conf_fd;
             std::vector<pollfd> clients;
             std::map<int, std::string> requist_data;
             std::map<int, bool> read_info;
