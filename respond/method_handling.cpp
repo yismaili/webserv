@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_handling.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/13 20:47:46 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/12 15:43:09 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -167,6 +167,7 @@ void    Respond::handle_form_data()
     //     std::cout << "content-type: " << it->get_content_type() << std::endl;
     //     std::cout << "data: " << it->get_data() << " END"<< std::endl;
     //     it++;
+    //}
     // }
     
     create_form_data();
