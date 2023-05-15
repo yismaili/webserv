@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/15 17:24:04 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 18:43:14 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,7 @@ namespace http{
                 {
                    std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
                     std::vector<pollfd>::iterator it = clients.begin() + i;
+                     std::map<int, bool>::iterator it_read =read_info.find(clients[i].fd);
                     sent_ret = send_data(clients[i].fd);
                     if (sent_ret == 1){
                         clients[i].events = POLLOUT;
@@ -139,7 +140,7 @@ namespace http{
                             close(clients[i].fd);
                         }
                         clients.erase(it);
-                        read_info[clients[i].fd] = 0;
+                        read_info.erase(it_read);
                         i--;
                     }
                     else if (sent_ret == -2)
@@ -185,15 +186,20 @@ namespace http{
         close(newsockfd);
         exit(1);
     }
+    // int http_sever ::parse_header(std::string header)
+    // {
+    // }
     
     int http_sever ::transfer_encoding_chunked(int sockfd)
     {
         std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
-        std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked\r\n");
-        // if ((content_length == std::string::npos && transfer_encoding == std::string::npos ) || (content_length != std::string::npos && transfer_encoding != std::string::npos ))
-        // {
-        //     return (-2);
-        // }
+        std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
+         std::size_t GET_M = requist_data[sockfd].find("GET");
+        if (((content_length == std::string::npos && transfer_encoding == std::string::npos ) 
+        || (content_length != std::string::npos && transfer_encoding != std::string::npos )) && GET_M == std::string::npos)
+        {
+            return (-2);
+        }
         if (content_length != std::string::npos && transfer_encoding != std::string::npos)
         {
             if (requist_data[sockfd].find("0\r\n\r\n") != std::string::npos)
