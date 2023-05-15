@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/15 17:24:04 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 18:09:04 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,7 @@ namespace http{
                         else if (!recv_ret)
                         {
                             
-                        //     std::cout << "-------WRITEING.....-----\n";
+                            std::cout << "-------WRITEING.....-----\n";
                         //    std::cout<<"-----"<< requist_data[clients[i].fd] <<std::endl;
                         //       exit(1);
                             unchunk(clients[i].fd);

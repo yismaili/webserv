@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/13 18:47:13 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/15 19:12:25 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,9 +74,10 @@ int Respond::ft_handle_index(std::vector<server> server)
         }
         else
         {
-            index = server[_server_index]._location[_location_index].get_index();
+            index = server[_server_index].get_index();
+            std::string file = server[_server_index].get_root() + "/" + index;
             _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
-            if (ft_handle_index_2(index))
+            if (ft_handle_index_2(file))
                 return (1);
         }
     }
@@ -86,9 +87,7 @@ int Respond::ft_handle_index(std::vector<server> server)
 
         std::string::size_type _mime_index= index.find_last_of('.');
         if (_mime_index != std::string::npos)
-        {
             _mime_string = index.substr(_mime_index + 1);
-        }
         std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
         _rooted_path = server[_location_index].get_root() + _removed_path + index;
         if (ft_handle_index_2(file))
