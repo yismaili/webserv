@@ -6,11 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2023/05/15 21:04:10 by yismaili         ###   ########.fr       */
-=======
-/*   Updated: 2023/05/15 19:12:25 by aoumad           ###   ########.fr       */
->>>>>>> d45c175b1a7fa01936d8caa7f73a93ac0eff7ad6
+/*   Updated: 2023/05/15 21:58:18 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,9 +44,9 @@ void Respond::ft_handle_file()
         set_status_code(200);
         set_status_message(get_response_status(200));
         set_header("Content-Type", get_mime_type(_mime_string));
-        std::cout << "mime _type: " << get_mime_type(_mime_string) << std::endl;
+        // std::cout << "mime _type: " << get_mime_type(_mime_string) << std::endl;
          _headers["Content-Length"] = std::to_string(_response_body.length());
-         std::cout << std::to_string(_response_body.length()) << std::endl;
+        //  std::cout << std::to_string(_response_body.length()) << std::endl;
         _headers["Connection"] = "keep-alive";
         set_date();
         set_cache_control("cache");

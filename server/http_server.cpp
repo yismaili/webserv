@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/15 21:15:31 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 22:25:18 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -369,19 +369,13 @@ namespace http{
     {
         // Keep track of how much data has been sent to a particular socket
         static std::map<int, std::size_t> sent_data;
-
-        //If this is the first time sending data to the socket, print the response header
-        if (sent_data.find(socket) == sent_data.end())
-        {
-            std::cout << " Response  sended "<<std::endl;
-        }
         // Send the data to the client
         std::string data_to_send = requist_data[socket].substr(sent_data[socket], 1024);
         long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
         // Check for errors while sending data
         if (bytes_sent == -1)
         {
-            std::cout << "Error: Failed to send data to the socket\n";
+            std::cout << "\033[31mError: Failed to send data to the socket\033[0m\n";
             close(socket);
             sent_data[socket] = 0;
             return (-2);
@@ -396,6 +390,7 @@ namespace http{
                 std::map<int, std::string>::iterator it = requist_data.find(socket);
                 requist_data.erase(it);
                 sent_data[socket] = 0;
+                std::cout << "\n\033[33mRESPONSE SENDED TO [" << conf_fd[socket]->port << "]\033[0m" << std::endl;
                 return (0);
             }
             // If there is still data to send, return 1
@@ -412,7 +407,7 @@ namespace http{
         int sockfd_client = accept(sockfd, (struct sockaddr *) NULL, NULL);
         if (sockfd_client < 0) 
         {
-           std::cout<<"accepting connection"<<std::endl;
+           std::cout << "\033[31mError: accepting connection\033[0m\n";
            exit(1);
         }
         return (sockfd_client);

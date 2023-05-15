@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/15 16:26:23 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 22:03:55 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <map>
+#include <fcntl.h>
 #include "../prs_rsc/server.hpp"
 
 namespace http{
