@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/15 16:45:48 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 21:16:53 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -95,6 +95,7 @@ namespace http{
                 std::cout<<"Socket listen failed"<<std::endl;
                 exit(1);
             }
+            std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
             freeaddrinfo(result);           /* No longer needed */  
             return true;
         }

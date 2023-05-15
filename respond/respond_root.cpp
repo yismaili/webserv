@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   respond_root.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/13 20:47:24 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/15 21:02:34 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ std::string Respond::response_root(std::vector<server> servers)
     // std::cout << "content type: " << r.get_header("Content-Type") << std::endl;
     // std::cout << "content length: " << r.get_header("Content-Length") << std::endl;
     // std::cout << "request body: " << r.get_body() << std::endl;
-    std::cout << "r method: " << r.get_method() << std::endl;
-    std::cout << "uri: " << r.get_uri() << std::endl;
+    // std::cout << "r method: " << r.get_method() << std::endl;
+    // std::cout << "uri: " << r.get_uri() << std::endl;
     init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     if (ft_parse_location(servers))
