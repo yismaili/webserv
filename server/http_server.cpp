@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/15 18:43:14 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 20:24:53 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,9 +71,8 @@ namespace http{
             i = 0;
             // Wait for events on any of the monitored file descriptors
             poll_ret = poll(clients.data(), clients.size(), -1);
-            
             //Check for events on server socket
-            while (i != clients.size())
+            while (i < clients.size())
             {
                 if (clients[i].revents & POLLERR)
                 {
@@ -94,7 +93,7 @@ namespace http{
                         // Add new socket to poll list
                         pollfd new_client_pollfd;
                         new_client_pollfd.fd = new_socket;
-                        new_client_pollfd.events = POLLIN;
+                        new_client_pollfd.events = POLLIN ;
                         read_info.insert(std::make_pair(new_socket, false));
                         requist_data.insert(std::make_pair(new_socket, ""));
                         clients.push_back(new_client_pollfd);
@@ -115,9 +114,7 @@ namespace http{
                         else if (!recv_ret)
                         {
                             
-                        //     std::cout << "-------WRITEING.....-----\n";
-                        //    std::cout<<"-----"<< requist_data[clients[i].fd] <<std::endl;
-                        //       exit(1);
+                            std::cout << "-------WRITEING.....-----\n";
                             unchunk(clients[i].fd);
                             clients[i].events = POLLOUT;
                         }
@@ -125,20 +122,20 @@ namespace http{
                 }
                else if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                   std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
+                    std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
                     std::vector<pollfd>::iterator it = clients.begin() + i;
-                     std::map<int, bool>::iterator it_read =read_info.find(clients[i].fd);
+                    std::map<int, bool>::iterator it_read =read_info.find(clients[i].fd);
                     sent_ret = send_data(clients[i].fd);
                     if (sent_ret == 1){
                         clients[i].events = POLLOUT;
                     }
                     if (sent_ret == 0)
                     {
-                        clients[i].events = POLLIN;
                         if (Connection == std::string::npos)
                         {
                             close(clients[i].fd);
                         }
+                         close(clients[i].fd);
                         clients.erase(it);
                         read_info.erase(it_read);
                         i--;
@@ -147,6 +144,7 @@ namespace http{
                     {
                         close(clients[i].fd);
                         clients.erase(it);
+                        read_info.erase(it_read);
                         i--;
                     }
                 }
@@ -301,14 +299,13 @@ namespace http{
         }
             //  std::cout<<"2-----"<<requist_data[sockfd]<<std::endl;
             //  exit(1);
-             std::cout<<"********"<<conf_fd[sockfd]->content_length<<std::endl;
         request req(requist_data[sockfd], conf_fd[sockfd]->content_length);
         Respond   res(req, conf_fd[sockfd]->index);
        requist_data[sockfd] =  res.response_root(conf);
     // requist_data[sockfd] =  build_response();
        std::cout << "A F T E R      R E S P O N S E" << std::endl;
 
-       //std::cout<<"-----"<< requist_data[sockfd] <<std::endl;     
+     //  std::cout<<"-----"<< requist_data[sockfd] <<std::endl;     
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
@@ -334,19 +331,7 @@ namespace http{
             pos = chunks.find("\r\n",  pos);
             result.append(chunks.substr(pos += 2, sizeof_chunk));
             pos += sizeof_chunk + 2;
-            try
-            {
-            
             subchunk = chunks.substr(pos , 9);
-
-            }
-            catch(const std::exception& e)
-            {
-                   std::cout << "-------..abbourt...-----\n";
-                exit(1);
-                std::cerr << e.what() << '\n';
-            }
-            
             sizeof_chunk = strtol(subchunk.c_str(), NULL, 16);
             if (sizeof_chunk == 0 && requist_data[sockfd].size() )
             {
@@ -424,7 +409,8 @@ namespace http{
             // If all data has been sent, erase the request information and return 0
             if (sent_data[socket] >= requist_data[socket].size())
             {
-                requist_data.erase(socket);
+                std::map<int, std::string>::iterator it = requist_data.find(socket);
+                requist_data.erase(it);
                 sent_data[socket] = 0;
                 return (0);
             }
