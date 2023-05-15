@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/13 15:10:11 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 16:45:48 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,11 +29,19 @@ namespace http{
             sock_addr_len = 0;
             ip_addr = ip_add;
             index = index_;
-            // AF stands for Address Family and PF stands for Protocol Family
-            // This construct holds the information about the address family, port number, Internet address
-            serv_addr.sin_family = AF_INET; // Address family IPv4 Internet protocols
-            serv_addr.sin_addr.s_addr = INADDR_ANY;//inet_addr(ip_addr.c_str());
-            serv_addr.sin_port = htons(port); // convert between host and network byte orders
+            
+            memset(&hints, 0, sizeof(hints));
+            hints.ai_family = AF_UNSPEC;
+            hints.ai_socktype = SOCK_STREAM;
+            hints.ai_flags = 0;
+            hints.ai_protocol = 0;
+
+            std::string port_str = std::to_string(port);
+            int s = getaddrinfo(ip_add.c_str(), port_str.c_str(), &hints, &result);
+            if (s != 0) {
+                fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+                exit(EXIT_FAILURE);
+            }
             if(start_server() == false){
                 exit(1);
             }
@@ -49,11 +57,6 @@ namespace http{
         {
             return (sock_addr_len);
         }
-            
-        sockaddr_in &sockets::git_serv_addr()
-        {
-            return (serv_addr);
-        }
         
         bool sockets::start_server() 
         {
@@ -61,9 +64,12 @@ namespace http{
             
             optval = 1;
             // Creates a TCP socket
-            sockfd = socket(AF_INET, SOCK_STREAM, 0); 
-            if (sockfd < 0)
-                return (false);
+           for (rp = result; rp != NULL; rp = rp->ai_next) 
+           {
+                sockfd = socket(rp->ai_family, rp->ai_socktype,rp->ai_protocol);
+                if (sockfd < 0)
+                    return (false);
+           }
             
             // set options for a socket
             if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
@@ -74,15 +80,14 @@ namespace http{
                 perror("setsockopt failed");
                 return (false);
             }
-            
-            sock_addr_len = sizeof(serv_addr);
+            // sock_addr_len = sizeof(hints);
             // set the O_NONBLOCK flag for the socket file descriptor
             fcntl(sockfd, F_SETFL, O_NONBLOCK);
             //bind a socket with a specific address and port number
-            if (bind(sockfd, (struct sockaddr *) &serv_addr, sock_addr_len) < 0) {
-                //the second is a pointer to a struct sockaddr structure that contains the address
+            // bind a socket with a specific address and port number
+            if (bind(sockfd, result->ai_addr, result->ai_addrlen) < 0) {
                 perror("Bind System failed");
-                return (false);
+                return false;
             }
           //  Set socket to listen
             if (listen(sockfd, SOMAXCONN) < 0){
@@ -90,6 +95,7 @@ namespace http{
                 std::cout<<"Socket listen failed"<<std::endl;
                 exit(1);
             }
+            freeaddrinfo(result);           /* No longer needed */  
             return true;
         }
     }
