@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/15 22:25:18 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/16 00:46:25 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,9 +103,8 @@ namespace http{
                         recv_ret = recv_data(clients[i].fd);
                         if (recv_ret == -2)
                         {
-                            requist_data[clients[i].fd] = build_response();
-                            send_data(clients[i].fd);
-                            requist_data[clients[i].fd].erase();
+                            std::map<int, std::string>::iterator it_ = requist_data.find(clients[i].fd);
+                            requist_data.erase(it_);
                             close(clients[i].fd);
                             std::vector<pollfd>::iterator it = clients.begin() + i;
                             clients.erase(it);
@@ -190,18 +189,13 @@ namespace http{
     {
         std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
         std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
-         std::size_t GET_M = requist_data[sockfd].find("GET");
+        std::size_t get_method = requist_data[sockfd].find("GET");
+
+    
         if (((content_length == std::string::npos && transfer_encoding == std::string::npos ) 
-        || (content_length != std::string::npos && transfer_encoding != std::string::npos )) && GET_M == std::string::npos)
+        || (content_length != std::string::npos && transfer_encoding != std::string::npos )) && get_method == std::string::npos)
         {
             return (-2);
-        }
-        if (content_length != std::string::npos && transfer_encoding != std::string::npos)
-        {
-            if (requist_data[sockfd].find("0\r\n\r\n") != std::string::npos)
-                return (1);
-            else
-                return (0);
         }
         if (content_length == std::string::npos)
         {
@@ -239,14 +233,15 @@ namespace http{
             return (-2);
         }
         requist_data[sockfd].append(std::string(buffer, bytes_received));
-        if (requist_data[sockfd].find("\r\n\r\n") != std::string::npos)
+        header_end = requist_data[sockfd].find("\r\n\r\n");
+        if (header_end != std::string::npos)
         {
-            std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
-             std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
+            // std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
+            //  std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
             int ret_transfer = transfer_encoding_chunked(sockfd);
-            if (content_length != std::string::npos && transfer_encoding == std::string::npos)
+            if (ret_transfer == 2)
             {
-                header_end = requist_data[sockfd].find("\r\n\r\n");
+                // header_end = requist_data[sockfd].find("\r\n\r\n");
                 content_len = std::strtol(requist_data[sockfd].substr(requist_data[sockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
                 conf_fd[sockfd]->content_length = content_len; 
                 if ((content_len +  header_end + 4) <= requist_data[sockfd].size())
@@ -288,6 +283,7 @@ namespace http{
             std::size_t header_end = requist_data[sockfd].find("\r\n\r\n");
             conf_fd[sockfd]->content_length = requist_data[sockfd].size() - (header_end + 4);
         }
+        std::cout<<"hi\n";
         request req(requist_data[sockfd], conf_fd[sockfd]->content_length);
         Respond   res(req, conf_fd[sockfd]->index);
         requist_data[sockfd] =  res.response_root(conf);  
