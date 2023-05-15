@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/14 15:35:55 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 16:26:23 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 #include <unistd.h>
 #include<fstream>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <map>
 #include "../prs_rsc/server.hpp"
 
@@ -39,7 +40,8 @@ namespace http{
         public:
             int sockfd;
             int port;
-            struct sockaddr_in serv_addr;
+            struct addrinfo hints;
+            struct addrinfo *result, *rp;
             unsigned int sock_addr_len;
             std::string ip_addr;
             int index;
