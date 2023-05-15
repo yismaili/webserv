@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   respond_root.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/15 19:33:15 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/15 21:59:21 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +19,8 @@ std::string Respond::response_root(std::vector<server> servers)
     // std::cout << "content type: " << r.get_header("Content-Type") << std::endl;
     // std::cout << "content length: " << r.get_header("Content-Length") << std::endl;
     // std::cout << "request body: " << r.get_body() << std::endl;
-    std::cout << "r method: " << r.get_method() << std::endl;
-    std::cout << "uri: " << r.get_uri() << std::endl;
+    // std::cout << "r method: " << r.get_method() << std::endl;
+    // std::cout << "uri: " << r.get_uri() << std::endl;
     init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     if (ft_parse_location(servers))
@@ -69,9 +69,9 @@ int Respond::exact_location(std::vector<server> server, std::string path)
         {
             if (server[_server_index]._location[j].location_name == path)
             {
-                std::cout << "path :" << path << std::endl;
-                std::cout << server[_server_index]._location[j].get_root() << std::endl;
-               std::cout << server[_server_index]._location[j].get_index() << std::endl;
+            //     std::cout << "path :" << path << std::endl;
+            //     std::cout << server[_server_index]._location[j].get_root() << std::endl;
+            //    std::cout << server[_server_index]._location[j].get_index() << std::endl;
 
                 _location_index = j;
                 _path_found = server[_server_index]._location[j].location_name;
@@ -149,8 +149,8 @@ int Respond::root_location(std::vector<server> server)
         {
             _location_index = j;
             _path_found = server[_server_index]._location[j].location_name;
-            std::cout << "path found: " << _path_found << std::endl;
-            std::cout << "root: " << server[_server_index]._location[j].get_root() << std::endl;
+            // std::cout << "path found: " << _path_found << std::endl;
+            // std::cout << "root: " << server[_server_index]._location[j].get_root() << std::endl;
             return (0);
         }
     }
@@ -160,7 +160,7 @@ int Respond::root_location(std::vector<server> server)
 int Respond::ft_parse_location(std::vector<server> server)
 {
     std::string path = r.get_uri();
-    std::cout << "___--_-______-_---______--__---____---_____---------__---_------------" << std::endl;
+  //  std::cout << "___--_-______-_---______--__---____---_____---------__---_------------" << std::endl;
     // exact location body code
     if (exact_location(server, path) == 0)
         return (0);

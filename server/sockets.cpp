@@ -6,12 +6,12 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/15 16:45:48 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 22:04:05 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/sockets.hpp"
-#include <fcntl.h>
+
 namespace http{
     
         sockets::sockets(/* args */)
@@ -39,7 +39,7 @@ namespace http{
             std::string port_str = std::to_string(port);
             int s = getaddrinfo(ip_add.c_str(), port_str.c_str(), &hints, &result);
             if (s != 0) {
-                fprintf(stderr, "getaddrinfo: %s\n", gai_strerror(s));
+                std::cout << "\033[31mGetaddrinfo error\033[0m\n";
                 exit(EXIT_FAILURE);
             }
             if(start_server() == false){
@@ -67,8 +67,10 @@ namespace http{
            for (rp = result; rp != NULL; rp = rp->ai_next) 
            {
                 sockfd = socket(rp->ai_family, rp->ai_socktype,rp->ai_protocol);
-                if (sockfd < 0)
+                if (sockfd < 0){
+                    std::cout << "\033[31mCreate sockopt failed\033[0m\n";
                     return (false);
+                }
            }
             
             // set options for a socket
@@ -77,7 +79,7 @@ namespace http{
                 //SOL_SOCKET: manipulate the socket-level options
                 //SO_REUSEADDR: the option name. It is used to enable reuse of local addresses.
                 //&optval: a pointer to the buffer that contains the value of the option you want to set
-                perror("setsockopt failed");
+                std::cout << "\033[31mSet sockopt failed\033[0m\n";
                 return (false);
             }
             // sock_addr_len = sizeof(hints);
@@ -86,15 +88,16 @@ namespace http{
             //bind a socket with a specific address and port number
             // bind a socket with a specific address and port number
             if (bind(sockfd, result->ai_addr, result->ai_addrlen) < 0) {
-                perror("Bind System failed");
+               std::cout << "\033[31mBind System failed\033[0m\n";
                 return false;
             }
           //  Set socket to listen
             if (listen(sockfd, SOMAXCONN) < 0){
                 // The backlog argument defines the maximum length to which the queue of pending connections for sockfd may grow
-                std::cout<<"Socket listen failed"<<std::endl;
+                std::cout << "\033[31mSocket listen failed\033[0m\n";
                 exit(1);
             }
+            std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
             freeaddrinfo(result);           /* No longer needed */  
             return true;
         }

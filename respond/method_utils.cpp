@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_utils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/15 19:12:25 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/15 21:58:18 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,9 @@ void Respond::ft_handle_file()
         set_status_code(200);
         set_status_message(get_response_status(200));
         set_header("Content-Type", get_mime_type(_mime_string));
-        std::cout << "mime _type: " << get_mime_type(_mime_string) << std::endl;
+        // std::cout << "mime _type: " << get_mime_type(_mime_string) << std::endl;
          _headers["Content-Length"] = std::to_string(_response_body.length());
-         std::cout << std::to_string(_response_body.length()) << std::endl;
+        //  std::cout << std::to_string(_response_body.length()) << std::endl;
         _headers["Connection"] = "keep-alive";
         set_date();
         set_cache_control("cache");
@@ -108,7 +108,7 @@ int Respond::ft_handle_index_2(std::string index)
             set_status_code(200);
             set_status_message(get_response_status(200));
             set_header("Content-Type", get_mime_type(_mime_string));
-            std::cout << "mime _type in index: " << get_mime_type(_mime_string) << std::endl;
+           // std::cout << "mime _type in index: " << get_mime_type(_mime_string) << std::endl;
             _headers["Content-Length"] = std::to_string(_response_body.length());
             _headers["Connection"] = "keep-alive";
             set_date();
@@ -117,7 +117,7 @@ int Respond::ft_handle_index_2(std::string index)
         }
         else
         {
-    std::cout << "____WWWWW_--------______" << std::endl;
+    //std::cout << "____WWWWW_--------______" << std::endl;
             handle_error_response(404);
             return (1);
         }
