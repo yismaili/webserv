@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/14 18:50:46 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 17:24:04 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,10 +190,10 @@ namespace http{
     {
         std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
         std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked\r\n");
-        if ((content_length == std::string::npos && transfer_encoding == std::string::npos ) || (content_length != std::string::npos && transfer_encoding != std::string::npos ))
-        {
-            return (-2);
-        }
+        // if ((content_length == std::string::npos && transfer_encoding == std::string::npos ) || (content_length != std::string::npos && transfer_encoding != std::string::npos ))
+        // {
+        //     return (-2);
+        // }
         if (content_length != std::string::npos && transfer_encoding != std::string::npos)
         {
             if (requist_data[sockfd].find("0\r\n\r\n") != std::string::npos)
@@ -228,6 +228,7 @@ namespace http{
         int bytes_received;
         std::size_t header_end = 0;
         std::size_t content_len = 0;
+        conf_fd[sockfd]->content_length = 0;
         bytes_received = recv(sockfd, buffer, sizeof(buffer) - 1, 0);
         if (bytes_received <= 0)
         {
@@ -245,7 +246,7 @@ namespace http{
             {
                 header_end = requist_data[sockfd].find("\r\n\r\n");
                 content_len = std::strtol(requist_data[sockfd].substr(requist_data[sockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
-                conf_fd[sockfd]->content_length = content_len;
+                conf_fd[sockfd]->content_length = content_len; 
                 if ((content_len +  header_end + 4) <= requist_data[sockfd].size())
                 {
                     // std::cout<<"2-----"<<requist_data[sockfd].size()<<std::endl;
@@ -292,7 +293,9 @@ namespace http{
             //  std::cout<<"2-----"<<requist_data[sockfd]<<std::endl;
            // exit(1);
         }
-            // std::cout<<"2-----"<<requist_data[sockfd]<<std::endl;
+            //  std::cout<<"2-----"<<requist_data[sockfd]<<std::endl;
+            //  exit(1);
+             std::cout<<"********"<<conf_fd[sockfd]->content_length<<std::endl;
         request req(requist_data[sockfd], conf_fd[sockfd]->content_length);
         Respond   res(req, conf_fd[sockfd]->index);
        requist_data[sockfd] =  res.response_root(conf);
