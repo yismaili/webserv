@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/14 15:37:39 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/15 17:59:02 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ namespace http{
             int transfer_encoding_chunked(int sockfd);
             std::string generate_cookie_value(int length);
             std::vector<http::sockets>::iterator find_conf(int sockfd);
+            int parse_header(std::string header);
         public:
             int clint;
             http::sockets sock;  
