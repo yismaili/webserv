@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/16 20:12:49 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/16 22:08:27 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ namespace http{
             std::vector<server> conf;
             std::size_t content_length ;
             std::size_t transfer_encoding;
-            std::size_t get_method;
+            std::size_t post_method;
             std::size_t content_len;
             std::size_t header_end;
             std::size_t body_end;

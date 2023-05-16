@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/16 21:13:47 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/16 22:08:57 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -190,13 +190,13 @@ namespace http{
     {
         content_length = header.find("Content-Length: ");
         transfer_encoding = header.find("Transfer-Encoding: chunked");
-        get_method = header.find("GET");
+        post_method = header.find("POST");
         content_len = std::strtol(header.substr(content_length + 16, 9).c_str(), nullptr, 0);
         conf_fd[sockfd]->setContent_length(content_len);
         std::string  subchunk = header.substr(header_end + 4, 9);
         int sizeof_chunk = std::strtol(subchunk.c_str(), NULL, 16);
-        if ((content_length == std::string::npos && transfer_encoding == std::string::npos) 
-            || (sizeof_chunk == 0 && content_length == std::string::npos ))
+        if ((content_length == std::string::npos && transfer_encoding == std::string::npos && post_method !=  std::string::npos) 
+            || (sizeof_chunk == 0 && content_length == std::string::npos && post_method !=  std::string::npos))
         {
             return (-2);
         }
@@ -207,11 +207,11 @@ namespace http{
     {
         // std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
         // std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
-        // std::size_t get_method = requist_data[sockfd].find("GET");
+        // std::size_t post_method = requist_data[sockfd].find("GET");
 
     
         if (((content_length == std::string::npos && transfer_encoding == std::string::npos ) 
-        || (content_length != std::string::npos && transfer_encoding != std::string::npos )) && get_method == std::string::npos)
+        || (content_length != std::string::npos && transfer_encoding != std::string::npos )) && post_method != std::string::npos)
         {
             return (-2);
         }
