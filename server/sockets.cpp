@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/15 22:04:05 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/16 14:35:28 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,8 +14,14 @@
 
 namespace http{
     
-        sockets::sockets(/* args */)
+        sockets::sockets()
         {
+            sockfd =  0;
+            port = 0;
+            sock_addr_len = 0;
+            ip_addr = "";
+            index = 0;
+            content_length = 0;
         }
         
         sockets::~sockets()
@@ -24,6 +30,9 @@ namespace http{
          //Assign a port to socket
         sockets &sockets::init_data(int port_, std::string ip_add, int index_)
         {
+            std::string port_str;
+            int ret_getadd;
+
             sockfd =  -1;
             port = port_;
             sock_addr_len = 0;
@@ -35,27 +44,47 @@ namespace http{
             hints.ai_socktype = SOCK_STREAM;
             hints.ai_flags = 0;
             hints.ai_protocol = 0;
-
-            std::string port_str = std::to_string(port);
-            int s = getaddrinfo(ip_add.c_str(), port_str.c_str(), &hints, &result);
-            if (s != 0) {
+            port_str = std::to_string(port);
+            ret_getadd = getaddrinfo(ip_add.c_str(), port_str.c_str(), &hints, &result);
+            
+            if (ret_getadd != 0) {
                 std::cout << "\033[31mGetaddrinfo error\033[0m\n";
                 exit(EXIT_FAILURE);
             }
+            
             if(start_server() == false){
-                exit(1);
+                exit(EXIT_FAILURE);
             }
             return (*this);
         }
             
-        int sockets::git_sockfd()const
+        int const &sockets::getSockfd()const
         {
             return (sockfd);
         }
-            
-        unsigned int &sockets::get_sock_addr_len()
+        
+        int const &sockets::getIndex() const
+        {
+            return (index);
+        }
+        
+        unsigned int sockets::getSock_addr_len()const
         {
             return (sock_addr_len);
+        }
+        
+        std::size_t const &sockets::getContent_length() const
+        {
+            return (content_length);
+        }
+        
+        int const &sockets::getPort() const{
+            return (port);
+        }
+        
+        void sockets::setContent_length(int const &len)
+        {
+            this->content_length = len;
         }
         
         bool sockets::start_server() 

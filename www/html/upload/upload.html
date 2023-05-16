@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>File Uploader</title>
-  <!-- <link rel="stylesheet" type="text/css" href="styles.css"> -->
+  <!-- <link rel="stylesheet" href="style.css"> -->
   <style>
     * {
     box-sizing: border-box;
@@ -102,13 +102,17 @@ video {
 <body>
   <header>
     <h1>File Uploader</h1>
-    <p>Select up to files to upload</p>
+    <p>Select up files to upload</p>
   </header>
   <main>
     <form action="http://localhost:8001/upload/" method="post" enctype="multipart/form-data">
       <div class="form-group">
         <label for="file1">File 1</label>
         <input type="file" name="file1" id="file1" accept=".jpg, .jpeg, .png, .pdf, .mp4" required>
+      </div>
+      <div class="form-group">
+        <label for="file2">File 2</label>
+        <input type="file" name="file2" id="file2" accept=".jpg, .jpeg, .png, .pdf, .mp4">
       </div>
       <button type="submit">Upload Files</button>
     </form>
