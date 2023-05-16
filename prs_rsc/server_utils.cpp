@@ -54,8 +54,6 @@ std::vector<server> ft_fill_servers(char **av)
                 continue;
             c  += search_char(line, '{');
             c -= search_char(line, '}');
-           // i = skip_spaces(line);
-
              if (is_world(&line[i], "server"))
                  j = 1;
             if (is_world(&line[i], "location"))
@@ -65,7 +63,6 @@ std::vector<server> ft_fill_servers(char **av)
                     std::cerr << "error something outside of server\n";
                     exit (1);
                 }
-              //  line = trimString(line);
                 std::string key = line + '\n';
                 while (!file.eof())
                 {
@@ -78,12 +75,12 @@ std::vector<server> ft_fill_servers(char **av)
                     if (search_char (line, '}'))
                     {
                         c -= search_char(line, '}'); 
-                        std::map<std::string, std::string>::const_iterator it = data.location.find(key);
-                        if (it != data.location.end())
-                        {
-                            std::cerr << "Error dupplicate location\n";
-                            exit (1);
-                        }
+                        // std::map<std::string, std::string>::const_iterator it = data.location.find(key);
+                        // if (it != data.location.end())
+                        // {
+                        //     std::cerr << "Error dupplicate location\n";
+                        //     exit (1);
+                        // }
                         data.location.insert(std::make_pair(key, map));
                         map.clear();
                         break;
@@ -120,10 +117,25 @@ std::vector<server> ft_fill_servers(char **av)
         std::cerr << "Error : not closed" << std::endl;
         exit (1);
     }
-
+    
     for (size_t i = 0; i < v.size(); i++)
     {
+        c = 0;
         server *s = new server(v[i], 1);
+        for (size_t i = 0; i < s->_location.size(); i++)
+        {
+            if (s->_location[i].location_name == "/")
+            {
+                c = 1;
+                break ;
+            }
+        }
+        if (c != 1)
+        {
+            std::cerr << "Error : missing location root\n";
+            delete (s);
+            exit (1);
+        }
         servers.push_back(*s);
         delete (s);
     }

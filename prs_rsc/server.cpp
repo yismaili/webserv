@@ -260,15 +260,18 @@ server::server(Data_config data, bool check_location)
             if (line.size() > 1)
             {
                 if (!is_world(line, "server") && !is_world(line, "location"))
-                    ft_error(line, "Error");
+                {
+                    ft_error(line, "Er1ror");
+                }
             }
             if(search_char(line, '{') > 1)
-                ft_error(line, "Error");
+                ft_error(line, "Er2ror");
         }
         std::string key, value;
         std::istringstream iss(line);
         iss >> key >> value;
         key = toLower(key);
+        //std::cout << "|"+key+"|" << std::endl;
         if (key == "server_name")
         {
             if(c_server_name)
@@ -443,11 +446,14 @@ server::server(Data_config data, bool check_location)
             if (line.size() > 1)
             {
                 if (!is_world(line, "server"))
-                    ft_error(line, "Error");
+                    ft_error(line, "Er4ror");
             }
         }
         else
-            ft_error(line, "Error");
+        {
+            //std::cout << key << std::endl;
+            ft_error(line, "Er3ror");
+        }
     }
 
     if(!c_allow_method && !check_location)
@@ -477,8 +483,17 @@ server::server(Data_config data, bool check_location)
         {
             location_data.data_server = it->second;
             location_name = it->first;
+            // std::cout << location_name << "---\n";
             location *l = new location(location_data, location_name);
             l->fill_rest(*this);
+            for (size_t i = 0; i < _location.size(); i++)
+            {
+                if (_location[i].location_name == l->location_name)
+                {
+                    std::cerr << "Error dupplicate location\n";
+                    exit (1);
+                }
+            }
             _location.push_back(*l);
             delete(l);
         }
