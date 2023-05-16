@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/16 16:53:58 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/16 18:00:25 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,7 +227,7 @@ namespace http{
 
     int http_sever::recv_data(int sockfd)
     {
-        char buffer[100024] = {0};
+        char buffer[1000204] = {0};
         int bytes_received;
         header_end = 0;
         content_len = 0;
@@ -293,7 +293,8 @@ namespace http{
         }
         request req(requist_data[sockfd], conf_fd[sockfd]->getContent_length());
         Respond   res(req, conf_fd[sockfd]->getIndex());
-        requist_data[sockfd] =  res.response_root(conf);  
+        requist_data[sockfd] =  res.response_root(conf); 
+        // std::cout<<"hey"<<std::endl; 
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
@@ -370,17 +371,19 @@ namespace http{
     
     int http_sever::send_data(int socket)
     {
-        // Keep track of how much data has been sent to a particular socket
         static std::map<int, std::size_t> sent_data;
-        // Send the data to the client
-        std::string data_to_send = requist_data[socket].substr(sent_data[socket], 1024);
-        long bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
+        std::string data_to_send;
+        long bytes_sent;
+
+        data_to_send = requist_data[socket].substr(sent_data[socket], 100024);
+        bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
         // Check for errors while sending data
         if (bytes_sent == -1)
         {
-            std::cout << "\033[31mError: Failed to send data to the socket\033[0m\n";
-            close(socket);
             sent_data[socket] = 0;
+            std::map<int, std::string>::iterator it = requist_data.find(socket);
+            requist_data.erase(it);
+            std::cout << "\033[31mError: Failed to send data to the socket\033[0m\n";
             return (-2);
         }
         else
@@ -390,15 +393,15 @@ namespace http{
             // If all data has been sent, erase the request information and return 0
             if (sent_data[socket] >= requist_data[socket].size())
             {
+                sent_data[socket] = 0;
+                std::cout << "\n\033[33mRESPONSE SENDED TO [" << conf_fd[socket]->getPort() << "]...\033[0m" << std::endl;
                 std::map<int, std::string>::iterator it = requist_data.find(socket);
                 requist_data.erase(it);
-                sent_data[socket] = 0;
-                std::cout << "\n\033[33mRESPONSE SENDED TO [" << conf_fd[socket]->getPort() << "]\033[0m" << std::endl;
                 return (0);
             }
-            // If there is still data to send, return 1
             else
             {
+                // If there is still data to send, return 1
                 return (1);
             }
         }
