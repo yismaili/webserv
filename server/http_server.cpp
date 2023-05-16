@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/16 18:00:25 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/16 18:22:26 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,6 +37,12 @@ namespace http{
         }
     }
     
+    // void signalHandler(int signal) 
+    // {
+    //     signal = 0;
+    //     // Do nothing or handle the signal as desired
+    // }
+    
     std::vector<http::sockets>::iterator http_sever::find_conf(int sockfd) 
     {
         std::vector<http::sockets>::iterator it = socket_id.begin();
@@ -55,6 +61,7 @@ namespace http{
     {
         int poll_ret, new_socket, recv_ret, sent_ret;
         unsigned long i = 0;
+        std::signal(SIGPIPE, SIG_IGN);
         // Add server socket to poll list
         std::vector<http::sockets>::iterator it = socket_id.begin();
         while (it != socket_id.end())
@@ -383,7 +390,6 @@ namespace http{
             sent_data[socket] = 0;
             std::map<int, std::string>::iterator it = requist_data.find(socket);
             requist_data.erase(it);
-            std::cout << "\033[31mError: Failed to send data to the socket\033[0m\n";
             return (-2);
         }
         else
