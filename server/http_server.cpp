@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/16 18:22:26 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/16 19:04:53 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -311,15 +311,15 @@ namespace http{
         std::string	body = "";
         std::string	chunks = ""; 
         std::string	subchunk = "";
-        std::size_t header_end;
+        // std::size_t header_end;
         std::size_t  pos; 
 
-        header_end = data.find("\r\n\r\n");
+        // header_end = data.find("\r\n\r\n");
         result.append(data.substr(0, header_end));
         result.append("\r\n\r\n");
         chunks = data.substr(data.find("\r\n\r\n") + 4, data.size() - 1);
         subchunk = chunks.substr(0, 9);
-        sizeof_chunk =  strtol(subchunk.c_str(), NULL, 16);
+        sizeof_chunk =  std::strtol(subchunk.c_str(), NULL, 16);
         pos = 0;
         while (true)
         {
@@ -327,8 +327,9 @@ namespace http{
             result.append(chunks.substr(pos += 2, sizeof_chunk));
             pos += sizeof_chunk + 2;
             subchunk = chunks.substr(pos , 9);
-            sizeof_chunk = strtol(subchunk.c_str(), NULL, 16);
-            if (sizeof_chunk == 0 && requist_data[sockfd].size() )
+            sizeof_chunk = std::strtol(subchunk.c_str(), NULL, 16);
+            // std::cout <<"---"<<sizeof_chunk<<std::endl;
+            if (sizeof_chunk == 0)
             {
                 result.append("\r\n\r\n");
                 read_info[sockfd] = true;
