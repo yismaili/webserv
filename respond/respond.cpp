@@ -10,13 +10,11 @@ Content-Length: 1234\r\n
 #include "respond.hpp"
 #include "../request/request.hpp"
 
-Respond::Respond()
+Respond::Respond(request& req, int index_) : r(req)
 {
     _http_version = "HTTP/1.1";
-    _response_body = "";
-    _status_code = "200";
+    _status_code = 200;
     _status_message = "OK";
-    // _document_root = "./www";
     _path_found = "";
     _is_cgi = false;
     _is_allowed_method = false;
@@ -24,8 +22,17 @@ Respond::Respond()
     _is_autoindex = false;
     _is_redirection = false;
     _is_index = false;
-    _boundary = r.get_header("Content-Type").substr(r.get_header("Content-Type").find("boundary=") + 9);
+    _boundary = r.get_boundary();
+    // _boundary = r.get_header("Content-Type").substr(r.get_header("Content-Type").find("boundary=") + 9);
     _upload_store = "";
+    _server_index = index_;
+    _location_index = 0;
+    _removed_path = "";
+    _path_info_founded = "";
+    _file_cgi = "";
+    _cache_control = "";
+    _last_boundary = false;
+    _mime_string = "";
 }
 
 Respond::~Respond()
@@ -52,12 +59,34 @@ void    Respond::set_header(std::string key, std::string value)
     _headers[key] = value;
 }
 
+void    Respond::set_date()
+{
+    std::time_t rawtime;
+    struct tm * timeinfo;
+    char buffer[80];
+
+    time (&rawtime);
+    timeinfo = localtime(&rawtime);
+    std::strftime(buffer, 80, "%a, %d %b %Y %X %Z", timeinfo);
+    _headers["Date"] = buffer;
+}
+
+void    Respond::set_last_modified()
+{
+    struct stat file_stats;
+    char buffer[80];
+
+    stat(_rooted_path.c_str(), &file_stats);
+    std::strftime(buffer, 80, "%a, %d %b %Y %X %Z", localtime(&file_stats.st_mtime));
+    _headers["Last-Modified"] = buffer;
+}
+
 std::string Respond::get_http_version()
 {
     return (_http_version);
 }
 
-std::string Respond::get_status_code()
+int Respond::get_status_code()
 {
     return (_status_code);
 }
@@ -66,13 +95,6 @@ std::string Respond::get_status_message()
 {
     return (_status_message);
 }
-
-
-std::string Respond::get_response_body()
-{
-    return (_response_body);
-}
-
 
 std::string Respond::get_header_line(std::string key)
 {
@@ -102,14 +124,66 @@ std::string Respond::get_document_root()
     return (_document_root);
 }
 
-int Respond::ft_parse_root_path()
+int Respond::ft_parse_root_path(std::vector<server> server)
 {
     struct stat file_stats;
-    _rooted_path = server.get_root() + _path_found;
-
+    _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path;
     if (!stat(_rooted_path.c_str(), &file_stats))
+    {
+        _file_cgi = _rooted_path;
         return (0);
-
+    }
     set_status_code(403);
+    set_status_message(get_response_status(get_status_code()));
     return (1);
+}
+
+void    Respond::set_response_body(std::string body)
+{
+    _response_body = body;
+}
+
+std::string Respond::get_path_info_founded()
+{
+    return (_path_info_founded);
+}
+
+std::string Respond::get_file_cgi()
+{
+    return (_file_cgi);
+}
+
+void    Respond::set_cache_control(std::string cache)
+{
+    _cache_control = cache;
+}
+
+std::string Respond::rtn_response()
+{
+    std::string response;
+
+    response = _http_version + " " + std::to_string(_status_code) + " " + _status_message + "\r\n";
+    for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
+        response += it->first + ": " + it->second + "\r\n";
+    response += "\r\n";
+    response += _response_body;
+    return (response);
+}
+
+void    Respond::init_response_body(std::string file, std::string _root)
+{
+    std::ifstream file_;
+    std::string line;
+
+    std::string f;
+    f = _root + "/" + file;
+    file_.open(f);
+    if (file_.is_open())
+    {
+        while (getline(file_, line))
+            _response_body += line + "\n";
+        file_.close();
+    }
+    else
+        std::cout << "Unable to open file" << std::endl;
 }

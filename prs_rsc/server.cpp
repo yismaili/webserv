@@ -16,16 +16,6 @@ std::string toUpper(std::string str) {
   return str;
 }
 
-// int count_lines(const std::string& str) {
-//     int count = 1;
-//     for (char c : str) {
-//         if (c == '\n') {
-//             count++;
-//         }
-//     }
-//     return count;
-// }
-
 bool isIpAddress(const std::string& ip) {
     int numDots = 0;
     std::string temp = "";
@@ -174,23 +164,24 @@ int ft_non_alphabetic(std::string value)
     return (0);
 }
 
-void ft_check_index(std::string index_file, std::string line)
-{
-    int i = index_file.find_last_of(".");
-    if (i == -1)
-        ft_error(line, "Error");
-    std::string filedot = index_file.substr(i + 1);
-    if (filedot != "html" && filedot != "php" && filedot != "htm" && filedot != "css"
-        && filedot != "js" && filedot != "jpg" && filedot != "jpeg" && filedot != "png" && filedot != "gif"
-        && filedot != "txt" && filedot != "xml" && filedot != "json") 
-            ft_error(line, "Error");
-}
+// void ft_check_index(std::string index_file, std::string line)
+// {
+//     int i = index_file.find_last_of(".");
+//     if (i == -1)
+//         ft_error(line, "Error");
+//     std::string filedot = index_file.substr(i + 1);
+//     if (filedot != "html" && filedot != "php" && filedot != "htm" && filedot != "css"
+//         && filedot != "js" && filedot != "jpg" && filedot != "jpeg" && filedot != "png" && filedot != "gif"
+//         && filedot != "txt" && filedot != "xml" && filedot != "json") 
+//             ft_error(line, "Error");
+// }
 
 void check_methods(std::string method, std::string line)
 {
-    if (method != "get" && method != "post" && method != "put" && method != "delete" && method != "head"
-        && method != "options" && method != "connect" && method != "trace")
-            ft_error(line, "Error is not method");
+    method = toLower(method);
+    if (method != "get" && method != "post" && method != "delete")
+              ft_error(line, "Error this method is not allowed");
+
 }
 
 std::string ft_method(std::string value, std::string line, std::vector<std::string> v)
@@ -201,26 +192,29 @@ std::string ft_method(std::string value, std::string line, std::vector<std::stri
     std::vector<std::string>::iterator it = std::find(v.begin(), v.end(), value);
     if(it != v.end())
         ft_error(line, "error duplicate index");
+
     return (value);
 }
 
 int is_world(std::string str, std::string tmp)
 {
     int i = 0;
-
-    while (str[i] && !isspace(str[i]))
+    if (str.size() < 2)
+        return(0);
+    while (str[i] && !isspace(str[i]) && str[i] != '{')
     {
         if(tmp[i] != str[i])
             return (0);
         i++;
     }
-    if(isspace(str[i]))
+    if(isspace(str[i]) || !str[i] || str[i] == '{')
         return (1);
     return(0);
 }
 
+
 server::server(Data_config data, bool check_location) 
-     : _root("/var/www"), _client_max_body_size(1048576)
+     : _root("./www/html"), _client_max_body_size(1048576)
 {
     std::istringstream ss(data.data_server);
     std::string line;
@@ -233,7 +227,7 @@ server::server(Data_config data, bool check_location)
     int c_listen = 0;
     int c_index = 0;
     int c_error_page = 0;
-    int c_rediriction = 0;
+    int c_redirection = 0;
     int c_upload = 0;
     int c_upload_store = 0;
     while (getline(ss, line))
@@ -242,7 +236,6 @@ server::server(Data_config data, bool check_location)
             continue;
         if (!search_char(line, '}') && !search_char(line, '{'))
         {
-            
             if (line.find(';') != line.size() - 1)
             {
                 std::cerr << "missing ; in " << line << std::endl;
@@ -291,6 +284,9 @@ server::server(Data_config data, bool check_location)
             int port = ft_number(value, line);
             if (port < 1 || port > 65535)
                 ft_error(line, "Error");
+            std::vector<int>::iterator it = std::find(_listen.begin(), _listen.end(), port);
+            if(it != _listen.end())
+                ft_error(line, "duplicate port");
             _listen.push_back(port);
             while (iss >> value)
             {
@@ -353,6 +349,7 @@ server::server(Data_config data, bool check_location)
         {
             is_empty_value(value, line);
             value = ft_method(value, line, _allow_methods);
+            check_methods(value, line);
             _allow_methods.push_back(value);
             while (iss >> value)
             {
@@ -379,7 +376,7 @@ server::server(Data_config data, bool check_location)
         }
         else if (key == "return" && !check_location)
         {
-            if (c_rediriction)
+            if (c_redirection)
                 ft_error(line, "Error duplicated rederiction");
             is_empty_value(value, line);
             int status = ft_number(value, line);
@@ -389,8 +386,8 @@ server::server(Data_config data, bool check_location)
             is_empty_value(value, line);
             if (ft_numbers_value(iss) )
                 ft_error(line, "Error");
-            _rediriction = std::make_pair(status, value);
-            c_rediriction++;
+            _redirection = std::make_pair(status, value);
+            c_redirection++;
         }
         else if (key == "path_info" && !check_location)
         {
@@ -434,12 +431,18 @@ server::server(Data_config data, bool check_location)
         {
             if (line.size() > 1)
             {
-                if (!is_world(line, "server") && !is_world(line, "location"))
+                if (!is_world(line, "server"))
+                {
+
+                    std::cout << check_location << std::endl;
                     ft_error(line, "Error");
+                }
             }
         }
         else
+        {
             ft_error(line, "Error");
+        }
     }
 
     if(!c_allow_method && !check_location)
@@ -471,6 +474,15 @@ server::server(Data_config data, bool check_location)
             location_name = it->first;
             location *l = new location(location_data, location_name);
             l->fill_rest(*this);
+            for (size_t i = 0; i < _location.size(); i++)
+            {
+                if (_location[i].location_name == l->location_name)
+                {
+                    std::cerr << "Error dupplicate location\n";
+                    delete(l);
+                    exit (1);
+                }
+            }
             _location.push_back(*l);
             delete(l);
         }
@@ -487,9 +499,7 @@ void server::display_sever()
     for (size_t i = 0; i < _server_name.size(); i++) 
         std::cout << _server_name[i] << " ";
     std::cout << std::endl;
-    std::cout << "Index : " << _index << "\n";
-    // for (size_t i = 0; i < _index.size(); i++) 
-    //     std::cout << _index[i] << " ";
+    std::cout << "Index : " << _index ;
     std::cout << std::endl;
     std::cout << "hostname : " << _host << std::endl;
     std::cout << "root : " << _root << std::endl;
@@ -506,8 +516,11 @@ void server::display_sever()
         std::cout << "on\n";
     else
          std::cout << "of\n";
-    std::cout << "rederiction : " << _rediriction.first << ", " << _rediriction.second << '\n';
-    std::cout << "upload_store :"<< _upload_store << "\n"; 
+    std::cout << "rederiction : " << _redirection.first << ", " << _redirection.second << '\n';
+    std::cout << "upload_store :"<< _upload_store << "\n";
+    std::cout << "path_info : \n";
+    for(std::map<std::string, std::string>::const_iterator it = _path_info.begin(); it != _path_info.end(); ++it)
+        std::cout << it->first << "  "<< it->second<< "\n";
 }
 
 std::string server::get_index() const
@@ -555,9 +568,9 @@ int server::get_client_max_body_size() const
     return(_client_max_body_size);
 }
 
-std::pair <int , std::string> server::get_rediriction() const
+std::pair <int , std::string> server::get_redirection() const
 {
-    return (_rediriction);
+    return (_redirection);
 }
 
 std::string server::get_upload_store() const
@@ -582,7 +595,7 @@ server& server::operator=(const server& o)
         this->_client_max_body_size = o._client_max_body_size;
         this->_error_page = o._error_page;
         this->_allow_methods = o._allow_methods;
-        this->_rediriction = o._rediriction;
+        this->_redirection = o._redirection;
         this->_path_info = o._path_info;
         this->_upload_store = o._upload_store;
         this->_autoindex = o._autoindex;
@@ -591,6 +604,11 @@ server& server::operator=(const server& o)
         this->_location = o._location;
     }
     return (*this);
+}
+
+bool server::get_upload() const
+{
+    return(_upload);
 }
 
 server::server(const server& o)

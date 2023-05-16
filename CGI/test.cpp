@@ -42,10 +42,10 @@ void extract_path(std::string location_name) {
 	int end = i;
 	//std::cout << location_name[end] << " " << end <<  "\n";
 	std::string path;
-	std::cout << location_name << "\n";
-	std::cout << start << " " << end << "\n";
+	//std::cout << location_name << "\n";
+	//std::cout << start << " " << end << "\n";
 	path = location_name.substr(start, end );
-	std::cout << path << "\n";
+	//std::cout << path << "\n";
     // // Extract the substring from the path name up to the closing curly brace character
     // std::string path = location_name.substr(pos);
     // size_t end_pos = path.find('}');

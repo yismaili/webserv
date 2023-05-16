@@ -1,11 +1,4 @@
-#include <iostream>
-#include <fcntl.h>
-#include <unistd.h>
-#include <vector>
-#include <map>
-#include <string>
-#include "../request/request.hpp"
-#include "../respond/respond.hpp"
+#include "cgi.hpp"
 
 
     // env["SERVER_SOFTWARE"] = "=webserv/1.0";
@@ -36,6 +29,8 @@
 	this->_env.push_back("HTTP_COOKIE=" + req.getHeadr("Cookie"));*/
 std::map<std::string, std::string>get_env(char *file, request req)
 {
+    //(void)file;
+    //(void)req;
     std::map<std::string, std::string> env;
 
     env["SERVER_SOFTWARE"] = "MyServer/1.0";
@@ -98,8 +93,9 @@ void set_headers_cgi(std::string output, Respond &res) {
     bool headers_finished = false;
 
     put_cookie(output, res);
+    body =+ "<!DOCTYPE html>";
     while (std::getline(ss, line)) {
-        if (line.empty()) {
+        if (line == "\r") {
             headers_finished = true;
             continue;
         }
@@ -111,17 +107,26 @@ void set_headers_cgi(std::string output, Respond &res) {
                 if(key != "Set-Cookie")
                     res.set_header(key, value);
             }
-        } else {
-            body += line;
+        } 
+        else 
+        {
+         //   std::cout << line << "\n";
+            body += line + "\n";
         }
     }
     res.set_response_body(body);
 }
 
 
-std::string run_cgi(char *file, char *path, request &r,  Respond &res)
+std::string run_cgi(request &r,  Respond &res)
 {
+    // puts("heeeeeeeeerererere");
+    char *file, *path;
+    file = strdup(res.get_file_cgi().c_str());
+    path = strdup(res.get_path_info_founded().c_str()); 
+   // std::cout << path << " " << file << std::endl;
     char *cmd[3] = {path, file, NULL};
+
     std::string cgi_str;
 
     FILE *temp = std::tmpfile();
@@ -147,7 +152,8 @@ std::string run_cgi(char *file, char *path, request &r,  Respond &res)
     if (pid == -1) 
     {
         res.set_status_code(500);
-        return ;
+        res.set_status_message(res.get_response_status(res.get_status_code()));
+        return NULL;
     }
     else if (pid == 0)
     {
@@ -174,8 +180,11 @@ std::string run_cgi(char *file, char *path, request &r,  Respond &res)
 
     int status;
     waitpid(pid, &status, 0);
-    if (WIFSIGNALED(status) || status != 0) 
+    if (WIFSIGNALED(status) || status != 0)
+    {
         res.set_status_code(500);
+        res.set_status_message(res.get_response_status(res.get_status_code()));
+    }
     char buf[1];
     std::string content;
     int byt;
@@ -183,6 +192,8 @@ std::string run_cgi(char *file, char *path, request &r,  Respond &res)
     while ((byt = read(fdtemp, buf, 1)) > 0){
         content.append(buf, 1);
     }
+    //std::cout << content <<std::endl;
+    //puts("heeeeere");
     if (byt == -1)
         std::cerr << "Error: failed to read output\n";
     // if (content.find("Content-Type:") == std::string::npos) {
@@ -193,13 +204,24 @@ std::string run_cgi(char *file, char *path, request &r,  Respond &res)
     close(fdtemp);
     close(fdtemp1);
 
-    put_cookie(content, res);
+    //put_cookie(content, res);
+   // std::cout << "Content :::::::::::\n" << content << std::endl;
+    set_headers_cgi(content, res);
+   // std::cout << "body :: \n" << res.get_response_body() << std::endl;
+    //std::cout << content << std::endl;
     return (content);
 }
 
-// std::string run_cgi(char *file, char *path)
+// std::string run_cgi(request &r,  Respond &res)
 // {
+
+//     (void)r;
+//     char *file, *path;
+
+//     file = strdup(res.get_file_cgi().c_str());
+//     path = strdup(res.get_path_info_founded().c_str()); 
 //     char *cmd[3] = {path, file, NULL};
+//     std::cout << cmd[0] << " " << cmd[1] << std::endl;
 //     std::string cgi_str;
 
 //     FILE *temp = std::tmpfile();
@@ -274,7 +296,7 @@ std::string run_cgi(char *file, char *path, request &r,  Respond &res)
 //     close(fdtemp);
 //     close(fdtemp1);
 
-//     put_cookie(content);
+//     //put_cookie(content);
 //     return (content);
 // }
 

@@ -3,40 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/30 18:28:34 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/14 16:04:23 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "request.hpp"
 
-typedef void (request::*encoding_handler)(std::string &body);
-
-encoding_handler    handlers[] = 
-{
-    &request::handle_chunked_encoding,
-    &request::handle_compress_encoding,
-    &request::handle_deflate_encoding,
-    &request::handle_gzip_encoding
-};
-
-const std::string  supported_encodings[] = 
-{
-    "chunked",
-    "compress",
-    "deflate",
-    "gzip"
-};
-
-request::request()
+request::request() : _method(""), _uri(""), _version(""),
+    _body(""), _port(80), _query("")
 {
     return ;
 }
 
-request::request(std::string request)
+request::request(std::string request, size_t content_len) : _method(""), _uri(""), _version(""),
+    _body(""), _port(80), _query(""), _content_len(content_len)
 {
+    add_header("Content-Length", std::to_string(_content_len));
     this->parse_request(request);
     return ;
 }
@@ -61,6 +46,9 @@ request &request::operator=(const request &src)
         this->_version = src._version;
         this->_headers = src._headers;
         this->_body = src._body;
+        this->_port = src._port;
+        this->_query = src._query;
+        this->_content_len = src._content_len;
     }
     return (*this);
 }
@@ -123,8 +111,16 @@ std::map<std::string, std::string> request::get_headers() const
     return (this->_headers);
 }
 
+size_t  request::get_content_length() const
+{
+    return (this->_content_len);
+}
+
 void request::parse_request(std::string request)
 {
+    // std::cout << "___________33______" << std::endl;
+    // std::cout << request << std::endl;
+    //     std::cout << "________55_________" << std::endl;
     // Split the request into lines
     std::vector<std::string> lines;
     std::istringstream iss(request);
@@ -137,6 +133,7 @@ void request::parse_request(std::string request)
         lines.push_back(line);
     }
     // Parse the request line
+    // std::cout << lines[0] << std::endl;
     std::istringstream request_line(lines[0]);
     request_line >> this->_method >> this->_uri >> this->_version;
     // i need to call a function to check if the request line content is suitable or not
@@ -154,7 +151,8 @@ void request::parse_request(std::string request)
         // Trim leading and trailing whitespaces from the value
         value.erase(0, value.find_first_not_of(" \t\r"));
         value.erase(value.find_last_not_of(" \t\r") + 1);
-        this->_headers[key] = value;
+        if (this->_headers.find(key) == this->_headers.end())
+            this->_headers[key] = value;
     }
 
     // function that checks if the request is POST or PUT to see if there is no content-length to return error
@@ -182,96 +180,46 @@ void request::parse_request(std::string request)
         exit(1);
     }
     ft_parse_port(this->get_header("Host"));
-    ft_parse_language_charset();
+    // ft_parse_language_charset();
 
     // Parse the request body
     std::string content_len_str = this->get_header("Content-Length");
-    if (!content_len_str.empty())
+    if (content_len_str != "")
     {
         size_t content_len = std::stoi(content_len_str);
-        this->_body = lines.back().substr(0, content_len);
-        std::string transfer_encoding = this->get_header("Accept-Encoding");
-        if (!transfer_encoding.empty())
+        if (content_len > request.size())
         {
-            // using pointers to member functions to call the functions handlers
-            std::vector<std::string> encoding_types;
-            size_t startPos = 0;
-            size_t endPos = transfer_encoding.find(',');
-            while (endPos != std::string::npos)
-            {
-                encoding_types.push_back(transfer_encoding.substr(startPos, endPos - startPos));
-                startPos = endPos + 1;
-                endPos = transfer_encoding.find(',', startPos);
-            }
-            encoding_types.push_back(transfer_encoding.substr(startPos, endPos - startPos));
-            for (std::vector<std::string>::const_iterator it = encoding_types.begin(); it != encoding_types.end(); ++it)
-            {
-                std::string type_tmp = *it;
-                // Trim leading and trailing whitespaces from the value
-                // type_tmp.erase(0, type_tmp.find_first_not_of(" \t"));
-                // type_tmp.erase(type_tmp.find_first_not_of(" \t") + 1);
-                bool supported = false;
-                for (size_t i = 0; i < sizeof(handlers) / sizeof(handlers[0]); ++i)
-                {
-                    if (type_tmp == supported_encodings[i])
-                    {
-                        (this->*handlers[i])(this->_body);
-                        supported = true;
-                        break;
-                    }
-                }
-                if (!supported)
-                    std::cerr << "Unsupported encoding type: " << type_tmp << std::endl;
-            }
-            
+            std::cerr << "Invalid Content-Length" << std::endl;
+            exit(1);
         }
+        this->_body = request.substr(request.size() - content_len);
+        // std::cout << "S T A R T     O F     REQUEST     B O D Y" << std::endl;
+        // std::cout << this->_body << std::endl;
+        // std::cout << "E N D     O F     REQUEST     B O D Y" << std::endl;
     }
     else
     {
-        if (this->_headers.find("Content-Length") != this->_headers.end() || this->_method == "POST" || this->_method == "PUT"
-            || this->_headers.find("Content-Type") != this->_headers.end())
+        if (content_len_str == "" || this->_method == "POST")
             {
-                std::cerr << "Body request is missing" << std::endl;
-                exit(1);
+                set_body("");
+                return ;
             }
         
     }
 }
 
-
-void    request::handle_chunked_encoding(std::string &body)
+void    request::print_request()
 {
-    std::stringstream ss(body);
-    std::string line;
-    std::stringstream decoded;
-    while (std::getline(ss, line))
-    {
-        std::stringstream size_ss(line);
-        int chunk_size;
-        size_ss >> std::hex >> chunk_size;
-        if (chunk_size == 0) // end of chunks
-            break;
-        std::string chunk(chunk_size, ' ');
-        ss.read(&chunk[0], chunk_size);
-        decoded << chunk;
-    }
-    body = decoded.str();
+    std::cout << "Method: " << this->_method << std::endl;
+    std::cout << "URI: " << this->_uri << std::endl;
+    std::cout << "Version: " << this->_version << std::endl;
+    std::cout << "Headers:" << std::endl;
+    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
+        std::cout << it->first << ": " << it->second << std::endl;
+    std::cout << "Body: " << this->_body << std::endl;
 }
 
-void    request::handle_gzip_encoding(std::string &body)
+std::string request::get_boundary() const
 {
-    (void)body;
-    std::cerr << "Unsupport gzip encoding" << std::endl;
-}
-
-void    request::handle_compress_encoding(std::string &body)
-{
-    (void)body;
-    std::cerr << "Unsupport compress encoding" << std::endl;
-}
-
-void    request::handle_deflate_encoding(std::string &body)
-{
-    (void)body;
-    std::cerr << "Unsupport deflate encoding" << std::endl;
+    return (this->_boundary);
 }
