@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/16 00:46:25 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/16 09:46:48 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -229,7 +229,7 @@ namespace http{
         if (bytes_received <= 0)
         {
             close(sockfd);
-            std::cout<<"connection was closed\n";
+           // std::cout<<"connection was closed\n";
             return (-2);
         }
         requist_data[sockfd].append(std::string(buffer, bytes_received));
@@ -283,7 +283,6 @@ namespace http{
             std::size_t header_end = requist_data[sockfd].find("\r\n\r\n");
             conf_fd[sockfd]->content_length = requist_data[sockfd].size() - (header_end + 4);
         }
-        std::cout<<"hi\n";
         request req(requist_data[sockfd], conf_fd[sockfd]->content_length);
         Respond   res(req, conf_fd[sockfd]->index);
         requist_data[sockfd] =  res.response_root(conf);  
