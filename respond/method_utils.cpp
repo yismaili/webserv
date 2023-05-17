@@ -89,7 +89,7 @@ int Respond::ft_handle_index(std::vector<server> server)
         if (_mime_index != std::string::npos)
             _mime_string = index.substr(_mime_index + 1);
         std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
-        _rooted_path = server[_location_index].get_root() + _removed_path + index;
+        _rooted_path = server[_server_index].get_root() + _removed_path + index;
         if (ft_handle_index_2(file))
             return (1);
     }

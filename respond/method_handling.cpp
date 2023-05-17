@@ -16,6 +16,7 @@ void    Respond::handle_get_response(std::vector<server> servers)
 {
     // std::cout << "+++WE+wewew=+______-__--_--___" << std::endl;
     // step 2: check if it's a CGI or not (like if `index` of the configuration file has .py or .php...etc)
+
     if (_is_cgi == true)
     {
         run_cgi(r, *this);
@@ -27,6 +28,7 @@ void    Respond::handle_get_response(std::vector<server> servers)
         ft_handle_file();
         return ;
     }
+    //puts("heeeeeeelo");
     // else
     // {
     //     std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;

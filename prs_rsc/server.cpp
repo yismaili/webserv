@@ -358,7 +358,7 @@ server::server(Data_config data, bool check_location)
             }
             c_allow_method++;
         }
-        else if (key == "autoindex")
+        else if (key == "autoindex" && !check_location)
         {
             if (c_autoindex)
                 ft_error(line, "Error duplicated");
@@ -468,23 +468,21 @@ server::server(Data_config data, bool check_location)
         Data_config location_data;
         std::string location_name;
         std::ostringstream oss;
-        for (std::map<std::string, std::string>::const_iterator it = data.location.begin(); it != data.location.end(); ++it) 
+        for (std::map<std::string, std::string>::iterator it = data.location.begin(); it != data.location.end(); ++it) 
         {
             location_data.data_server = it->second;
             location_name = it->first;
-            location *l = new location(location_data, location_name);
-            l->fill_rest(*this);
+            location l = location(location_data, location_name);
+            l.fill_rest(*this);
             for (size_t i = 0; i < _location.size(); i++)
             {
-                if (_location[i].location_name == l->location_name)
+                if (_location[i].location_name == l.location_name)
                 {
                     std::cerr << "Error dupplicate location\n";
-                    delete(l);
                     exit (1);
                 }
             }
-            _location.push_back(*l);
-            delete(l);
+            _location.push_back(l);
         }
     }
 }

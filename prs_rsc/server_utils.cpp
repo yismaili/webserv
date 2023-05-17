@@ -79,7 +79,6 @@ std::vector<server> ft_fill_servers(char **av)
                     }
                     c  += search_char(line, '{');
                     kws += search_char(line, '{');
-
                 }
              }
             if (kws >  1)

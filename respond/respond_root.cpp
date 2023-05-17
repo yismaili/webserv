@@ -21,6 +21,9 @@ std::string Respond::response_root(std::vector<server> servers)
     // std::cout << "request body: " << r.get_body() << std::endl;
     // std::cout << "r method: " << r.get_method() << std::endl;
     // std::cout << "uri: " << r.get_uri() << std::endl;
+
+
+
     init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     if (ft_parse_location(servers))
@@ -59,6 +62,7 @@ std::string Respond::response_root(std::vector<server> servers)
     else // unsupported http method
         handle_error_response(405);
 
+    
     // rtn response
     return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
 }
