@@ -214,15 +214,7 @@ int is_world(std::string str, std::string tmp)
 
 
 server::server(Data_config data, bool check_location) 
-<<<<<<< HEAD
-<<<<<<< HEAD
-     : _root("/www/html"), _client_max_body_size(1048576)
-=======
      : _root("./www/html"), _client_max_body_size(1048576)
->>>>>>> snouae
-=======
-     : _root("./www/html"), _client_max_body_size(1048576)
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 {
     std::istringstream ss(data.data_server);
     std::string line;
@@ -240,8 +232,6 @@ server::server(Data_config data, bool check_location)
     int c_upload_store = 0;
     while (getline(ss, line))
     {
-        // if (!check_location)
-        //     std::cout << line << std::endl;
         if(line.empty() || line[0] == '#')
             continue;
         if (!search_char(line, '}') && !search_char(line, '{'))
@@ -259,18 +249,15 @@ server::server(Data_config data, bool check_location)
             if (line.size() > 1)
             {
                 if (!is_world(line, "server") && !is_world(line, "location"))
-                {
-                    ft_error(line, "Er1ror");
-                }
+                    ft_error(line, "Error");
             }
             if(search_char(line, '{') > 1)
-                ft_error(line, "Er2ror");
+                ft_error(line, "Error");
         }
         std::string key, value;
         std::istringstream iss(line);
         iss >> key >> value;
         key = toLower(key);
-        //std::cout << "|"+key+"|" << std::endl;
         if (key == "server_name")
         {
             if(c_server_name)
@@ -445,28 +432,16 @@ server::server(Data_config data, bool check_location)
             if (line.size() > 1)
             {
                 if (!is_world(line, "server"))
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
                 {
 
                     std::cout << check_location << std::endl;
->>>>>>> snouae
                     ft_error(line, "Error");
                 }
-=======
-                    ft_error(line, "Er4ror");
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
             }
         }
         else
         {
-<<<<<<< HEAD
             ft_error(line, "Error");
-=======
-            //std::cout << key << std::endl;
-            ft_error(line, "Er3ror");
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
         }
     }
 
@@ -474,8 +449,6 @@ server::server(Data_config data, bool check_location)
         _allow_methods.push_back("GET");
     if (!c_listen && check_location)
         _listen.push_back(80);
-    // if (!c_index && check_location)
-    //     _index = "index.html";
     if (!c_host && check_location)
         _host = "127.0.0.1";
     if(!c_error_page && check_location)
@@ -497,31 +470,17 @@ server::server(Data_config data, bool check_location)
         {
             location_data.data_server = it->second;
             location_name = it->first;
-<<<<<<< HEAD
             location l = location(location_data, location_name);
             l.fill_rest(*this);
             for (size_t i = 0; i < _location.size(); i++)
             {
                 if (_location[i].location_name == l.location_name)
-=======
-            // std::cout << location_name << "---\n";
-            location *l = new location(location_data, location_name);
-            l->fill_rest(*this);
-            for (size_t i = 0; i < _location.size(); i++)
-            {
-                if (_location[i].location_name == l->location_name)
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
                 {
                     std::cerr << "Error dupplicate location\n";
                     exit (1);
                 }
             }
-<<<<<<< HEAD
             _location.push_back(l);
-=======
-            _location.push_back(*l);
-            delete(l);
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
         }
     }
 }
@@ -537,11 +496,6 @@ void server::display_sever()
         std::cout << _server_name[i] << " ";
     std::cout << std::endl;
     std::cout << "Index : " << _index ;
-<<<<<<< HEAD
-    // for (size_t i = 0; i < _index.size(); i++) 
-    //     std::cout << _index[i] << " ";
-=======
->>>>>>> snouae
     std::cout << std::endl;
     std::cout << "hostname : " << _host << std::endl;
     std::cout << "root : " << _root << std::endl;

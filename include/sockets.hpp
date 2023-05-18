@@ -46,14 +46,7 @@ namespace http{
             unsigned int sock_addr_len;
             std::string ip_addr;
             int index;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
             std::size_t content_length;
->>>>>>> snouae
-=======
-            std::size_t content_length;
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
     };
 }
 #endif

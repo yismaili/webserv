@@ -6,15 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-<<<<<<< HEAD
-<<<<<<< HEAD
-/*   Updated: 2023/05/02 21:13:31 by yismaili         ###   ########.fr       */
-=======
 /*   Updated: 2023/05/15 22:04:05 by yismaili         ###   ########.fr       */
->>>>>>> snouae
-=======
-/*   Updated: 2023/05/15 22:04:05 by yismaili         ###   ########.fr       */
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,16 +21,7 @@ namespace http{
         sockets::~sockets()
         {
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-    
-    //Assign a port to socket
-=======
          //Assign a port to socket
->>>>>>> snouae
-=======
-         //Assign a port to socket
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
         sockets &sockets::init_data(int port_, std::string ip_add, int index_)
         {
             sockfd =  -1;
@@ -46,16 +29,6 @@ namespace http{
             sock_addr_len = 0;
             ip_addr = ip_add;
             index = index_;
-<<<<<<< HEAD
-<<<<<<< HEAD
-            // AF stands for Address Family and PF stands for Protocol Family
-            // This construct holds the information about the address family, port number, Internet address
-            serv_addr.sin_family = AF_INET; // Address family // IPv4 Internet protocols    !!!get add info
-            serv_addr.sin_addr.s_addr = inet_addr(ip_addr.c_str());  // Internet "address inet_addr(ip_addr.c_str());"
-            serv_addr.sin_port = htons(port); // Port number // Network to Host Shor
-=======
-=======
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
             
             memset(&hints, 0, sizeof(hints));
             hints.ai_family = AF_UNSPEC;
@@ -69,10 +42,6 @@ namespace http{
                 std::cout << "\033[31mGetaddrinfo error\033[0m\n";
                 exit(EXIT_FAILURE);
             }
-<<<<<<< HEAD
->>>>>>> snouae
-=======
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
             if(start_server() == false){
                 exit(1);
             }

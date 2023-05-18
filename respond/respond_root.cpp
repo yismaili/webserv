@@ -6,15 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-<<<<<<< HEAD
-<<<<<<< HEAD
-/*   Updated: 2023/05/13 20:47:24 by aoumad           ###   ########.fr       */
-=======
 /*   Updated: 2023/05/15 21:59:21 by yismaili         ###   ########.fr       */
->>>>>>> snouae
-=======
-/*   Updated: 2023/05/15 21:59:21 by yismaili         ###   ########.fr       */
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,21 +19,8 @@ std::string Respond::response_root(std::vector<server> servers)
     // std::cout << "content type: " << r.get_header("Content-Type") << std::endl;
     // std::cout << "content length: " << r.get_header("Content-Length") << std::endl;
     // std::cout << "request body: " << r.get_body() << std::endl;
-<<<<<<< HEAD
-<<<<<<< HEAD
-    std::cout << "r method: " << r.get_method() << std::endl;
-    std::cout << "uri: " << r.get_uri() << std::endl;
-=======
     // std::cout << "r method: " << r.get_method() << std::endl;
     // std::cout << "uri: " << r.get_uri() << std::endl;
-
-
-
->>>>>>> snouae
-=======
-    // std::cout << "r method: " << r.get_method() << std::endl;
-    // std::cout << "uri: " << r.get_uri() << std::endl;
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
     init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     if (ft_parse_location(servers))
@@ -69,7 +48,7 @@ std::string Respond::response_root(std::vector<server> servers)
         return (rtn_response());
     }
     // step 5 : check the autoindex
-    ft_check_autoindex(servers);
+    //ft_check_autoindex(servers);
     // methods area
     if (r.get_method() == "GET")
         handle_get_response(servers);
@@ -80,10 +59,6 @@ std::string Respond::response_root(std::vector<server> servers)
     else // unsupported http method
         handle_error_response(405);
 
-<<<<<<< HEAD
-=======
-    
->>>>>>> snouae
     // rtn response
     return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
 }
@@ -94,20 +69,10 @@ int Respond::exact_location(std::vector<server> server, std::string path)
         {
             if (server[_server_index]._location[j].location_name == path)
             {
-<<<<<<< HEAD
-<<<<<<< HEAD
-                
-=======
-=======
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
             //     std::cout << "path :" << path << std::endl;
             //     std::cout << server[_server_index]._location[j].get_root() << std::endl;
             //    std::cout << server[_server_index]._location[j].get_index() << std::endl;
 
-<<<<<<< HEAD
->>>>>>> snouae
-=======
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
                 _location_index = j;
                 _path_found = server[_server_index]._location[j].location_name;
                 return (0);
@@ -178,39 +143,15 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
 
 int Respond::root_location(std::vector<server> server)
 {
-<<<<<<< HEAD
-<<<<<<< HEAD
-    for (size_t i = 0; i < server.size(); i++)
-=======
-    for (size_t j = 0; j < server[_server_index]._location.size(); j++)
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
-    {
-        if (server[_server_index]._location[j].location_name == "/")
-        {
-<<<<<<< HEAD
-            if (server[i]._location[j].location_name == "/")
-            {
-                _server_index = i;
-                _location_index = j;
-                _path_found = server[i]._location[j].location_name;
-                return (0);
-            }
-=======
     for (size_t j = 0; j < server[_server_index]._location.size(); j++)
     {
         if (server[_server_index]._location[j].location_name == "/")
         {
-=======
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
             _location_index = j;
             _path_found = server[_server_index]._location[j].location_name;
             // std::cout << "path found: " << _path_found << std::endl;
             // std::cout << "root: " << server[_server_index]._location[j].get_root() << std::endl;
             return (0);
-<<<<<<< HEAD
->>>>>>> snouae
-=======
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
         }
     }
     return (1);
@@ -219,14 +160,7 @@ int Respond::root_location(std::vector<server> server)
 int Respond::ft_parse_location(std::vector<server> server)
 {
     std::string path = r.get_uri();
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
   //  std::cout << "___--_-______-_---______--__---____---_____---------__---_------------" << std::endl;
->>>>>>> snouae
-=======
-  //  std::cout << "___--_-______-_---______--__---____---_____---------__---_------------" << std::endl;
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
     // exact location body code
     if (exact_location(server, path) == 0)
         return (0);

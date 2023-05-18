@@ -6,15 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-<<<<<<< HEAD
-<<<<<<< HEAD
-/*   Updated: 2023/05/13 18:19:31 by aoumad           ###   ########.fr       */
-=======
 /*   Updated: 2023/05/15 22:25:18 by yismaili         ###   ########.fr       */
->>>>>>> snouae
-=======
-/*   Updated: 2023/05/15 22:25:18 by yismaili         ###   ########.fr       */
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,14 +14,7 @@
 #include "../prs_rsc/server.hpp"
 
 namespace http{
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
     
->>>>>>> snouae
-=======
-    
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
    http_sever::http_sever(std::vector<server> conf_) :sock()
    {
         for (size_t i = 0; i < conf_.size(); i++)
@@ -108,15 +93,7 @@ namespace http{
                         // Add new socket to poll list
                         pollfd new_client_pollfd;
                         new_client_pollfd.fd = new_socket;
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        new_client_pollfd.events = POLLIN;
-=======
                         new_client_pollfd.events = POLLIN ;
->>>>>>> snouae
-=======
-                        new_client_pollfd.events = POLLIN ;
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
                         read_info.insert(std::make_pair(new_socket, false));
                         requist_data.insert(std::make_pair(new_socket, ""));
                         clients.push_back(new_client_pollfd);
@@ -124,14 +101,6 @@ namespace http{
                     else
                     {
                         recv_ret = recv_data(clients[i].fd);
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        
-                        if (!recv_ret)
-                        {
-                            unchunk(clients[i].fd);
-                            std::cout << "-------WRITEING.....-----\n";
-=======
                         if (recv_ret == -2)
                         {
                             requist_data[clients[i].fd] = build_response();
@@ -145,48 +114,11 @@ namespace http{
                         else if (!recv_ret)
                         {
                             unchunk(clients[i].fd);
->>>>>>> snouae
-=======
-                        if (recv_ret == -2)
-                        {
-                            requist_data[clients[i].fd] = build_response();
-                            send_data(clients[i].fd);
-                            requist_data[clients[i].fd].erase();
-                            close(clients[i].fd);
-                            std::vector<pollfd>::iterator it = clients.begin() + i;
-                            clients.erase(it);
-                            i--;
-                        }
-                        else if (!recv_ret)
-                        {
-                            unchunk(clients[i].fd);
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
                             clients[i].events = POLLOUT;
                         }
                     }
                 }
                else if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
-<<<<<<< HEAD
-<<<<<<< HEAD
-                {   //std::cout << "-------.....-----\n";
-                   std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
-=======
-                {
-                    std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
->>>>>>> snouae
-                    std::vector<pollfd>::iterator it = clients.begin() + i;
-                    std::map<int, bool>::iterator it_read =read_info.find(clients[i].fd);
-                    sent_ret = send_data(clients[i].fd);
-<<<<<<< HEAD
-                    // if (sent_ret == 1){
-                    //     clients[i].events = POLLOUT;
-                    // }
-=======
-                    if (sent_ret == 1){
-                        clients[i].events = POLLOUT;
-                    }
->>>>>>> snouae
-=======
                 {
                     std::size_t Connection = requist_data[clients[i].fd].find("Connection: keep-alive");
                     std::vector<pollfd>::iterator it = clients.begin() + i;
@@ -195,7 +127,6 @@ namespace http{
                     if (sent_ret == 1){
                         clients[i].events = POLLOUT;
                     }
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
                     if (sent_ret == 0)
                     {
                         if (Connection == std::string::npos)
@@ -204,16 +135,7 @@ namespace http{
                         }
                          close(clients[i].fd);
                         clients.erase(it);
-<<<<<<< HEAD
-<<<<<<< HEAD
-                        //read_info[clients[i].fd] = 0;
-                       // requist_data.erase(clients[i].fd);
-=======
                         read_info.erase(it_read);
->>>>>>> snouae
-=======
-                        read_info.erase(it_read);
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
                         i--;
                     }
                     else if (sent_ret == -2)
@@ -268,22 +190,12 @@ namespace http{
     {
         std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
         std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
-<<<<<<< HEAD
-<<<<<<< HEAD
-        
-=======
-=======
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
          std::size_t GET_M = requist_data[sockfd].find("GET");
         if (((content_length == std::string::npos && transfer_encoding == std::string::npos ) 
         || (content_length != std::string::npos && transfer_encoding != std::string::npos )) && GET_M == std::string::npos)
         {
             return (-2);
         }
-<<<<<<< HEAD
->>>>>>> snouae
-=======
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
         if (content_length != std::string::npos && transfer_encoding != std::string::npos)
         {
             if (requist_data[sockfd].find("0\r\n\r\n") != std::string::npos)
@@ -318,18 +230,8 @@ namespace http{
         int bytes_received;
         std::size_t header_end = 0;
         std::size_t content_len = 0;
-<<<<<<< HEAD
-<<<<<<< HEAD
-        
-        bytes_received = recv(sockfd, buffer, sizeof(buffer), 0);
-=======
         conf_fd[sockfd]->content_length = 0;
         bytes_received = recv(sockfd, buffer, sizeof(buffer) - 1, 0);
->>>>>>> snouae
-=======
-        conf_fd[sockfd]->content_length = 0;
-        bytes_received = recv(sockfd, buffer, sizeof(buffer) - 1, 0);
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
         if (bytes_received <= 0)
         {
             close(sockfd);
@@ -343,25 +245,7 @@ namespace http{
              std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
             int ret_transfer = transfer_encoding_chunked(sockfd);
             if (content_length != std::string::npos && transfer_encoding == std::string::npos)
-<<<<<<< HEAD
             {
-<<<<<<< HEAD
-                return (0);
-            }
-            else if (transfer_encoding_chunked(sockfd) == 0)
-            {
-                if (read_info[sockfd] == true)
-                {
-                    return (0);
-                }
-                return (1);
-            }
-            else if (transfer_encoding_chunked(sockfd) == 2)
-=======
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
-            {
-=======
->>>>>>> snouae
                 header_end = requist_data[sockfd].find("\r\n\r\n");
                 content_len = std::strtol(requist_data[sockfd].substr(requist_data[sockfd].find("Content-Length: ") + 16, 9).c_str(), nullptr, 0);
                 conf_fd[sockfd]->content_length = content_len; 
@@ -404,23 +288,9 @@ namespace http{
             std::size_t header_end = requist_data[sockfd].find("\r\n\r\n");
             conf_fd[sockfd]->content_length = requist_data[sockfd].size() - (header_end + 4);
         }
-<<<<<<< HEAD
-<<<<<<< HEAD
-        request req(requist_data[sockfd]);
-        Respond   res(req, conf_fd[sockfd]->index);
-       requist_data[sockfd] =  res.response_root(conf);
-       std::cout << "A F T E R      R E S P O N S E" << std::endl;
-       //std::cout<<"-----"<< requist_data[sockfd] <<std::endl;     
-=======
         request req(requist_data[sockfd], conf_fd[sockfd]->content_length);
         Respond   res(req, conf_fd[sockfd]->index);
         requist_data[sockfd] =  res.response_root(conf);  
->>>>>>> snouae
-=======
-        request req(requist_data[sockfd], conf_fd[sockfd]->content_length);
-        Respond   res(req, conf_fd[sockfd]->index);
-        requist_data[sockfd] =  res.response_root(conf);  
->>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
     }
     
     std::string http_sever::join_chunked(const std::string &data, int sockfd) 
