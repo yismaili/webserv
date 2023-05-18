@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/18 13:25:22 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/18 16:08:19 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,16 +84,16 @@ namespace http{
             while (i < clients.size())
             {
                 header_error = 0;
-                // if (!is_server(clients[i].fd) && check_rev == 1)
-                // {
-                //     check_rev = 0;
-                //    std::cout<<getTime()<<std::endl;
-                //     std::cout<<conf_fd[clients[i].fd]->getTime_out()<<std::endl;
-                //    if (getTime() - conf_fd[clients[i].fd]->getTime_out() > 10)
-                //    {
-                //         exit(1);
-                //     }
-                // }
+                if (!is_server(clients[i].fd) && check_rev == 1)
+                {
+                    check_rev = 0;
+                   //std::cout<<getTime()<<std::endl;
+                    //std::cout<<conf_fd[clients[i].fd]->getTime_out()<<std::endl;
+                   if (getTime() - conf_fd[clients[i].fd]->getTime_out() > 10)
+                   {
+                        exit(1);
+                    }
+                }
                 if (clients[i].revents & POLLERR)
                 {
                     std::vector<pollfd>::iterator it = clients.begin() + i;
@@ -119,7 +119,7 @@ namespace http{
                     }
                     else
                     {   
-                       // conf_fd[clients[i].fd]->setTime_out(getTime());
+                        conf_fd[clients[i].fd]->setTime_out(getTime());
                         recv_ret = recv_data(clients[i].fd);
                         check_rev = 1;
                         if (recv_ret == -2)
@@ -279,7 +279,7 @@ namespace http{
             // std::size_t content_length = requist_data[sockfd].find("Content-Length: ");
             //  std::size_t transfer_encoding = requist_data[sockfd].find("Transfer-Encoding: chunked");
             ret_parce = parse_header(requist_data[sockfd], sockfd);
-            if (ret_parce == -2 )//|| getTime() >= conf_fd[sockfd]->getTime_out())
+            if (ret_parce == -2 )
             {
                 return (-2);
             }
@@ -369,7 +369,6 @@ namespace http{
             pos += sizeof_chunk + 2;
             subchunk = chunks.substr(pos , 9);
             sizeof_chunk = std::strtol(subchunk.c_str(), NULL, 16);
-            // std::cout <<"---"<<sizeof_chunk<<std::endl;
             if (sizeof_chunk == 0)
             {
                 result.append("\r\n\r\n");
