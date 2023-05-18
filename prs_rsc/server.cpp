@@ -449,8 +449,8 @@ server::server(Data_config data, bool check_location)
         _allow_methods.push_back("GET");
     if (!c_listen && check_location)
         _listen.push_back(80);
-    if (!c_index && check_location)
-        _index = "index.html";
+    // if (!c_index && check_location)
+    //     _index = "index.html";
     if (!c_host && check_location)
         _host = "127.0.0.1";
     if(!c_error_page && check_location)
