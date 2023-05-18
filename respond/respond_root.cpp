@@ -48,7 +48,7 @@ std::string Respond::response_root(std::vector<server> servers)
         return (rtn_response());
     }
     // step 5 : check the autoindex
-    ft_check_autoindex(servers);
+    //ft_check_autoindex(servers);
     // methods area
     if (r.get_method() == "GET")
         handle_get_response(servers);

@@ -56,7 +56,7 @@ public:
 
 };
 
-int is_world(std::string str, std::string tmp);
+int is_world(std::string word, std::string str);
 int search_char(std::string str, char c);
 std::string trimString(const std::string& str);
 int skip_spaces(std::string str);
