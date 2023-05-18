@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   method_handling.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2023/05/13 20:47:46 by aoumad           ###   ########.fr       */
+=======
+/*   Updated: 2023/05/15 21:00:55 by yismaili         ###   ########.fr       */
+>>>>>>> snouae
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +20,7 @@ void    Respond::handle_get_response(std::vector<server> servers)
 {
     // std::cout << "+++WE+wewew=+______-__--_--___" << std::endl;
     // step 2: check if it's a CGI or not (like if `index` of the configuration file has .py or .php...etc)
+
     if (_is_cgi == true)
     {
         run_cgi(r, *this);
@@ -27,6 +32,10 @@ void    Respond::handle_get_response(std::vector<server> servers)
         ft_handle_file();
         return ;
     }
+<<<<<<< HEAD
+=======
+    //puts("heeeeeeelo");
+>>>>>>> snouae
     // else
     // {
     //     std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
@@ -49,6 +58,7 @@ void    Respond::handle_post_response(std::vector<server> server)
 {
     // step 1: check if the request body is empty or not
     if (r.get_body().empty())
+<<<<<<< HEAD
     {
         set_response_body("Body request is missing");
         return ;
@@ -60,6 +70,19 @@ void    Respond::handle_post_response(std::vector<server> server)
     struct stat st;
     if (stat(_upload_store_path.c_str(), &st) != 0)
     {
+=======
+    {
+        set_response_body("Body request is missing");
+        return ;
+    }
+    if (_is_cgi == false && (server[_server_index]._location[_location_index].get_upload_store().empty() && server[_server_index]._location[_location_index].get_upload() == false))
+        return ;
+    _upload_store_path = _rooted_path;
+    _upload_store.append(_upload_store);
+    struct stat st;
+    if (stat(_upload_store_path.c_str(), &st) != 0)
+    {
+>>>>>>> snouae
         mkdir(_upload_store_path.c_str(), 0777);
         // or return error
     }
@@ -167,6 +190,10 @@ void    Respond::handle_form_data()
     //     std::cout << "content-type: " << it->get_content_type() << std::endl;
     //     std::cout << "data: " << it->get_data() << " END"<< std::endl;
     //     it++;
+<<<<<<< HEAD
+=======
+    //}
+>>>>>>> snouae
     // }
     
     create_form_data();
@@ -288,8 +315,13 @@ std::string Respond::check_post_type()
 
 void    Respond::handle_delete_response()
 {
+<<<<<<< HEAD
         std::cout << "DKHLAAAAAAAAAAT" << std::endl;
         std::cout << "rooted path:" << _rooted_path << std::endl;
+=======
+        // std::cout << "DKHLAAAAAAAAAAT" << std::endl;
+        // std::cout << "rooted path:" << _rooted_path << std::endl;
+>>>>>>> snouae
     if (std::remove(_rooted_path.c_str()) == 0)
     {
         _status_code = 200;

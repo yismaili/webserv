@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2023/05/13 18:03:39 by aoumad           ###   ########.fr       */
+=======
+/*   Updated: 2023/05/14 16:04:23 by yismaili         ###   ########.fr       */
+>>>>>>> snouae
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,9 +22,15 @@ request::request() : _method(""), _uri(""), _version(""),
     return ;
 }
 
+<<<<<<< HEAD
 request::request(std::string request) : _method(""), _uri(""), _version(""),
     _body(""), _port(80), _query("")
+=======
+request::request(std::string request, size_t content_len) : _method(""), _uri(""), _version(""),
+    _body(""), _port(80), _query(""), _content_len(content_len)
+>>>>>>> snouae
 {
+    add_header("Content-Length", std::to_string(_content_len));
     this->parse_request(request);
     return ;
 }
@@ -47,6 +57,10 @@ request &request::operator=(const request &src)
         this->_body = src._body;
         this->_port = src._port;
         this->_query = src._query;
+<<<<<<< HEAD
+=======
+        this->_content_len = src._content_len;
+>>>>>>> snouae
     }
     return (*this);
 }
@@ -107,6 +121,11 @@ std::string request::get_header(std::string key) const
 std::map<std::string, std::string> request::get_headers() const
 {
     return (this->_headers);
+}
+
+size_t  request::get_content_length() const
+{
+    return (this->_content_len);
 }
 
 void request::parse_request(std::string request)

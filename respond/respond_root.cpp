@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   respond_root.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2023/05/13 20:47:24 by aoumad           ###   ########.fr       */
+=======
+/*   Updated: 2023/05/15 21:59:21 by yismaili         ###   ########.fr       */
+>>>>>>> snouae
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,8 +23,16 @@ std::string Respond::response_root(std::vector<server> servers)
     // std::cout << "content type: " << r.get_header("Content-Type") << std::endl;
     // std::cout << "content length: " << r.get_header("Content-Length") << std::endl;
     // std::cout << "request body: " << r.get_body() << std::endl;
+<<<<<<< HEAD
     std::cout << "r method: " << r.get_method() << std::endl;
     std::cout << "uri: " << r.get_uri() << std::endl;
+=======
+    // std::cout << "r method: " << r.get_method() << std::endl;
+    // std::cout << "uri: " << r.get_uri() << std::endl;
+
+
+
+>>>>>>> snouae
     init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     if (ft_parse_location(servers))
@@ -59,6 +71,10 @@ std::string Respond::response_root(std::vector<server> servers)
     else // unsupported http method
         handle_error_response(405);
 
+<<<<<<< HEAD
+=======
+    
+>>>>>>> snouae
     // rtn response
     return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
 }
@@ -69,7 +85,14 @@ int Respond::exact_location(std::vector<server> server, std::string path)
         {
             if (server[_server_index]._location[j].location_name == path)
             {
+<<<<<<< HEAD
                 
+=======
+            //     std::cout << "path :" << path << std::endl;
+            //     std::cout << server[_server_index]._location[j].get_root() << std::endl;
+            //    std::cout << server[_server_index]._location[j].get_index() << std::endl;
+
+>>>>>>> snouae
                 _location_index = j;
                 _path_found = server[_server_index]._location[j].location_name;
                 return (0);
@@ -140,6 +163,7 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
 
 int Respond::root_location(std::vector<server> server)
 {
+<<<<<<< HEAD
     for (size_t i = 0; i < server.size(); i++)
     {
         for (size_t j = 0; j < server[i]._location.size(); j++)
@@ -151,6 +175,17 @@ int Respond::root_location(std::vector<server> server)
                 _path_found = server[i]._location[j].location_name;
                 return (0);
             }
+=======
+    for (size_t j = 0; j < server[_server_index]._location.size(); j++)
+    {
+        if (server[_server_index]._location[j].location_name == "/")
+        {
+            _location_index = j;
+            _path_found = server[_server_index]._location[j].location_name;
+            // std::cout << "path found: " << _path_found << std::endl;
+            // std::cout << "root: " << server[_server_index]._location[j].get_root() << std::endl;
+            return (0);
+>>>>>>> snouae
         }
     }
     return (1);
@@ -159,6 +194,10 @@ int Respond::root_location(std::vector<server> server)
 int Respond::ft_parse_location(std::vector<server> server)
 {
     std::string path = r.get_uri();
+<<<<<<< HEAD
+=======
+  //  std::cout << "___--_-______-_---______--__---____---_____---------__---_------------" << std::endl;
+>>>>>>> snouae
     // exact location body code
     if (exact_location(server, path) == 0)
         return (0);

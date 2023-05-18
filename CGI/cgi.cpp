@@ -1,4 +1,5 @@
 #include "cgi.hpp"
+<<<<<<< HEAD
 
 
     // env["SERVER_SOFTWARE"] = "=webserv/1.0";
@@ -31,6 +32,11 @@ std::map<std::string, std::string>get_env(char *file, request req)
 {
     //(void)file;
     //(void)req;
+=======
+std::map<std::string, std::string>get_env(char *file, request req)
+{
+
+>>>>>>> snouae
     std::map<std::string, std::string> env;
 
     env["SERVER_SOFTWARE"] = "MyServer/1.0";
@@ -47,20 +53,6 @@ std::map<std::string, std::string>get_env(char *file, request req)
     env["REMOTE_HOST"] = "localhost";
     env["REDIRECT_STATUS"] = "200";
     env["HTTP_COOKIE"] = req.get_header("Cookie");
-    // std::map<std::string, std::string> env;
-    // env["SERVER_SOFTWARE"] = "MyServer/1.0";
-    // env["SERVER_NAME"] = "localhost";
-    // env["GATEWAY_INTERFACE"] = "CGI/1.1";
-    // env["SERVER_PROTOCOL"] = "HTTP/1.1";
-    // env["SERVER_PORT"] = "80";
-    // env["REQUEST_METHOD"] = "GET";
-    // env["SCRIPT_NAME"] = "/cgi-bin/mycgi";
-    // env["CONTENT_TYPE"] = "application/x-www-form-urlencoded";
-    // env["CONTENT_LENGTH"] = "0";
-    // env["QUERY_STRING"] = "name=John&last_name=john@example.com";
-    // env["REMOTE_ADDR"] = "127.0.0.1";
-    // env["REMOTE_HOST"] = "localhost";
-    // env["REDIRECT_STATUS"] = "200";
     env["SCRIPT_FILENAME"] = file;
 
 
@@ -82,6 +74,7 @@ void put_cookie(std::string output, Respond &res)
         }
         res.set_header("Set-Cookie", token);
     }
+<<<<<<< HEAD
 
     // std::cout <<"\ntoken : " << token << std::endl;
 }
@@ -115,9 +108,17 @@ void set_headers_cgi(std::string output, Respond &res) {
         }
     }
     res.set_response_body(body);
+=======
+>>>>>>> snouae
 }
 
+void set_headers_cgi(std::string output, Respond &res) {
+    std::stringstream ss(output);
+    std::string line;
+    std::string body;
+    bool headers_finished = false;
 
+<<<<<<< HEAD
 std::string run_cgi(request &r,  Respond &res)
 {
     // puts("heeeeeeeeerererere");
@@ -125,10 +126,40 @@ std::string run_cgi(request &r,  Respond &res)
     file = strdup(res.get_file_cgi().c_str());
     path = strdup(res.get_path_info_founded().c_str()); 
    // std::cout << path << " " << file << std::endl;
+=======
+    put_cookie(output, res);
+    body =+ "<!DOCTYPE html>";
+    while (std::getline(ss, line)) {
+        if (line == "\r") {
+            headers_finished = true;
+            continue;
+        }
+        if (!headers_finished) {
+            std::size_t pos = line.find(": ");
+            if (pos != std::string::npos) {
+                std::string key = line.substr(0, pos);
+                std::string value = line.substr(pos + 2);
+                if(key != "Set-Cookie")
+                    res.set_header(key, value);
+            }
+        } 
+        else 
+            body += line + "\n";
+    }
+    res.set_response_body(body);
+}
+
+
+std::string run_cgi(request &r,  Respond &res)
+{
+    char *file, *path;
+    file = strdup(res.get_file_cgi().c_str());
+    path = strdup(res.get_path_info_founded().c_str());
+
+>>>>>>> snouae
     char *cmd[3] = {path, file, NULL};
 
     std::string cgi_str;
-
     FILE *temp = std::tmpfile();
     FILE *temp1 = std::tmpfile();
     int fdtemp = fileno(temp);
@@ -142,7 +173,7 @@ std::string run_cgi(request &r,  Respond &res)
 
     char **envp = (char **)malloc(sizeof(char *) * (env.size() + 1));
     int i = 0;
-    for (std::map<std::string , std::string>::iterator it = env.begin(); it != env.end(); ++it, ++i) 
+    for (std::map<std::string , std::string>::iterator it = env.begin(); it != env.end(); it++, i++) 
     {
         std::string e = it->first + "=" + it->second;
         envp[i] = strdup(e.c_str());
@@ -172,9 +203,14 @@ std::string run_cgi(request &r,  Respond &res)
             std::cerr << "Error: failed to redirect stdout\n";
             exit(1);
         }
+<<<<<<< HEAD
         alarm(5);
         execve(cmd[0], cmd, envp);
         //std::cerr << "Error: failed to execute command\n";
+=======
+        alarm(2);
+        execve(cmd[0], cmd, envp);
+>>>>>>> snouae
         exit(1);
     }
 
@@ -196,13 +232,9 @@ std::string run_cgi(request &r,  Respond &res)
     //puts("heeeeere");
     if (byt == -1)
         std::cerr << "Error: failed to read output\n";
-    // if (content.find("Content-Type:") == std::string::npos) {
-    //     std::cerr << "Error: no HTTP headers found in output\n";
-    //     // Return an empty string or handle the error in some other way
-    //     return "";
-    // }
     close(fdtemp);
     close(fdtemp1);
+<<<<<<< HEAD
 
     //put_cookie(content, res);
    // std::cout << "Content :::::::::::\n" << content << std::endl;
@@ -305,3 +337,8 @@ std::string run_cgi(request &r,  Respond &res)
 // {
 //     std::cout << run_cgi(av[1], av[2]) << "\n";
 // }
+=======
+    set_headers_cgi(content, res);
+    return (content);
+}
+>>>>>>> snouae

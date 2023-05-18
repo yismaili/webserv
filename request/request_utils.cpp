@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   request_utils.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 21:18:13 by aoumad            #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2023/05/13 20:20:01 by aoumad           ###   ########.fr       */
+=======
+/*   Updated: 2023/05/15 20:59:53 by yismaili         ###   ########.fr       */
+>>>>>>> snouae
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +18,11 @@
 
 int ft_check_request_line(std::string method, std::string uri, std::string version)
 {
+<<<<<<< HEAD
     std::cout << "Method: " << method << std::endl;
+=======
+    // std::cout << "Method: " << method << std::endl;
+>>>>>>> snouae
     if (method != "GET" && method != "POST" && method != "DELETE")
     {
         if (method != "PUT" || method == "OPTIONS" || method == "TRACE"  || method != "HEAD")

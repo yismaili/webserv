@@ -3,10 +3,14 @@
 /*                                                        :::      ::::::::   */
 /*   request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 18:00:51 by aoumad            #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2023/05/10 19:01:41 by aoumad           ###   ########.fr       */
+=======
+/*   Updated: 2023/05/14 16:01:47 by yismaili         ###   ########.fr       */
+>>>>>>> snouae
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,10 +45,14 @@ class request
         int         _port;
         std::string _query;
         std::string _boundary;
+<<<<<<< HEAD
+=======
+        size_t _content_len;
+>>>>>>> snouae
 
     public:
         request();
-        request(std::string request);
+        request(std::string request, size_t content_len);
         request(const request &src);
         ~request();
         
@@ -56,6 +64,10 @@ class request
         std::string get_body() const;
         std::string get_query() const;
         std::string get_boundary() const;
+<<<<<<< HEAD
+=======
+        size_t      get_content_length() const;
+>>>>>>> snouae
         // int     ft_get_port() const;
 
         void set_method(std::string method);
