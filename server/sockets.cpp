@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/16 14:35:28 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/17 19:44:35 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@ namespace http{
             ip_addr = "";
             index = 0;
             content_length = 0;
+            time_out = 0;
         }
         
         sockets::~sockets()
@@ -57,7 +58,7 @@ namespace http{
             }
             return (*this);
         }
-            
+          
         int const &sockets::getSockfd()const
         {
             return (sockfd);
@@ -129,6 +130,16 @@ namespace http{
             std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
             freeaddrinfo(result);           /* No longer needed */  
             return true;
+        }
+        
+        unsigned int const &sockets::getTime_out() const
+        {
+            return (time_out);
+        }
+        
+        void sockets::setTime_out(unsigned int time)
+        {
+            this->time_out = time;
         }
     }
     
