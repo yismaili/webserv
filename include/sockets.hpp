@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/15 22:03:55 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/18 00:26:08 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,27 +26,34 @@
 #include <map>
 #include <fcntl.h>
 #include "../prs_rsc/server.hpp"
+#include <sys/time.h>
 
 namespace http{
     class sockets{
         public: 
-            sockets(); 
+            sockets();
             ~sockets();
             sockets &init_data(int port_, std::string ip_add,int index_);
-
-            int git_sockfd()const;
-            unsigned int &get_sock_addr_len();
-            sockaddr_in &git_serv_addr();
+            int const &getSockfd()const;
+            unsigned int getSock_addr_len()const;
+            sockaddr_in &getServ_addr()const;
             bool start_server();
-        public:
-            int sockfd;
-            int port;
+            std::size_t const &getContent_length() const;
+            int const &getIndex() const;
+            int const &getPort() const;
+            void setContent_length(int const &content);
+            unsigned int const &getTime_out() const;
+            void    setTime_out(unsigned int time);
+        private:
             struct addrinfo hints;
             struct addrinfo *result, *rp;
-            unsigned int sock_addr_len;
-            std::string ip_addr;
-            int index;
-            std::size_t content_length;
+            unsigned int    sock_addr_len;
+            std::string     ip_addr;
+            int             index;
+            std::size_t     content_length;
+            int             sockfd;
+            int             port;
+            unsigned int    time_out;
     };
 }
 #endif
