@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/13 18:24:09 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/18 12:59:53 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,6 +63,8 @@ class Respond
         std::string get_document_root();
         std::string get_file_cgi();
         std::string get_path_info_founded();
+        int         ft_check_location_index(std::vector<server> server);
+        int         ft_check_server_index(std::vector<server> server);
         
         
         void print_respond();
@@ -71,7 +73,7 @@ class Respond
         std::string response_root(std::vector<server> server);
         std::string response_autoindex(request &r);
         std::string response_cgi(request &r);
-        int         ft_parse_location(std::vector<server> server);
+        int         ft_parse_location(std::vector<server> server, bool flag);
         int         exact_location(std::vector<server> server, std::string path);
         int         prefix_location(std::vector<server> server, std::string &path);
         int         dynamic_location(std::vector<server> server, std::string path);
@@ -123,6 +125,9 @@ class Respond
         std::string _file_cgi;
         std::string _cache_control;
         std::string _mime_string;
+        static std::string _uri;
+        std::string _pur_uri;
+        static bool check_location;
 
         bool        _is_cgi;
         bool        _is_allowed_method;

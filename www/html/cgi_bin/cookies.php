@@ -1,25 +1,27 @@
 <?php
-ob_start(); // Start output buffering
-$username = "snoffuae";
-setcookie("username", $username, time()+3600);
-ob_end_flush(); // End output buffering and send output to browser
+$cookies = array(
+    "lang" => "en",
+    "USER" => "ADMIN"
+);
+foreach ($cookies as $name => $value) {
+    setcookie($name, $value, time() + (86400 * 30), "/");
+}
+
 ?>
 
-<!DOCTYPE html>
 <html>
-<head>
-	<title>Cookie Example</title>
-</head>
+
 <body>
 	<?php
-	if(isset($_COOKIE["username"])) {
-	    // The "username" cookie is already set
-	    $username = $_COOKIE["username"];
-	    echo "<h1>Welcome back, $username!</h1>";
-	} else {
-	    // The "username" cookie is not set
-	    echo "<h1>Hello, we've set a cookie for you!</h1>";
+	foreach ($cookies as $name => $value) {
+		if (!isset($_COOKIE[$name]))
+			echo "<h3>Cookie = '" . $name . "' is not  set!</h3><br>";
+		else {
+			echo "<h3>Cookie = '" . $name . "' is set!</h3><br>";
+			echo "<h4>Value is: " . $_COOKIE[$name] . "</h4>";
+		}
 	}
 	?>
 </body>
+
 </html>

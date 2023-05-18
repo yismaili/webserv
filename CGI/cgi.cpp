@@ -33,7 +33,7 @@ void put_cookie(std::string output, Respond &res)
         pos += 12;
         std::size_t end = output.find(";", pos);
         if (end != std::string::npos) {
-            token = output.substr(pos, end - pos);
+            token = output.substr(pos);
         } else {
             token = output.substr(pos);
         }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_handling.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/15 21:00:55 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/18 14:26:23 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,13 +14,13 @@
 
 void    Respond::handle_get_response(std::vector<server> servers)
 {
-    // std::cout << "+++WE+wewew=+______-__--_--___" << std::endl;
     // step 2: check if it's a CGI or not (like if `index` of the configuration file has .py or .php...etc)
     if (_is_cgi == true)
     {
         run_cgi(r, *this);
         return ;
     }
+    std::cout << "___---222222__________@@@@@-______-" << std::endl;
     // step 3: check if it's a file or not
     if (ft_check_file() == true)
     {
@@ -34,14 +34,23 @@ void    Respond::handle_get_response(std::vector<server> servers)
     //     return ;
     // }
     // step 4 : check the index in the configuration file and render it
-    if (!ft_handle_index(servers))
+    int rtn_index = ft_handle_index(servers);
+    if (rtn_index == 0)
         return ;
-    // step 5: check if the autoindex if on or off
-    if (ft_handle_autoindex(servers))
+    else if (rtn_index == 1)
     {
-        handle_error_response(403);
+        if (ft_handle_autoindex(servers))
+        {
+            handle_error_response(403);
+            return ;
+        }
+    }
+    else if (rtn_index == 2)
+    {
+        handle_error_response(404);
         return ;
     }
+    // step 5: check if the autoindex if on or off
 
 }
 
