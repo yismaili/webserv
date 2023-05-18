@@ -54,7 +54,7 @@ std::vector<server> ft_fill_servers(char **av)
                 continue;
             c  += search_char(line, '{');
             c -= search_char(line, '}');
-            i = skip_spaces(line);
+           // i = skip_spaces(line);
 
              if (is_world(&line[i], "server"))
                  j = 1;
@@ -65,11 +65,14 @@ std::vector<server> ft_fill_servers(char **av)
                     std::cerr << "error something outside of server\n";
                     exit (1);
                 }
-                line = trimString(line);
+              //  line = trimString(line);
                 std::string key = line + '\n';
                 while (!file.eof())
                 {
                     std::getline(file, line);
+                    line = trimString(line);
+                    if(line.empty() || line[0] == '#')
+                        continue;
                     c  += search_char(line, '{');
                     map += line + '\n';
                     if (search_char (line, '}'))
@@ -89,18 +92,14 @@ std::vector<server> ft_fill_servers(char **av)
             }
             else if (!j)
             {
-                i = skip_spaces(line);
-                if (i != line.size())
+                if (!line.empty())
                 {
                     std::cerr << "error something outside of server\n";
                     exit (1);
                 }
             }
-            else if (i != line.size())
-            {
-                line = trimString(line);
+            else if (!line.empty())
                 data.data_server += line + "\n";
-            }
             if (!c && j)
             {
                 j = 0;

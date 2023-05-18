@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/04/15 01:41:51 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/16 14:35:57 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,25 +22,34 @@
 #include <unistd.h>
 #include<fstream>
 #include <arpa/inet.h>
+#include <netdb.h>
 #include <map>
+#include <fcntl.h>
+#include "../prs_rsc/server.hpp"
 
 namespace http{
     class sockets{
         public: 
-            sockets(); 
+            sockets();
             ~sockets();
-            sockets &init_data(int port_, std::string ip_add);
-            int git_sockfd()const;
-            unsigned int &get_sock_addr_len();
-            sockaddr_in &git_serv_addr();
+            sockets &init_data(int port_, std::string ip_add,int index_);
+            int const &getSockfd()const;
+            unsigned int getSock_addr_len()const;
+            sockaddr_in &getServ_addr()const;
             bool start_server();
-        public:
-            int sockfd;
-            int port;
-            struct sockaddr_in serv_addr;
-            unsigned int sock_addr_len;
-            std::string ip_addr;
-            
+            std::size_t const &getContent_length() const;
+            int const &getIndex() const;
+            int const &getPort() const;
+            void setContent_length(int const &content);
+        private:
+            struct addrinfo hints;
+            struct addrinfo *result, *rp;
+            unsigned int    sock_addr_len;
+            std::string     ip_addr;
+            int             index;
+            std::size_t     content_length;
+            int             sockfd;
+            int             port;
     };
 }
 #endif

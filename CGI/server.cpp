@@ -61,12 +61,12 @@ int main(int ac, char **av)
         printf("%s\n",buffer );
         //write(new_socket , hello , strlen ));
         //printf("------------------Hello message sent-------------------\n");
-        request r(buffer);
+       // request r(buffer);
         //std::cout << "query :::::::::::::::::::::::::::::::::::::::::::::: " <<r.get_query() << "\n";
-        std::string content = run_cgi(av[1], av[2], r);
+        std::string content = run_cgi(av[1], av[2]);
         std::string header = "HTTP/1.1 200 OK\n";
         header = header + content ;
-        std::cout << content;
+       // std::cout << content;
         send(new_socket, header.c_str(), content.length(), 0);
         // write(new_socket, content.c_str(), content.size());
         close(new_socket);

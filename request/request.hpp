@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 18:00:51 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/05 02:28:47 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/14 16:01:47 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,10 +40,12 @@ class request
         std::map<std::string, std::string> _charset;
         int         _port;
         std::string _query;
+        std::string _boundary;
+        size_t _content_len;
 
     public:
         request();
-        request(std::string request);
+        request(std::string request, size_t content_len);
         request(const request &src);
         ~request();
         
@@ -54,6 +56,8 @@ class request
         std::string get_version() const;
         std::string get_body() const;
         std::string get_query() const;
+        std::string get_boundary() const;
+        size_t      get_content_length() const;
         // int     ft_get_port() const;
 
         void set_method(std::string method);
@@ -78,6 +82,8 @@ class request
         int     ft_check_content_type();
         void    ft_find_query();
         void    ft_parse_language_charset();
+        void    print_request();
+        void    init_parse();
 };
 
 int     ft_check_request_line(std::string method, std::string uri, std::string version);
