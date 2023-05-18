@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/16 22:08:27 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/17 21:08:43 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,9 +38,6 @@
 #include <csignal>
 
 
-
-
-#define BUFFER_SIZE 1024
 namespace http{
     class http_sever{
         public:
@@ -61,6 +58,7 @@ namespace http{
             std::string generate_cookie_value(int length);
             std::vector<http::sockets>::iterator find_conf(int sockfd);
             int parse_header(std::string header, int sockfd);
+            unsigned int getTime(void);
         public:
             http::sockets sock;  
             std::vector<http::sockets> socket_id;
@@ -76,6 +74,8 @@ namespace http{
             std::size_t header_end;
             std::size_t body_end;
             int         header_error;
+            std::size_t transfer_encoding_gzip;
+            int check_rev;
     };
 }
 #endif

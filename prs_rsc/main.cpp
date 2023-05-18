@@ -17,7 +17,7 @@ int main(int ac, char **av)
     all_ports = get_all_ports(servers);
 //    for (size_t i = 0; i < servers.size(); i++)
 //    {
-//        // servers[i].display_sever();
+//        servers[i].display_sever();
 //         std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
 //         for (size_t j = 0; j < servers[i]._location.size(); j++)
 //         {

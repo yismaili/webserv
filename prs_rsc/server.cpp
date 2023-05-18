@@ -16,16 +16,6 @@ std::string toUpper(std::string str) {
   return str;
 }
 
-// int count_lines(const std::string& str) {
-//     int count = 1;
-//     for (char c : str) {
-//         if (c == '\n') {
-//             count++;
-//         }
-//     }
-//     return count;
-// }
-
 bool isIpAddress(const std::string& ip) {
     int numDots = 0;
     std::string temp = "";
@@ -174,17 +164,17 @@ int ft_non_alphabetic(std::string value)
     return (0);
 }
 
-void ft_check_index(std::string index_file, std::string line)
-{
-    int i = index_file.find_last_of(".");
-    if (i == -1)
-        ft_error(line, "Error");
-    std::string filedot = index_file.substr(i + 1);
-    if (filedot != "html" && filedot != "php" && filedot != "htm" && filedot != "css"
-        && filedot != "js" && filedot != "jpg" && filedot != "jpeg" && filedot != "png" && filedot != "gif"
-        && filedot != "txt" && filedot != "xml" && filedot != "json") 
-            ft_error(line, "Error");
-}
+// void ft_check_index(std::string index_file, std::string line)
+// {
+//     int i = index_file.find_last_of(".");
+//     if (i == -1)
+//         ft_error(line, "Error");
+//     std::string filedot = index_file.substr(i + 1);
+//     if (filedot != "html" && filedot != "php" && filedot != "htm" && filedot != "css"
+//         && filedot != "js" && filedot != "jpg" && filedot != "jpeg" && filedot != "png" && filedot != "gif"
+//         && filedot != "txt" && filedot != "xml" && filedot != "json") 
+//             ft_error(line, "Error");
+// }
 
 void check_methods(std::string method, std::string line)
 {
@@ -209,17 +199,19 @@ std::string ft_method(std::string value, std::string line, std::vector<std::stri
 int is_world(std::string str, std::string tmp)
 {
     int i = 0;
-
-    while (str[i] && !isspace(str[i]))
+    if (str.size() < 2)
+        return(0);
+    while (str[i] && !isspace(str[i]) && str[i] != '{')
     {
         if(tmp[i] != str[i])
             return (0);
         i++;
     }
-    if(isspace(str[i]))
+    if(isspace(str[i]) || !str[i] || str[i] == '{')
         return (1);
     return(0);
 }
+
 
 server::server(Data_config data, bool check_location) 
      : _root("./www/html"), _client_max_body_size(1048576)
@@ -240,13 +232,10 @@ server::server(Data_config data, bool check_location)
     int c_upload_store = 0;
     while (getline(ss, line))
     {
-        // if (!check_location)
-        //     std::cout << line << std::endl;
         if(line.empty() || line[0] == '#')
             continue;
         if (!search_char(line, '}') && !search_char(line, '{'))
         {
-            
             if (line.find(';') != line.size() - 1)
             {
                 std::cerr << "missing ; in " << line << std::endl;
@@ -369,7 +358,7 @@ server::server(Data_config data, bool check_location)
             }
             c_allow_method++;
         }
-        else if (key == "autoindex")
+        else if (key == "autoindex" && !check_location)
         {
             if (c_autoindex)
                 ft_error(line, "Error duplicated");
@@ -443,19 +432,23 @@ server::server(Data_config data, bool check_location)
             if (line.size() > 1)
             {
                 if (!is_world(line, "server"))
+                {
+
+                    std::cout << check_location << std::endl;
                     ft_error(line, "Error");
+                }
             }
         }
         else
+        {
             ft_error(line, "Error");
+        }
     }
 
     if(!c_allow_method && !check_location)
         _allow_methods.push_back("GET");
     if (!c_listen && check_location)
         _listen.push_back(80);
-    if (!c_index && check_location)
-        _index = "index.html";
     if (!c_host && check_location)
         _host = "127.0.0.1";
     if(!c_error_page && check_location)
@@ -473,14 +466,21 @@ server::server(Data_config data, bool check_location)
         Data_config location_data;
         std::string location_name;
         std::ostringstream oss;
-        for (std::map<std::string, std::string>::const_iterator it = data.location.begin(); it != data.location.end(); ++it) 
+        for (std::map<std::string, std::string>::iterator it = data.location.begin(); it != data.location.end(); ++it) 
         {
             location_data.data_server = it->second;
             location_name = it->first;
-            location *l = new location(location_data, location_name);
-            l->fill_rest(*this);
-            _location.push_back(*l);
-            delete(l);
+            location l = location(location_data, location_name);
+            l.fill_rest(*this);
+            for (size_t i = 0; i < _location.size(); i++)
+            {
+                if (_location[i].location_name == l.location_name)
+                {
+                    std::cerr << "Error dupplicate location\n";
+                    exit (1);
+                }
+            }
+            _location.push_back(l);
         }
     }
 }
@@ -496,8 +496,6 @@ void server::display_sever()
         std::cout << _server_name[i] << " ";
     std::cout << std::endl;
     std::cout << "Index : " << _index ;
-    // for (size_t i = 0; i < _index.size(); i++) 
-    //     std::cout << _index[i] << " ";
     std::cout << std::endl;
     std::cout << "hostname : " << _host << std::endl;
     std::cout << "root : " << _root << std::endl;

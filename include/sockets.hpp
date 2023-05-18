@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/16 14:35:57 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/18 00:26:08 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@
 #include <map>
 #include <fcntl.h>
 #include "../prs_rsc/server.hpp"
+#include <sys/time.h>
 
 namespace http{
     class sockets{
@@ -41,6 +42,8 @@ namespace http{
             int const &getIndex() const;
             int const &getPort() const;
             void setContent_length(int const &content);
+            unsigned int const &getTime_out() const;
+            void    setTime_out(unsigned int time);
         private:
             struct addrinfo hints;
             struct addrinfo *result, *rp;
@@ -50,6 +53,7 @@ namespace http{
             std::size_t     content_length;
             int             sockfd;
             int             port;
+            unsigned int    time_out;
     };
 }
 #endif

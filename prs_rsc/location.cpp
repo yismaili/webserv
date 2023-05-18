@@ -44,7 +44,7 @@ location::location(Data_config data, std::string location_name) : server(data, 0
 {
 	//std::cout << location_name << "\n";
     this->location_name = extract_path(location_name);
-    //std::cout <<"|"<<this->location_name<<"|"<<std::endl;
+    //std::cout <<"|||||||||||||"<<this->location_name<<"|"<<std::endl;
 }
 
 location::~location()
