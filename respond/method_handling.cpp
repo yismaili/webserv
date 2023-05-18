@@ -7,10 +7,14 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
 <<<<<<< HEAD
+<<<<<<< HEAD
 /*   Updated: 2023/05/13 20:47:46 by aoumad           ###   ########.fr       */
 =======
 /*   Updated: 2023/05/15 21:00:55 by yismaili         ###   ########.fr       */
 >>>>>>> snouae
+=======
+/*   Updated: 2023/05/15 21:00:55 by yismaili         ###   ########.fr       */
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -191,9 +195,13 @@ void    Respond::handle_form_data()
     //     std::cout << "data: " << it->get_data() << " END"<< std::endl;
     //     it++;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     //}
 >>>>>>> snouae
+=======
+    //}
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
     // }
     
     create_form_data();
@@ -316,12 +324,17 @@ std::string Respond::check_post_type()
 void    Respond::handle_delete_response()
 {
 <<<<<<< HEAD
+<<<<<<< HEAD
         std::cout << "DKHLAAAAAAAAAAT" << std::endl;
         std::cout << "rooted path:" << _rooted_path << std::endl;
 =======
         // std::cout << "DKHLAAAAAAAAAAT" << std::endl;
         // std::cout << "rooted path:" << _rooted_path << std::endl;
 >>>>>>> snouae
+=======
+        // std::cout << "DKHLAAAAAAAAAAT" << std::endl;
+        // std::cout << "rooted path:" << _rooted_path << std::endl;
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
     if (std::remove(_rooted_path.c_str()) == 0)
     {
         _status_code = 200;

@@ -7,10 +7,14 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 18:00:51 by aoumad            #+#    #+#             */
 <<<<<<< HEAD
+<<<<<<< HEAD
 /*   Updated: 2023/05/10 19:01:41 by aoumad           ###   ########.fr       */
 =======
 /*   Updated: 2023/05/14 16:01:47 by yismaili         ###   ########.fr       */
 >>>>>>> snouae
+=======
+/*   Updated: 2023/05/14 16:01:47 by yismaili         ###   ########.fr       */
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,9 +50,13 @@ class request
         std::string _query;
         std::string _boundary;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         size_t _content_len;
 >>>>>>> snouae
+=======
+        size_t _content_len;
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 
     public:
         request();
@@ -65,9 +73,13 @@ class request
         std::string get_query() const;
         std::string get_boundary() const;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         size_t      get_content_length() const;
 >>>>>>> snouae
+=======
+        size_t      get_content_length() const;
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
         // int     ft_get_port() const;
 
         void set_method(std::string method);

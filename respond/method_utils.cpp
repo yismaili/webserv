@@ -7,10 +7,14 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
 <<<<<<< HEAD
+<<<<<<< HEAD
 /*   Updated: 2023/05/13 18:47:13 by aoumad           ###   ########.fr       */
 =======
 /*   Updated: 2023/05/15 21:58:18 by yismaili         ###   ########.fr       */
 >>>>>>> snouae
+=======
+/*   Updated: 2023/05/15 21:58:18 by yismaili         ###   ########.fr       */
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +53,7 @@ void Respond::ft_handle_file()
         set_status_message(get_response_status(200));
         set_header("Content-Type", get_mime_type(_mime_string));
 <<<<<<< HEAD
+<<<<<<< HEAD
         std::cout << "mime _type: " << get_mime_type(_mime_string) << std::endl;
          _headers["Content-Length"] = std::to_string(_response_body.length());
          std::cout << std::to_string(_response_body.length()) << std::endl;
@@ -57,6 +62,11 @@ void Respond::ft_handle_file()
          _headers["Content-Length"] = std::to_string(_response_body.length());
         //  std::cout << std::to_string(_response_body.length()) << std::endl;
 >>>>>>> snouae
+=======
+        // std::cout << "mime _type: " << get_mime_type(_mime_string) << std::endl;
+         _headers["Content-Length"] = std::to_string(_response_body.length());
+        //  std::cout << std::to_string(_response_body.length()) << std::endl;
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
         _headers["Connection"] = "keep-alive";
         set_date();
         set_cache_control("cache");
@@ -85,6 +95,7 @@ int Respond::ft_handle_index(std::vector<server> server)
         else
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
             index = server[_server_index]._location[_location_index].get_index();
             _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
             if (ft_handle_index_2(index))
@@ -94,6 +105,12 @@ int Respond::ft_handle_index(std::vector<server> server)
             _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
             if (ft_handle_index_2(file))
 >>>>>>> snouae
+=======
+            index = server[_server_index].get_index();
+            std::string file = server[_server_index].get_root() + "/" + index;
+            _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
+            if (ft_handle_index_2(file))
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
                 return (1);
         }
     }
@@ -104,9 +121,11 @@ int Respond::ft_handle_index(std::vector<server> server)
         std::string::size_type _mime_index= index.find_last_of('.');
         if (_mime_index != std::string::npos)
 <<<<<<< HEAD
+<<<<<<< HEAD
         {
+=======
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
             _mime_string = index.substr(_mime_index + 1);
-        }
         std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
         _rooted_path = server[_location_index].get_root() + _removed_path + index;
 =======
@@ -133,10 +152,14 @@ int Respond::ft_handle_index_2(std::string index)
             set_status_message(get_response_status(200));
             set_header("Content-Type", get_mime_type(_mime_string));
 <<<<<<< HEAD
+<<<<<<< HEAD
             std::cout << "mime _type in index: " << get_mime_type(_mime_string) << std::endl;
 =======
            // std::cout << "mime _type in index: " << get_mime_type(_mime_string) << std::endl;
 >>>>>>> snouae
+=======
+           // std::cout << "mime _type in index: " << get_mime_type(_mime_string) << std::endl;
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
             _headers["Content-Length"] = std::to_string(_response_body.length());
             _headers["Connection"] = "keep-alive";
             set_date();
@@ -146,10 +169,14 @@ int Respond::ft_handle_index_2(std::string index)
         else
         {
 <<<<<<< HEAD
+<<<<<<< HEAD
     std::cout << "____WWWWW_--------______" << std::endl;
 =======
     //std::cout << "____WWWWW_--------______" << std::endl;
 >>>>>>> snouae
+=======
+    //std::cout << "____WWWWW_--------______" << std::endl;
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
             handle_error_response(404);
             return (1);
         }

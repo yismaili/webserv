@@ -15,6 +15,7 @@ int main(int ac, char **av)
     servers = ft_fill_servers(av);
     all_ports = get_all_ports(servers);
 <<<<<<< HEAD
+<<<<<<< HEAD
    for (size_t i = 0; i < servers.size(); i++)
    {
        // servers[i].display_sever();
@@ -31,6 +32,11 @@ int main(int ac, char **av)
 //    for (size_t i = 0; i < servers.size(); i++)
 //    {
 //        servers[i].display_sever();
+=======
+//    for (size_t i = 0; i < servers.size(); i++)
+//    {
+//        // servers[i].display_sever();
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 //         std::cout << "locations :::::::::::::::::::::::::::::::::::::::::::: \n";
 //         for (size_t j = 0; j < servers[i]._location.size(); j++)
 //         {
@@ -40,7 +46,10 @@ int main(int ac, char **av)
 //         }
 //         std::cout << "++++++++++++++++++++++\n";
 //    }  
+<<<<<<< HEAD
 >>>>>>> snouae
+=======
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 //     for (size_t i = 0; i < all_ports.size(); i++)
 //             std::cout << all_ports[i] << "\n";
     http::http_sever server1(servers);

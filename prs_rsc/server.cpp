@@ -215,10 +215,14 @@ int is_world(std::string str, std::string tmp)
 
 server::server(Data_config data, bool check_location) 
 <<<<<<< HEAD
+<<<<<<< HEAD
      : _root("/www/html"), _client_max_body_size(1048576)
 =======
      : _root("./www/html"), _client_max_body_size(1048576)
 >>>>>>> snouae
+=======
+     : _root("./www/html"), _client_max_body_size(1048576)
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 {
     std::istringstream ss(data.data_server);
     std::string line;
@@ -255,15 +259,18 @@ server::server(Data_config data, bool check_location)
             if (line.size() > 1)
             {
                 if (!is_world(line, "server") && !is_world(line, "location"))
-                    ft_error(line, "Error");
+                {
+                    ft_error(line, "Er1ror");
+                }
             }
             if(search_char(line, '{') > 1)
-                ft_error(line, "Error");
+                ft_error(line, "Er2ror");
         }
         std::string key, value;
         std::istringstream iss(line);
         iss >> key >> value;
         key = toLower(key);
+        //std::cout << "|"+key+"|" << std::endl;
         if (key == "server_name")
         {
             if(c_server_name)
@@ -439,6 +446,7 @@ server::server(Data_config data, bool check_location)
             {
                 if (!is_world(line, "server"))
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
                 {
 
@@ -446,11 +454,19 @@ server::server(Data_config data, bool check_location)
 >>>>>>> snouae
                     ft_error(line, "Error");
                 }
+=======
+                    ft_error(line, "Er4ror");
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
             }
         }
         else
         {
+<<<<<<< HEAD
             ft_error(line, "Error");
+=======
+            //std::cout << key << std::endl;
+            ft_error(line, "Er3ror");
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
         }
     }
 
@@ -481,17 +497,31 @@ server::server(Data_config data, bool check_location)
         {
             location_data.data_server = it->second;
             location_name = it->first;
+<<<<<<< HEAD
             location l = location(location_data, location_name);
             l.fill_rest(*this);
             for (size_t i = 0; i < _location.size(); i++)
             {
                 if (_location[i].location_name == l.location_name)
+=======
+            // std::cout << location_name << "---\n";
+            location *l = new location(location_data, location_name);
+            l->fill_rest(*this);
+            for (size_t i = 0; i < _location.size(); i++)
+            {
+                if (_location[i].location_name == l->location_name)
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
                 {
                     std::cerr << "Error dupplicate location\n";
                     exit (1);
                 }
             }
+<<<<<<< HEAD
             _location.push_back(l);
+=======
+            _location.push_back(*l);
+            delete(l);
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
         }
     }
 }

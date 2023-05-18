@@ -57,6 +57,7 @@ std::vector<server> ft_fill_servers(char **av)
 <<<<<<< HEAD
             c  += search_char(line, '{');
             c -= search_char(line, '}');
+<<<<<<< HEAD
            // i = skip_spaces(line);
 
 =======
@@ -65,6 +66,8 @@ std::vector<server> ft_fill_servers(char **av)
                 kws += search_char(line, '{');
                 c -= search_char(line, '}');
 >>>>>>> snouae
+=======
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
              if (is_world(&line[i], "server"))
              {
                 j = 1;
@@ -101,11 +104,14 @@ std::vector<server> ft_fill_servers(char **av)
                     exit (1);
                 }
 <<<<<<< HEAD
+<<<<<<< HEAD
               //  line = trimString(line);
 =======
                 kws = 0;
                 kws = search_char(line, '{');             
 >>>>>>> snouae
+=======
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
                 std::string key = line + '\n';
                 while (!file.eof())
                 {
@@ -127,6 +133,15 @@ std::vector<server> ft_fill_servers(char **av)
                     if (search_char (line, '}'))
                     {
                         c -= search_char(line, '}'); 
+<<<<<<< HEAD
+=======
+                        // std::map<std::string, std::string>::const_iterator it = data.location.find(key);
+                        // if (it != data.location.end())
+                        // {
+                        //     std::cerr << "Error dupplicate location\n";
+                        //     exit (1);
+                        // }
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
                         data.location.insert(std::make_pair(key, map));
                         map.clear();
                         break;

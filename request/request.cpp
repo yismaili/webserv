@@ -7,10 +7,14 @@
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
 <<<<<<< HEAD
+<<<<<<< HEAD
 /*   Updated: 2023/05/13 18:03:39 by aoumad           ###   ########.fr       */
 =======
 /*   Updated: 2023/05/14 16:04:23 by yismaili         ###   ########.fr       */
 >>>>>>> snouae
+=======
+/*   Updated: 2023/05/14 16:04:23 by yismaili         ###   ########.fr       */
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,12 +27,17 @@ request::request() : _method(""), _uri(""), _version(""),
 }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 request::request(std::string request) : _method(""), _uri(""), _version(""),
     _body(""), _port(80), _query("")
 =======
 request::request(std::string request, size_t content_len) : _method(""), _uri(""), _version(""),
     _body(""), _port(80), _query(""), _content_len(content_len)
 >>>>>>> snouae
+=======
+request::request(std::string request, size_t content_len) : _method(""), _uri(""), _version(""),
+    _body(""), _port(80), _query(""), _content_len(content_len)
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
 {
     add_header("Content-Length", std::to_string(_content_len));
     this->parse_request(request);
@@ -58,9 +67,13 @@ request &request::operator=(const request &src)
         this->_port = src._port;
         this->_query = src._query;
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
         this->_content_len = src._content_len;
 >>>>>>> snouae
+=======
+        this->_content_len = src._content_len;
+>>>>>>> e3f1ee7a5112b3cc883ff196c531cae797e42b3f
     }
     return (*this);
 }
