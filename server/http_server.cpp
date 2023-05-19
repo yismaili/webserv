@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/18 16:08:19 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/19 12:44:44 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,21 +79,20 @@ namespace http{
             i = 0;
           //  check_rev = 0;
             // Wait for events on any of the monitored file descriptors
-            poll_ret = poll(&clients[0], clients.size(), -1);
+            poll_ret = poll(&clients[0], clients.size(), 0);
             //Check for events on server socket
             while (i < clients.size())
             {
-                header_error = 0;
-                if (!is_server(clients[i].fd) && check_rev == 1)
-                {
-                    check_rev = 0;
-                   //std::cout<<getTime()<<std::endl;
-                    //std::cout<<conf_fd[clients[i].fd]->getTime_out()<<std::endl;
-                   if (getTime() - conf_fd[clients[i].fd]->getTime_out() > 10)
-                   {
-                        exit(1);
-                    }
-                }
+                // if (!is_server(clients[i].fd) && check_rev == 1)
+                // {
+                //     check_rev = 0;
+                //    //std::cout<<getTime()<<std::endl;
+                //     //std::cout<<conf_fd[clients[i].fd]->getTime_out()<<std::endl;
+                //    if (getTime() - conf_fd[clients[i].fd]->getTime_out() > 10)
+                //    {
+                //         exit(1);
+                //     }
+                // }
                 if (clients[i].revents & POLLERR)
                 {
                     std::vector<pollfd>::iterator it = clients.begin() + i;
@@ -118,8 +117,8 @@ namespace http{
                         clients.push_back(new_client_pollfd);
                     }
                     else
-                    {   
-                        conf_fd[clients[i].fd]->setTime_out(getTime());
+                    {   header_error = 0;
+                        //conf_fd[clients[i].fd]->setTime_out(getTime());
                         recv_ret = recv_data(clients[i].fd);
                         check_rev = 1;
                         if (recv_ret == -2)
@@ -203,7 +202,6 @@ namespace http{
     {
         close(sock.getSockfd());
         close(newsockfd);
-        exit(1);
     }
     int http_sever ::parse_header(std::string header, int sockfd)
     {
