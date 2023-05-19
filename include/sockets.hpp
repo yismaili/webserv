@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/18 00:26:08 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/19 14:18:40 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,7 @@ namespace http{
             int             sockfd;
             int             port;
             unsigned int    time_out;
+            int           header_error; 
     };
 }
 #endif

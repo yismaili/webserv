@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/18 21:34:46 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 15:39:35 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ namespace http{
     {
         struct timeval current_time;
         gettimeofday(&current_time, NULL);
-        return (current_time.tv_sec);
+        return (current_time.tv_sec * 1000 + current_time.tv_usec / 1000);
     }
     
     void http_sever::run() 
@@ -79,21 +79,20 @@ namespace http{
             i = 0;
           //  check_rev = 0;
             // Wait for events on any of the monitored file descriptors
-            poll_ret = poll(&clients[0], clients.size(), -1);
+           // static int j = 0;
+            poll_ret = poll(&clients[0], clients.size(), 0);
             //Check for events on server socket
             while (i < clients.size())
             {
-                header_error = 0;
-                // if (!is_server(clients[i].fd) && check_rev == 1)
-                // {
-                //     check_rev = 0;
-                //    //std::cout<<getTime()<<std::endl;
-                //     //std::cout<<conf_fd[clients[i].fd]->getTime_out()<<std::endl;
-                //    if (getTime() - conf_fd[clients[i].fd]->getTime_out() > 10)
-                //    {
-                //         exit(1);
-                //     }
-                // }
+                if (!is_server(clients[i].fd) && requist_data[clients[i].fd].size() > 0)
+                {
+                    if (getTime() - conf_fd[clients[i].fd]->getTime_out() >= 10000)
+                    {
+                        header_error = 1;
+                        unchunk(clients[i].fd);
+                        clients[i].events = POLLOUT;
+                    }
+                }
                 if (clients[i].revents & POLLERR)
                 {
                     std::vector<pollfd>::iterator it = clients.begin() + i;
@@ -107,6 +106,8 @@ namespace http{
                     {
                         // Accept incoming connection
                         new_socket = accept_connection(clients[i].fd);
+                        int val = fcntl(new_socket, F_GETFL, 0);
+                        fcntl(new_socket, F_SETFL, val | O_NONBLOCK);
                         conf_fd.insert(std::make_pair(new_socket, find_conf(clients[i].fd)));
                         std::cout <<"\n\033[32mCONNECTION TO ["<<conf_fd[new_socket]->getPort()<<"] "<<"ACCEPTED...\033[0m\n";
                         // Add new socket to poll list
@@ -119,9 +120,9 @@ namespace http{
                     }
                     else
                     {   
-                        //conf_fd[clients[i].fd]->setTime_out(getTime());
+                        header_error = 0;
+
                         recv_ret = recv_data(clients[i].fd);
-                        check_rev = 1;
                         if (recv_ret == -2)
                         {
                             // std::map<int, std::string>::iterator it_ = requist_data.find(clients[i].fd);
@@ -203,7 +204,6 @@ namespace http{
     {
         close(sock.getSockfd());
         close(newsockfd);
-        exit(1);
     }
     int http_sever ::parse_header(std::string header, int sockfd)
     {
@@ -266,6 +266,7 @@ namespace http{
         header_end = 0;
         content_len = 0;
         conf_fd[sockfd]->setContent_length(0);
+        conf_fd[sockfd]->setTime_out(getTime());
         bytes_received = recv(sockfd, buffer, sizeof(buffer) - 1, 0);
         if (bytes_received <= 0)
         {
@@ -323,8 +324,6 @@ namespace http{
     {
         if (header_error == 1)
         {
-            std::cout<<"hey----->"<<std::endl;
-            exit(1);
             request req(requist_data[sockfd], conf_fd[sockfd]->getContent_length());
             Respond   res(req, conf_fd[sockfd]->getIndex());
             requist_data[sockfd] =  res.response_root(conf);
@@ -342,7 +341,6 @@ namespace http{
             request req(requist_data[sockfd], conf_fd[sockfd]->getContent_length());
             Respond   res(req, conf_fd[sockfd]->getIndex());
             requist_data[sockfd] =  res.response_root(conf); 
-            // std::cout<<"hey"<<std::endl; 
         }
     }
     

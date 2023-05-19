@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/19 13:29:06 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 15:41:36 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ std::string Respond::response_root(std::vector<server> servers)
     }
     else
     {
-        std::cout << "____-_-_4---_-_--_--_--_--_-_" << std::endl;
+       // std::cout << "____-_-_4---_-_--_--_--_--_-_" << std::endl;
         _uri = r.get_uri();
         check_location = false;
     }

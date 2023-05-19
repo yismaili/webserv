@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/19 13:30:05 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 15:43:03 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -180,7 +180,6 @@ int Respond::ft_handle_index_2(std::string index)
         }
         else
         {
-    //std::cout << "____WWWWW_--------______" << std::endl;
             handle_error_response(404);
             return (1);
         }
