@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   respond_root.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/19 12:33:01 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/19 17:19:57 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,66 +32,66 @@ std::string Respond::response_root(std::vector<server> servers)
     if (ft_parse_location(servers, false))
     {
         // to avoid reload of the page in case r.get_uri == _uri
-            // std::cout << "uri: " << _uri << std::endl;
-            // std::cout << "r.get_uri(): " << r.get_uri() << std::endl;
-            // std::cout << "check location: " << check_location << std::endl;
-        std::string::size_type index_uri = _uri.find(r.get_uri());
-        if (r.get_uri() != _uri)
-        {
-            std::string::size_type index__uri = _uri.find(r.get_uri());
-            if (index__uri == std::string::npos)
-            {
-                if (check_location == true && index_uri == std::string::npos)
-                {
-                    //std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
-                    _uri = _uri.substr(0, _uri.find_last_of('/'));
-                    _uri += r.get_uri();
-                    r.set_uri(_uri);
-                    _removed_path = "";
-                    ft_parse_location(servers, true);
-                    // check_location = false;
-                    std::cout << "_uri: " << _uri << std::endl;
-                }
-                else
-                {
-                    //std::cout << "____-_-_1---_-_--_--_--_--_-_" << std::endl;
-                    _uri += r.get_uri();
-                    r.set_uri(_uri);
-                    _removed_path = "";
-                    ft_parse_location(servers, true);
-                    std::cout << "_uri: " << _uri << std::endl;
-                    check_location = true;
-                }
-            }
-            else if (index__uri != std::string::npos)
-            {
-           // std::cout << "____-_-_NONE---_-_--_--_--_--_-_" << std::endl;
-            _removed_path = "";
-            ft_parse_location(servers, true);
-            check_location = true;
-            }
-        }
-        else if (index_uri == std::string::npos)
-        {
-           // std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
-            _uri = _uri.substr(_uri.find_last_of('/'));
-            _uri += r.get_uri();
-            r.set_uri(_uri);
-            _removed_path = "";
-            ft_parse_location(servers, true);
-            check_location = false;
-        }
-        else if (index_uri != std::string::npos)
-        {
-           // std::cout << "____-_-_3---_-_--_--_--_--_-_" << std::endl;
-            check_location = true;
-        }
-        // else if (root_location(servers) == 1)
+        //     std::cout << "uri: " << _uri << std::endl;
+        //     std::cout << "r.get_uri(): " << r.get_uri() << std::endl;
+        //     std::cout << "check location: " << check_location << std::endl;
+        // std::string::size_type index_uri = _uri.find(r.get_uri());
+        // if (r.get_uri() != _uri)
         // {
-        //     // if (_uri != "")
-        //     handle_error_response(404);
-        //     return (rtn_response()); 
+        //     std::string::size_type index__uri = _uri.find(r.get_uri());
+        //     if (index__uri == std::string::npos)
+        //     {
+        //         if (check_location == true && index_uri == std::string::npos)
+        //         {
+        //             std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
+        //             _uri = _uri.substr(0, _uri.find_last_of('/'));
+        //             _uri += r.get_uri();
+        //             r.set_uri(_uri);
+        //             _removed_path = "";
+        //             ft_parse_location(servers, true);
+        //             // check_location = false;
+        //             std::cout << "_uri: " << _uri << std::endl;
+        //         }
+        //         else
+        //         {
+        //             std::cout << "____-_-_1---_-_--_--_--_--_-_" << std::endl;
+        //             _uri += r.get_uri();
+        //             r.set_uri(_uri);
+        //             _removed_path = "";
+        //             ft_parse_location(servers, true);
+        //             std::cout << "_uri: " << _uri << std::endl;
+        //             check_location = true;
+        //         }
+        //     }
+        //     else if (index__uri != std::string::npos)
+        //     {
+        //     std::cout << "____-_-_NONE---_-_--_--_--_--_-_" << std::endl;
+        //     _removed_path = "";
+        //     ft_parse_location(servers, true);
+        //     check_location = true;
+        //     }
         // }
+        // else if (index_uri == std::string::npos)
+        // {
+        //     std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
+        //     _uri = _uri.substr(_uri.find_last_of('/'));
+        //     _uri += r.get_uri();
+        //     r.set_uri(_uri);
+        //     _removed_path = "";
+        //     ft_parse_location(servers, true);
+        //     check_location = false;
+        // }
+        // else if (index_uri != std::string::npos)
+        // {
+        //     std::cout << "____-_-_3---_-_--_--_--_--_-_" << std::endl;
+        //     check_location = true;
+        // }
+        if (root_location(servers) == 1)
+        {
+            // if (_uri != "")
+            handle_error_response(404);
+            return (rtn_response()); 
+        }
     }
     else
     {
@@ -140,7 +140,6 @@ int Respond::exact_location(std::vector<server> server, std::string path)
             //     std::cout << "path :" << path << std::endl;
             //     std::cout << server[_server_index]._location[j].get_root() << std::endl;
             //    std::cout << server[_server_index]._location[j].get_index() << std::endl;
-
                 _location_index = j;
                 _path_found = server[_server_index]._location[j].location_name;
                 return (0);
@@ -236,7 +235,6 @@ int Respond::ft_parse_location(std::vector<server> server, bool flag)
     // exact location body code
     if (exact_location(server, path) == 0)
         return (0);
-
     // regex location body code
     if (dynamic_location(server, path) == 0)
         return (0);
@@ -244,7 +242,6 @@ int Respond::ft_parse_location(std::vector<server> server, bool flag)
     // prefix location body code
     if (prefix_location(server, path) == 0)
         return (0);
-
     return (1);
 }
 
