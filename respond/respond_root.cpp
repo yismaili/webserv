@@ -21,6 +21,7 @@ std::string Respond::response_root(std::vector<server> servers)
     // std::cout << "request body: " << r.get_body() << std::endl;
     // std::cout << "r method: " << r.get_method() << std::endl;
     // std::cout << "uri: " << r.get_uri() << std::endl;
+    std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
     init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     if (ft_parse_location(servers))
@@ -178,28 +179,26 @@ int Respond::ft_parse_location(std::vector<server> server)
 
 int Respond::ft_parse_url_forwarding(std::vector<server> server)
 {
-    for (size_t j = 0;  j < server[_server_index]._location.size(); j++)
-    {
-        if (_path_found == server[_server_index]._location[j].location_name)
+            std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
+        if (_path_found == server[_server_index]._location[_location_index].location_name)
         {
             // check for redirection ===== where redirection is make_pair
             // std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
             // std::cout << server[i]._location[j].get_redirection().first << std::endl;
             // std::cout << server[i]._location[j].get_redirection().second << std::endl;
-            // std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
-            if (!server[_server_index]._location[j].get_redirection().second.empty())
+            if (!server[_server_index]._location[_location_index].get_redirection().second.empty())
             {
-                size_t status_code = server[_server_index]._location[j].get_redirection().first;
+                std::cout << server[_server_index]._location[_location_index].get_redirection().second << "\n";
+                size_t status_code = server[_server_index]._location[_location_index].get_redirection().first;
                 // search for message of the status_code
                 set_status_code(status_code);
                 set_status_message(get_response_status(status_code));
-                set_header("Location", server[_server_index]._location[j].get_redirection().second);
-                set_cache_control("cache");
+                set_header("Location", server[_server_index]._location[_location_index].get_redirection().second);
+                set_cache_control("no cache");
                 _is_redirection = true;
                 return (0);
             }
         }
-    }
     return (1);
 }
 

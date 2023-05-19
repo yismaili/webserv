@@ -1,52 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            width: 100vw;
-            height: 100vh;
-            font-family: Tahoma, Verdana, Arial, sans-serif;
-            text-align: center;
-            padding: 250px 0;
-            background:  #f4efef;
-        }
-        
-        .main {
-            margin: 0 auto;
-            width: 850px;
-            background-color: #ffffff;
-            padding: 15px;
-            border: 10px solid #beb5b5;
-        }
-
-        .main img {
-            margin-top: 40px;
-            width: 100%;
-        }
-
-        .message {
-            font-size: 45px;
-            color: #000000;
-        }
-
-    </style>
+  <title>Your Website Title</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f1f1f1;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+      text-align: center;
+      color: #333333;
+    }
+    p {
+      color: #555555;
+      line-height: 1.5;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #007bff;
+      color: #ffffff;
+      font-size: 16px;
+      text-decoration: none;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .cta-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
-<body dir="rtl">
-    <div class="main">
-        <h1 class="message"> WELCOM TO WEVSERV</h1>
-        <div>
-            <img src="https://media.tenor.com/F9HK7dNM01EAAAAd/lord-abe-marroki.gif" width="360px" height="600px">
-        </div>
-    </div>
+<body>
+  <div class="container">
+    <h1>Welcome to our WEBSERVER!</h1>
+    <p>This is the main page of our web server.</p>
+    <p class="message">This is the default page for my website. Start exploring by clicking the button below.</p>
+    <a class="cta-button" href="start.html">Get Started</a>
+  </div>
 </body>
 </html>
