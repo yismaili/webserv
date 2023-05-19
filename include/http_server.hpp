@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/17 21:08:43 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/19 14:16:17 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,7 +75,6 @@ namespace http{
             std::size_t body_end;
             int         header_error;
             std::size_t transfer_encoding_gzip;
-            int check_rev;
     };
 }
 #endif
