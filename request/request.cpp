@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/18 23:26:03 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 17:39:49 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,9 +119,6 @@ size_t  request::get_content_length() const
 
 void request::parse_request(std::string request)
 {
-    // std::cout << "___________33______" << std::endl;
-    // std::cout << request << std::endl;
-    //     std::cout << "________55_________" << std::endl;
     // Split the request into lines
     std::vector<std::string> lines;
     std::istringstream iss(request);
@@ -133,6 +130,8 @@ void request::parse_request(std::string request)
             break;
         lines.push_back(line);
     }
+    if (lines[0].empty())
+        std::cout << "HAHAHAHAHAH REQUEST KHAAAAAAWWIIIIIIII" << std::endl;
     // Parse the request line
     // std::cout << lines[0] << std::endl;
     std::istringstream request_line(lines[0]);

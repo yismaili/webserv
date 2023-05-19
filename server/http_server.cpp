@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/19 15:39:35 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 15:47:19 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -327,7 +327,6 @@ namespace http{
             request req(requist_data[sockfd], conf_fd[sockfd]->getContent_length());
             Respond   res(req, conf_fd[sockfd]->getIndex());
             requist_data[sockfd] =  res.response_root(conf);
-            // std::cout << "___--_------__------_-_-_--_-__-_-_-_-H@@@@@@##$%^$%$%$%$%$%$EREEEEE_--_-_-_--_-_-_-_-" << std::endl;
         }
         else 
         {

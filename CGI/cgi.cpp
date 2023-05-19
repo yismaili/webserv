@@ -4,23 +4,21 @@ std::map<std::string, std::string>get_env(char *file, request req)
 
     std::map<std::string, std::string> env;
 
-    env["SERVER_SOFTWARE"] = "MyServer/1.0";
-    env["SERVER_NAME"] = "localhost";
-    env["GATEWAY_INTERFACE"] = "CGI/1.1";
-    env["SERVER_PROTOCOL"] = "HTTP/1.1";
-    env["SERVER_PORT"] = "80";
+    // env["SERVER_SOFTWARE"] = "MyServer/1.0";
+    // env["SERVER_NAME"] = "localhost";
+    // env["GATEWAY_INTERFACE"] = "CGI/1.1";
+    // env["SERVER_PROTOCOL"] = "HTTP/1.1";
+    // env["SERVER_PORT"] = "80";
     env["REQUEST_METHOD"] = req.get_method();
-    env["SCRIPT_NAME"] = "/cgi-bin/mycgi";
+    // env["SCRIPT_NAME"] = "/cgi-bin/mycgi";
     env["CONTENT_TYPE"] = req.get_header("Content-Type");
     env["CONTENT_LENGTH"] = std::to_string(req.get_body().size());
     env["QUERY_STRING"] = req.get_query();
-    env["REMOTE_ADDR"] = "127.0.0.1";
-    env["REMOTE_HOST"] = "localhost";
+    // env["REMOTE_ADDR"] = "127.0.0.1";
+    // env["REMOTE_HOST"] = "localhost";
     env["REDIRECT_STATUS"] = "200";
     env["HTTP_COOKIE"] = req.get_header("Cookie");
     env["SCRIPT_FILENAME"] = file;
-
-
     return env;
 }
 
@@ -69,6 +67,10 @@ void set_headers_cgi(std::string output, Respond &res) {
     res.set_response_body(body);
 }
 
+void free_all()
+{
+
+}
 
 std::string run_cgi(request &r,  Respond &res)
 {
@@ -90,6 +92,7 @@ std::string run_cgi(request &r,  Respond &res)
     std::string query_string = env["QUERY_STRING"];
 
     char **envp = (char **)malloc(sizeof(char *) * (env.size() + 1));
+    //char** envp = new char*[env.size() + 1];
     int i = 0;
     for (std::map<std::string , std::string>::iterator it = env.begin(); it != env.end(); it++, i++) 
     {
@@ -102,6 +105,7 @@ std::string run_cgi(request &r,  Respond &res)
     {
         res.set_status_code(500);
         res.set_status_message(res.get_response_status(res.get_status_code()));
+        res.set_response_body(res.get_response_status(res.get_status_code()));
         return NULL;
     }
     else if (pid == 0)
@@ -110,18 +114,20 @@ std::string run_cgi(request &r,  Respond &res)
         {
             if (dup2(fdtemp1, STDIN_FILENO) == -1)
             {
-                std::cerr << "Error: failed to redirect stdin\n";
-                exit(1);
+                res.set_status_code(500);
+                res.set_response_body(res.get_response_status(res.get_status_code()));
+                return res.get_response_status(res.get_status_code());
             }
             std::fprintf(temp1, "%s", r.get_body().c_str());
             std::rewind(temp1);
         }
         if (dup2(fdtemp, STDOUT_FILENO) == -1)
         {
-            std::cerr << "Error: failed to redirect stdout\n";
-            exit(1);
+            res.set_status_code(500);
+            res.set_response_body(res.get_response_status(res.get_status_code()));
+            return res.get_response_status(res.get_status_code());
         }
-        alarm(2);
+        alarm(1);
         execve(cmd[0], cmd, envp);
         exit(1);
     }
@@ -131,7 +137,8 @@ std::string run_cgi(request &r,  Respond &res)
     if (WIFSIGNALED(status) || status != 0)
     {
         res.set_status_code(500);
-        res.set_status_message(res.get_response_status(res.get_status_code()));
+        res.set_response_body(res.get_response_status(res.get_status_code()));
+        return res.get_response_status(res.get_status_code());
     }
     char buf[1];
     std::string content;
@@ -140,12 +147,16 @@ std::string run_cgi(request &r,  Respond &res)
     while ((byt = read(fdtemp, buf, 1)) > 0){
         content.append(buf, 1);
     }
-    //std::cout << content <<std::endl;
-    //puts("heeeeere");
     if (byt == -1)
-        std::cerr << "Error: failed to read output\n";
+    {
+        res.set_status_code(500);
+        res.set_response_body(res.get_response_status(res.get_status_code()));
+        return res.get_response_status(res.get_status_code());
+    }
     close(fdtemp);
     close(fdtemp1);
+    free (file);
+    free (path);
     set_headers_cgi(content, res);
     return (content);
 }
