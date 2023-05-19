@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/14 16:04:23 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/18 23:26:03 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,7 @@ request::request() : _method(""), _uri(""), _version(""),
 request::request(std::string request, size_t content_len) : _method(""), _uri(""), _version(""),
     _body(""), _port(80), _query(""), _content_len(content_len)
 {
+    // std::cout << request << std::endl;
     add_header("Content-Length", std::to_string(_content_len));
     this->parse_request(request);
     return ;

@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/18 13:10:09 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 13:30:05 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,9 @@
 
 int    Respond::ft_check_file()
 {
+    std::cout << "___--_-______-_---______--__---____---_____---------__---_------------" << std::endl;
+    std::cout << _rooted_path << std::endl;
+    std::cout << "___--_-______-_---______--__---____---_____---------__---_------------" << std::endl;
     struct stat st;
     if (stat(_rooted_path.c_str(), &st) == 0)
     {
@@ -49,7 +52,7 @@ void Respond::ft_handle_file()
         //  std::cout << std::to_string(_response_body.length()) << std::endl;
         _headers["Connection"] = "keep-alive";
         set_date();
-        set_cache_control("cache");
+        set_cache_control("no cache");
     }
     else
         handle_error_response(403);
@@ -194,13 +197,10 @@ int     Respond::ft_handle_autoindex(std::vector<server> server)
 {
     if (_path_found == server[_server_index]._location[_location_index].location_name)
     {
-        std::cout << "path found: " << _path_found << std::endl;
         if (!server[_server_index]._location[_location_index].get_autoindex())
             return (1);
         else
         {
-        std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
-        std::cout << "rooted path: " << _rooted_path << std::endl;
             ft_show_autoindex();
             return (0);
         }
@@ -250,22 +250,59 @@ void    Respond::ft_show_autoindex()
     {
         if (entry->d_name[0] != '.')
         {
+            std::cout << "file name:" << file_name << std::endl;
             file_name = std::string(entry->d_name);
-            std::string file_path = _rooted_path + "/" + file_name;
+            std::string file_path;
+            if (_path_found[_path_found.size() - 1] == '/')
+                file_path = _path_found + file_name;
+            else
+                file_path = _path_found + "/" + file_name;
+            std::string match_path;
+            if (_rooted_path[_rooted_path.size() - 1] == '/')
+                match_path = _rooted_path + file_name;
+            else
+                match_path = _rooted_path + "/" + file_name;
+            std::cout << "match path: " << match_path << std::endl;
+            std::cout << "file path:" << file_path << std::endl;
             
-            if (stat(file_path.c_str(), &file_stat) < 0)
+            if (stat(match_path.c_str(), &file_stat) < 0)
             {
                 handle_error_response(403);
                 continue ;
             }
-            
             file_size = std::to_string(file_stat.st_size);
-            index_html += "<tr>";
-            index_html += "<td><a href=\"" + file_name + "\">" + file_name + "</a></td>";
-            index_html += "<td>" + file_size + "</td>";
-            index_html += "</tr>\n";
+            time_t entryTime = file_stat.st_mtime;  // Assuming 'time' is of type 'time_t'
+            std::tm* timeInfo = std::localtime(&entryTime);
+            char buffer[80];
+            std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);
+            std::string fileTime(buffer);
+
+            // Now you can use 'fileTime' in your HTML code
+            index_html += "<p><a href=\"http://" + r.get_header("Host") + file_path + "\"><b><i><font size=\"5\">" + file_name + "</font></i></b></a>";
+            index_html += "\t\t <b><i><font size=\"5\">" + file_size + "\t\t" + fileTime + "</font></i></b></p>\n";
         }
     }
+    // std::cout << index_html << std::endl;
+    // while ((entry = readdir(dir)) != NULL)
+    // {
+    //     if (entry->d_name[0] != '.')
+    //     {
+    //         file_name = std::string(entry->d_name);
+    //         std::string file_path = _rooted_path + "/" + file_name;
+            
+    //         if (stat(file_path.c_str(), &file_stat) < 0)
+    //         {
+    //             handle_error_response(403);
+    //             continue ;
+    //         }
+            
+    //         file_size = std::to_string(file_stat.st_size);
+    //         index_html += "<tr>";
+    //         index_html += "<td><a href=\"" + file_name + "\">" + file_name + "</a></td>";
+    //         index_html += "<td>" + file_size + "</td>";
+    //         index_html += "</tr>\n";
+    //     }
+    // }
     closedir(dir);
     index_html += "</tbody>\n</table>\n</body>\n</html>\n";
     _response_body = index_html;
