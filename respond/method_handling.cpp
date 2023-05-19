@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_handling.cpp                                :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/18 14:26:23 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 12:36:33 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,7 +20,7 @@ void    Respond::handle_get_response(std::vector<server> servers)
         run_cgi(r, *this);
         return ;
     }
-    std::cout << "___---222222__________@@@@@-______-" << std::endl;
+    // std::cout << "___---222222__________@@@@@-______-" << std::endl;
     // step 3: check if it's a file or not
     if (ft_check_file() == true)
     {
