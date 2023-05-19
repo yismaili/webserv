@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_utils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/18 13:10:09 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 12:36:58 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -194,13 +194,13 @@ int     Respond::ft_handle_autoindex(std::vector<server> server)
 {
     if (_path_found == server[_server_index]._location[_location_index].location_name)
     {
-        std::cout << "path found: " << _path_found << std::endl;
+        // std::cout << "path found: " << _path_found << std::endl;
         if (!server[_server_index]._location[_location_index].get_autoindex())
             return (1);
         else
         {
-        std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
-        std::cout << "rooted path: " << _rooted_path << std::endl;
+        // std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
+        // std::cout << "rooted path: " << _rooted_path << std::endl;
             ft_show_autoindex();
             return (0);
         }

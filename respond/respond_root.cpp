@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   respond_root.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/18 14:30:59 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 12:33:01 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,9 +31,9 @@ std::string Respond::response_root(std::vector<server> servers)
     if (ft_parse_location(servers, false))
     {
         // to avoid reload of the page in case r.get_uri == _uri
-            std::cout << "uri: " << _uri << std::endl;
-            std::cout << "r.get_uri(): " << r.get_uri() << std::endl;
-            std::cout << "check location: " << check_location << std::endl;
+            // std::cout << "uri: " << _uri << std::endl;
+            // std::cout << "r.get_uri(): " << r.get_uri() << std::endl;
+            // std::cout << "check location: " << check_location << std::endl;
         std::string::size_type index_uri = _uri.find(r.get_uri());
         if (r.get_uri() != _uri)
         {
@@ -42,7 +42,7 @@ std::string Respond::response_root(std::vector<server> servers)
             {
                 if (check_location == true && index_uri == std::string::npos)
                 {
-                    std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
+                    //std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
                     _uri = _uri.substr(0, _uri.find_last_of('/'));
                     _uri += r.get_uri();
                     r.set_uri(_uri);
@@ -53,7 +53,7 @@ std::string Respond::response_root(std::vector<server> servers)
                 }
                 else
                 {
-                    std::cout << "____-_-_1---_-_--_--_--_--_-_" << std::endl;
+                    //std::cout << "____-_-_1---_-_--_--_--_--_-_" << std::endl;
                     _uri += r.get_uri();
                     r.set_uri(_uri);
                     _removed_path = "";
@@ -64,7 +64,7 @@ std::string Respond::response_root(std::vector<server> servers)
             }
             else if (index__uri != std::string::npos)
             {
-            std::cout << "____-_-_NONE---_-_--_--_--_--_-_" << std::endl;
+           // std::cout << "____-_-_NONE---_-_--_--_--_--_-_" << std::endl;
             _removed_path = "";
             ft_parse_location(servers, true);
             check_location = true;
@@ -72,7 +72,7 @@ std::string Respond::response_root(std::vector<server> servers)
         }
         else if (index_uri == std::string::npos)
         {
-            std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
+           // std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
             _uri = _uri.substr(_uri.find_last_of('/'));
             _uri += r.get_uri();
             r.set_uri(_uri);
@@ -82,7 +82,7 @@ std::string Respond::response_root(std::vector<server> servers)
         }
         else if (index_uri != std::string::npos)
         {
-            std::cout << "____-_-_3---_-_--_--_--_--_-_" << std::endl;
+           // std::cout << "____-_-_3---_-_--_--_--_--_-_" << std::endl;
             check_location = true;
         }
         // else if (root_location(servers) == 1)
@@ -94,7 +94,7 @@ std::string Respond::response_root(std::vector<server> servers)
     }
     else
     {
-        std::cout << "____-_-_4---_-_--_--_--_--_-_" << std::endl;
+       // std::cout << "____-_-_4---_-_--_--_--_--_-_" << std::endl;
         _uri = r.get_uri();
         check_location = false;
     }
