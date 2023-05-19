@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/19 14:22:53 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/19 15:55:43 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -115,7 +115,6 @@ namespace http{
             }
             // sock_addr_len = sizeof(hints);
             // set the O_NONBLOCK flag for the socket file descriptor
-            // fcntl(sockfd, F_SETFL, O_NONBLOCK);
             int val = fcntl(sockfd, F_GETFL, 0);
             fcntl(sockfd, F_SETFL, val | O_NONBLOCK);
 
