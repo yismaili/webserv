@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/15 21:59:21 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/19 12:33:01 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,81 @@ std::string Respond::response_root(std::vector<server> servers)
     std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
     init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
-    if (ft_parse_location(servers))
-    {
-        if (root_location(servers) == 1)
-        {
-            handle_error_response(404);
-           return (rtn_response()); 
-        }
-    }
 
+    
+    // if(_uri != "")
+    // r.set_uri(_uri + r.get_uri());
+    // _uri = "";
+    if (ft_parse_location(servers, false))
+    {
+        // to avoid reload of the page in case r.get_uri == _uri
+            // std::cout << "uri: " << _uri << std::endl;
+            // std::cout << "r.get_uri(): " << r.get_uri() << std::endl;
+            // std::cout << "check location: " << check_location << std::endl;
+        std::string::size_type index_uri = _uri.find(r.get_uri());
+        if (r.get_uri() != _uri)
+        {
+            std::string::size_type index__uri = _uri.find(r.get_uri());
+            if (index__uri == std::string::npos)
+            {
+                if (check_location == true && index_uri == std::string::npos)
+                {
+                    //std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
+                    _uri = _uri.substr(0, _uri.find_last_of('/'));
+                    _uri += r.get_uri();
+                    r.set_uri(_uri);
+                    _removed_path = "";
+                    ft_parse_location(servers, true);
+                    // check_location = false;
+                    std::cout << "_uri: " << _uri << std::endl;
+                }
+                else
+                {
+                    //std::cout << "____-_-_1---_-_--_--_--_--_-_" << std::endl;
+                    _uri += r.get_uri();
+                    r.set_uri(_uri);
+                    _removed_path = "";
+                    ft_parse_location(servers, true);
+                    std::cout << "_uri: " << _uri << std::endl;
+                    check_location = true;
+                }
+            }
+            else if (index__uri != std::string::npos)
+            {
+           // std::cout << "____-_-_NONE---_-_--_--_--_--_-_" << std::endl;
+            _removed_path = "";
+            ft_parse_location(servers, true);
+            check_location = true;
+            }
+        }
+        else if (index_uri == std::string::npos)
+        {
+           // std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
+            _uri = _uri.substr(_uri.find_last_of('/'));
+            _uri += r.get_uri();
+            r.set_uri(_uri);
+            _removed_path = "";
+            ft_parse_location(servers, true);
+            check_location = false;
+        }
+        else if (index_uri != std::string::npos)
+        {
+           // std::cout << "____-_-_3---_-_--_--_--_--_-_" << std::endl;
+            check_location = true;
+        }
+        // else if (root_location(servers) == 1)
+        // {
+        //     // if (_uri != "")
+        //     handle_error_response(404);
+        //     return (rtn_response()); 
+        // }
+    }
+    else
+    {
+       // std::cout << "____-_-_4---_-_--_--_--_--_-_" << std::endl;
+        _uri = r.get_uri();
+        check_location = false;
+    }
     // step 2 : check the redirectation
     if (!ft_parse_url_forwarding(servers))
         return (rtn_response());
@@ -42,6 +108,7 @@ std::string Respond::response_root(std::vector<server> servers)
         handle_error_response(_status_code);
         return (rtn_response());
     }
+    // std::cout << "our new uri: " << _uri << std::endl;
     // step 4 : check the allowed methods
     if (ft_check_allowed_methods(servers))
     {
@@ -49,7 +116,7 @@ std::string Respond::response_root(std::vector<server> servers)
         return (rtn_response());
     }
     // step 5 : check the autoindex
-    //ft_check_autoindex(servers);
+    ft_check_autoindex(servers);
     // methods area
     if (r.get_method() == "GET")
         handle_get_response(servers);
@@ -158,9 +225,13 @@ int Respond::root_location(std::vector<server> server)
     return (1);
 }
 
-int Respond::ft_parse_location(std::vector<server> server)
+int Respond::ft_parse_location(std::vector<server> server, bool flag)
 {
-    std::string path = r.get_uri();
+    std::string path = "";
+    if (flag == false)
+        path = r.get_uri();
+    else if (flag == true)
+        path = _uri;
   //  std::cout << "___--_-______-_---______--__---____---_____---------__---_------------" << std::endl;
     // exact location body code
     if (exact_location(server, path) == 0)
@@ -226,19 +297,13 @@ int Respond::ft_check_allowed_methods(std::vector<server> server)
 
 void    Respond::ft_check_autoindex(std::vector<server> server)
 {
-    for (size_t i = 0; i < server.size(); i++)
+    if (_path_found == server[_server_index]._location[_location_index].location_name)
     {
-        for (size_t j = 0; server[i]._location.size(); j++)
+        // check for autoindex
+        if (server[_server_index]._location[_location_index].get_autoindex() == true)
         {
-            if (_path_found == server[i]._location[j].location_name)
-            {
-                // check for autoindex
-                if (server[i]._location[j].get_autoindex() == true)
-                {
-                    _is_autoindex = true;
-                    return ;
-                }
-            }
+            _is_autoindex = true;
+            return ;
         }
     }
 }

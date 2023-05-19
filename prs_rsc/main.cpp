@@ -10,6 +10,7 @@ int main(int ac, char **av)
         std::cerr << "Error: could not open config file.\n";
         return (1);
     }
+    // Register a custom signal handler for demonstration
     std::vector<server> servers;
     std::vector<int> all_ports;
     servers = ft_fill_servers(av);

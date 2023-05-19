@@ -33,11 +33,15 @@ Respond::Respond(request& req, int index_) : r(req)
     _cache_control = "";
     _last_boundary = false;
     _mime_string = "";
+    _pur_uri = r.get_uri();
 }
 
 Respond::~Respond()
 {
 }
+
+std::string Respond::_uri = "";
+bool Respond::check_location = false;
 
 void    Respond::set_http_version(std::string http_version)
 {
@@ -127,7 +131,14 @@ std::string Respond::get_document_root()
 int Respond::ft_parse_root_path(std::vector<server> server)
 {
     struct stat file_stats;
-    _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path;
+    // std::cout << "removed path: " << _removed_path << std::endl;
+    // std::cout << "get root: " << server[_server_index]._location[_location_index].get_root() << std::endl;
+    // std::cout << "_uriiii: " << _uri << std::endl;
+    // if (check_location == false)
+        _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path;
+    // if (check_location == true)
+        // _rooted_path = server[_server_index]._location[_location_index].get_root() + _uri;
+    // std::cout << "rooted path: " << _rooted_path << std::endl;
     if (!stat(_rooted_path.c_str(), &file_stats))
     {
         _file_cgi = _rooted_path;

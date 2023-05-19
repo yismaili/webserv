@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/15 21:58:18 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/19 12:36:58 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,34 +65,94 @@ In other words, the std::string constructor reads the entire contents of the fil
 int Respond::ft_handle_index(std::vector<server> server)
 {
     std::string index;
-    if (server[_server_index]._location[_location_index].get_index().empty())
+    // if (server[_server_index]._location[_location_index].get_index().empty())
+    // {
+    //     if (server[_server_index].get_index().empty())
+    //     {
+    //         handle_error_response(403);
+    //         return (1);
+    //     }
+    //     else
+    //     {
+    //         index = server[_server_index].get_index();
+    //         std::string file = server[_server_index].get_root() + "/" + index;
+    //         _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
+    //         if (ft_handle_index_2(file))
+    //             return (1);
+    //     }
+    // }
+    // else
+    // {
+    //     index = server[_server_index]._location[_location_index].get_index();
+
+    //     std::string::size_type _mime_index= index.find_last_of('.');
+    //     if (_mime_index != std::string::npos)
+    //         _mime_string = index.substr(_mime_index + 1);
+    //     std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
+    //     _rooted_path = server[_location_index].get_root() + _removed_path + index;
+    //     if (ft_handle_index_2(file))
+    //         return (1);
+    // }
+    if (server[_server_index]._location[_location_index].location_name == "/")
     {
-        if (server[_server_index].get_index().empty())
+        if (ft_check_location_index(server))
         {
-            handle_error_response(403);
-            return (1);
+            if (ft_check_server_index(server))
+                return (1);
+            else
+            {
+                index = server[_server_index].get_index();
+                std::string::size_type _mime_index= index.find_last_of('.');
+                if (_mime_index != std::string::npos)
+                    _mime_string = index.substr(_mime_index + 1);
+                std::string file = server[_server_index].get_root() + "/" + index;
+                _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
+                if (ft_handle_index_2(file))
+                    return (1);
+            }
         }
         else
         {
-            index = server[_server_index].get_index();
-            std::string file = server[_server_index].get_root() + "/" + index;
-            _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
+            index = server[_server_index]._location[_location_index].get_index();
+            std::string::size_type _mime_index= index.find_last_of('.');
+            if (_mime_index != std::string::npos)
+                _mime_string = index.substr(_mime_index + 1);
+            std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
+            _rooted_path = server[_location_index].get_root() + _removed_path + index;
             if (ft_handle_index_2(file))
-                return (1);
+                return (2);
         }
     }
-    else
+    else if (server[_server_index]._location[_location_index].location_name != "/")
     {
-        index = server[_server_index]._location[_location_index].get_index();
-
-        std::string::size_type _mime_index= index.find_last_of('.');
-        if (_mime_index != std::string::npos)
-            _mime_string = index.substr(_mime_index + 1);
-        std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
-        _rooted_path = server[_location_index].get_root() + _removed_path + index;
-        if (ft_handle_index_2(file))
+        if (ft_check_location_index(server))
             return (1);
+        else
+        {
+            index = server[_server_index]._location[_location_index].get_index();
+            std::string::size_type _mime_index= index.find_last_of('.');
+            if (_mime_index != std::string::npos)
+                _mime_string = index.substr(_mime_index + 1);
+            std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
+            _rooted_path = server[_location_index].get_root() + _removed_path + index;
+            if (ft_handle_index_2(file))
+                return (2);
+        }
     }
+    return (0);
+}
+
+int     Respond::ft_check_location_index(std::vector<server> server)
+{
+    if (server[_server_index]._location[_location_index].get_index().empty())
+        return (1);
+    return (0);
+}
+
+int Respond::ft_check_server_index(std::vector<server> server)
+{
+    if (server[_server_index].get_index().empty())
+        return (1);
     return (0);
 }
 
@@ -132,28 +192,17 @@ int Respond::ft_handle_index_2(std::string index)
 
 int     Respond::ft_handle_autoindex(std::vector<server> server)
 {
-    for (size_t i = 0; i < server.size(); i++)
+    if (_path_found == server[_server_index]._location[_location_index].location_name)
     {
-        for (size_t j = 0; j < server[i]._location.size(); j++)
+        // std::cout << "path found: " << _path_found << std::endl;
+        if (!server[_server_index]._location[_location_index].get_autoindex())
+            return (1);
+        else
         {
-            if (_path_found == server[i]._location[j].location_name)
-            {
-                if (!server[i]._location[j].get_autoindex())
-                {
-                    if (!server[i].get_autoindex())
-                        return (1);
-                    else
-                    {
-                        ft_show_autoindex();
-                        return (0);
-                    }
-                }
-                else
-                {
-                    ft_show_autoindex();
-                    return (0);
-                }
-            }
+        // std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
+        // std::cout << "rooted path: " << _rooted_path << std::endl;
+            ft_show_autoindex();
+            return (0);
         }
     }
     return (1);
@@ -173,16 +222,18 @@ void    Respond::ft_handle_error(int error_code)
 
 void    Respond::ft_show_autoindex()
 {
+    // if(!check_location)
+        // _uri = _uri + r.get_uri();
     std::string index_html = "<!DOCTYPE html>\n<html>\n<head>\n";
     index_html += "<meta charset=\"UTF-8\">\n";
-    index_html += "<title>Index of " + _path_found + "</title>\n";
+    index_html += "<title>Index of " + _rooted_path + "</title>\n";
     index_html += "</head>\n<body style=\"text-align:center;\">\n";
-    index_html += "<h1>Index of " + _path_found + "</h1>\n";
+    index_html += "<h1>Index of " + _rooted_path + "</h1>\n";
     index_html += "<table align=\"center\" style=\"border-collapse: collapse;\">\n";
     index_html += "<thead><tr><th>Name</th><th>Size</th></tr></thead>\n";
     index_html += "<tbody>\n";
 
-    DIR *dir = opendir(_path_found.c_str());
+    DIR *dir = opendir(_rooted_path.c_str());
     
     if (dir == NULL)
     {
@@ -200,7 +251,7 @@ void    Respond::ft_show_autoindex()
         if (entry->d_name[0] != '.')
         {
             file_name = std::string(entry->d_name);
-            std::string file_path = _path_found + "/" + file_name;
+            std::string file_path = _rooted_path + "/" + file_name;
             
             if (stat(file_path.c_str(), &file_stat) < 0)
             {
