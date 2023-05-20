@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/20 18:01:51 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/20 23:48:26 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ void    Respond::handle_get_response(std::vector<server> servers)
     // step 3: check if it's a file or not
     if (ft_check_file() == true)
     {
-        ft_handle_file();
+        ft_handle_file(servers);
         return ;
     }
     // else
@@ -41,13 +41,13 @@ void    Respond::handle_get_response(std::vector<server> servers)
     {
         if (ft_handle_autoindex(servers))
         {
-            handle_error_response(403);
+            handle_error_response(servers, 403);
             return ;
         }
     }
     else if (rtn_index == 2)
     {
-        handle_error_response(404);
+        handle_error_response(servers, 404);
         return ;
     }
     // step 5: check if the autoindex if on or off
@@ -163,7 +163,7 @@ void    Respond::handle_form_data(std::vector<server> server)
         FormData formData = read_form_data(server, pos); // escape /r/n
         if (_file_too_large == false)
         {
-            handle_error_response(413);
+            handle_error_response(server, 413);
             return ;
         }
         if (formData.isValid())

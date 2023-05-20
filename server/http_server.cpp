@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/20 18:17:20 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/21 00:37:58 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -209,7 +209,7 @@ namespace http{
     {
         content_length = header.find("Content-Length: ");
         transfer_encoding = header.find("Transfer-Encoding: chunked");
-        // transfer_encoding_gzip = header.find("Transfer-Encoding: gzip, chunked");
+        transfer_encoding_gzip = header.find("Transfer-Encoding: gzip, chunked");
         post_method = header.find("POST");
         content_len = std::strtol(header.substr(content_length + 16, 9).c_str(), nullptr, 0);
         conf_fd[sockfd]->setContent_length(content_len);
@@ -317,11 +317,9 @@ namespace http{
             
         if (header_error == 1)
         {
-            std::cout << "___-_-_-_--__----_-_--_--_-_-_----_-" << std::endl;
-            //std::cout<<"i am in header\n";
             request req;
             header_error = 0;
-            Respond res(false, req);
+            Respond res(conf, conf_fd[sockfd]->getIndex() ,false, req);
             requist_data[sockfd] = res.rtn_response();
            // std::cout<<requist_data[sockfd]<<std::endl;
             read_info[sockfd] = true;
@@ -338,7 +336,7 @@ namespace http{
             rtn_error = req.parse_request();
             if (rtn_error == 2)
             {
-                Respond res(false, req);
+                Respond res(conf, conf_fd[sockfd]->getIndex() ,false, req);
                 requist_data[sockfd] = res.rtn_response();
             }
             else if (rtn_error == 0)

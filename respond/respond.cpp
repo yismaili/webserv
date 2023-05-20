@@ -37,20 +37,13 @@ Respond::Respond(request& req, int index_) : r(req)
     _file_too_large = false;
 }
 
-Respond::Respond(bool rtn_error, request &req) : _rtn_error(rtn_error), r(req)
+Respond::Respond(std::vector<server> server, int _index, bool rtn_error, request &req) : _rtn_error(rtn_error), r(req)
 {
+    _server_index = _index;
     _http_version = "HTTP/1.1";
     if (_rtn_error == false)
     {
-        std::string msg = "400";
-        // i need to set response wuth bad request
-        set_status_code(400);
-        set_status_message(get_response_status(get_status_code()));
-        set_header("Content-Type", "text/html");
-        set_header("Connection", "keep-alive");
-        set_date();
-        _response_body = "<html><head><title>" + msg + " " + _status_message + "</title></head><body><h1>" + msg + " " + _status_message + "</p></body></html>";
-        set_header("Content-Length", std::to_string(_response_body.length()));
+        handle_error_response(server, 400);
     }
     return ;
 }

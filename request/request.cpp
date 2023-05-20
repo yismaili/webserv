@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/20 18:14:44 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/20 22:51:00 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,7 @@ request::request(std::string request, size_t content_len) : _method(""), _uri(""
     _body(""), _port(80), _query(""), _content_len(content_len)
 {
     this->_init_request = request;
-    // std::cout << request << std::endl;
     add_header("Content-Length", std::to_string(_content_len));
-    // this->parse_request();
     return ;
 }
 
@@ -126,6 +124,8 @@ int request::parse_request()
     std::istringstream iss(request);
     std::string line;
 
+    if (request.empty())
+        return (2);
     while (std::getline(iss, line))
     {
         if (line.empty())
@@ -142,6 +142,7 @@ int request::parse_request()
         return (2);
     }
     ft_find_query();
+    ft_handle_space_uri();
     // Parse the headers
     for (std::vector<std::string>::const_iterator it = lines.begin() + 1; it != lines.end(); ++it)
     {
@@ -153,7 +154,6 @@ int request::parse_request()
         if (this->_headers.find(key) == this->_headers.end())
             this->_headers[key] = value;
     }
-
     // function that checks if the request is POST or PUT to see if there is no content-length to return error
     if (ft_check_content_length() == false || ft_check_content_type() == false)
     {
@@ -183,6 +183,7 @@ int request::parse_request()
 
     // Parse the request body
     std::string content_len_str = this->get_header("Content-Length");
+    std::cout << "content len: " << content_len_str << std::endl;
     if (content_len_str != "")
     {
         size_t content_len = std::stoi(content_len_str);
@@ -219,4 +220,17 @@ void    request::print_request()
 std::string request::get_boundary() const
 {
     return (this->_boundary);
+}
+
+// change the "%20" with a space
+void    request::ft_handle_space_uri()
+{
+    std::string uri = this->_uri;
+    std::string::size_type n = 0;
+    while ((n = uri.find("%20", n)) != std::string::npos)
+    {
+        uri.replace(n, 3, " ");
+        n += 1;
+    }
+    this->_uri = uri;
 }

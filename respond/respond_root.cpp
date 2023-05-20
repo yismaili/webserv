@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/20 15:03:32 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/20 23:51:51 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ std::string Respond::response_root(std::vector<server> servers)
     {
         if (root_location(servers) == 1)
         {
-            handle_error_response(404);
+            handle_error_response(servers, 404);
             return (rtn_response()); 
         }
     }
@@ -46,14 +46,14 @@ std::string Respond::response_root(std::vector<server> servers)
     // step 3 : check the validation of rooted path
     if (ft_parse_root_path(servers))
     {
-        handle_error_response(_status_code);
+        handle_error_response(servers, _status_code);
         return (rtn_response());
     }
     // std::cout << "our new uri: " << _uri << std::endl;
     // step 4 : check the allowed methods
     if (ft_check_allowed_methods(servers))
     {
-        handle_error_response(_status_code);
+        handle_error_response(servers, _status_code);
         return (rtn_response());
     }
     // step 5 : check the autoindex
@@ -66,7 +66,7 @@ std::string Respond::response_root(std::vector<server> servers)
     else if (r.get_method() == "DELETE")
         handle_delete_response();
     else // unsupported http method
-        handle_error_response(405);
+        handle_error_response(servers, 405);
 
     // rtn response
     return (!rtn_response().empty() ? rtn_response() : "ERROR in returning response");
@@ -147,7 +147,7 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
         }
         if (extension == ".php" || extension == ".py")
         {
-            handle_error_response(403);
+            handle_error_response(server, 403);
             return (2);
         }
     }
