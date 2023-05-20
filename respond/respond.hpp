@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/19 23:02:16 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/20 17:51:30 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,9 +98,9 @@ class Respond
         // POST RESPONSE
         std::string check_post_type();
         void        handle_post_response(std::vector<server> server);
-        void        handle_form_data();
+        void        handle_form_data(std::vector<server> server);
         size_t      find_boundary(size_t pos);
-        FormData    read_form_data(size_t pos);
+        FormData    read_form_data(std::vector<server> servers, size_t pos);
         void        handle_urlencoded();
         void        create_form_data();
 
@@ -131,6 +131,7 @@ class Respond
         std::string _pur_uri;
         static bool check_location;
         bool        _rtn_error;
+        bool        _file_too_large;
 
         bool        _is_cgi;
         bool        _is_allowed_method;

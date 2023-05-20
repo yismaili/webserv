@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/19 15:40:22 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/20 18:01:51 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,8 @@ void    Respond::handle_post_response(std::vector<server> server)
     }
     if (check_post_type() == "form-data")
     {
-        handle_form_data();
+        handle_form_data(server);
+        
     }
 
 }
@@ -143,7 +144,7 @@ void    Respond::create_decode_files()
     }
 }
 
-void    Respond::handle_form_data()
+void    Respond::handle_form_data(std::vector<server> server)
 {
     // std::cout << r.get_body() << std::endl;
     // Find the first boundary
@@ -159,7 +160,12 @@ void    Respond::handle_form_data()
             break;
 
         // Read the data between the boundaries
-        FormData formData = read_form_data(pos); // escape /r/n
+        FormData formData = read_form_data(server, pos); // escape /r/n
+        if (_file_too_large == false)
+        {
+            handle_error_response(413);
+            return ;
+        }
         if (formData.isValid())
             _form_data.push_back(formData); // Add the form data to the list
         // std::cout << "pos before: " << pos << std::endl;
@@ -211,7 +217,7 @@ size_t Respond::find_boundary(size_t pos)
     return (r.get_body().find(_boundary, pos));
 }
 
-FormData Respond::read_form_data(size_t pos)
+FormData Respond::read_form_data(std::vector<server> servers ,size_t pos)
 {
     FormData form_data;
     std::string line;
@@ -259,6 +265,8 @@ FormData Respond::read_form_data(size_t pos)
 
     // Process the data content
     std::string data_content = section.substr(header_end + 4); // Skip the CRLF delimiter
+    if (data_content.length() * 8 >= (unsigned int)servers[_server_index].get_client_max_body_size())
+        _file_too_large = true;
     form_data.data = data_content;
 
     return (form_data);
@@ -312,7 +320,7 @@ void    Respond::handle_delete_response()
     {
         _status_code = 500;
         _status_message = get_response_status(_status_code);
-        // set_response_body("Error deleting file");
+        set_response_body("<html><body><h1>Error deleting file: the folder is not empty</h1></body></html>");
         set_header("Content-Type", r.get_header("Content-Type"));
         set_header("Content-Length", std::to_string(_response_body.length()));
         set_header("Connection", "keep-alive");

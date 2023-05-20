@@ -34,6 +34,7 @@ Respond::Respond(request& req, int index_) : r(req)
     _last_boundary = false;
     _mime_string = "";
     _pur_uri = r.get_uri();
+    _file_too_large = false;
 }
 
 Respond::Respond(bool rtn_error, request &req) : _rtn_error(rtn_error), r(req)
