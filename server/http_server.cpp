@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/20 16:58:14 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/20 17:34:15 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ namespace http{
                 {
                     if (getTime() - conf_fd[clients[i].fd]->getTime_out() >= 10000)
                     {
-                        std::cout<<"hey.....i am time out .\n";
+                      //  std::cout<<"hey.....i am time out .\n";
                         header_error = 1;
                         conf_fd[clients[i].fd]->data_issending = 1;
                         unchunk(clients[i].fd);
@@ -146,6 +146,7 @@ namespace http{
                 }
                else if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
+                    //std::cout<<"hey ... i am in send function\n";
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     std::map<int, bool>::iterator it_read = read_info.find(clients[i].fd);
                     sent_ret = send_data(clients[i].fd);
@@ -313,25 +314,17 @@ namespace http{
     {
         if (header_error == 1)
         {
-            // request req(requist_data[sockfd], conf_fd[sockfd]->getContent_length());
-            // Respond   res(req, conf_fd[sockfd]->getIndex());
-            // requist_data[sockfd] =  res.response_root(conf);
+            //std::cout<<"i am in header\n";
             request req;
+            header_error = 0;
             Respond res(false, req);
             requist_data[sockfd] = res.rtn_response();
+           // std::cout<<requist_data[sockfd]<<std::endl;
+            read_info[sockfd] = true;
         }
         else 
         {
-            // if (transfer_encoding != std::string::npos && transfer_encoding < header_end)
-            // {
-            //     requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
-            //     conf_fd[sockfd]->setContent_length(requist_data[sockfd].size() - (header_end + 4));
-            // }
-            // request req(requist_data[sockfd], conf_fd[sockfd]->getContent_length());
-            // Respond   res(req, conf_fd[sockfd]->getIndex());
-            // requist_data[sockfd] =  res.response_root(conf);
-
-             if (transfer_encoding != std::string::npos && transfer_encoding < header_end)
+            if (transfer_encoding != std::string::npos && transfer_encoding < header_end)
             {
                 requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
                 conf_fd[sockfd]->setContent_length(requist_data[sockfd].size() - (header_end + 4));
