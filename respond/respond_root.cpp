@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/19 17:19:57 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/20 15:03:32 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 
 std::string Respond::response_root(std::vector<server> servers)
 {
+    int rtn_location = 0;
     // std::cout << "method: " << r.get_method() << std::endl;
     // std::cout << "boundary: " << r.get_boundary() << std::endl;
     // std::cout << "content type: " << r.get_header("Content-Type") << std::endl;
@@ -29,76 +30,17 @@ std::string Respond::response_root(std::vector<server> servers)
     // if(_uri != "")
     // r.set_uri(_uri + r.get_uri());
     // _uri = "";
-    if (ft_parse_location(servers, false))
+    rtn_location = ft_parse_location(servers, false);
+    if (rtn_location)
     {
-        // to avoid reload of the page in case r.get_uri == _uri
-        //     std::cout << "uri: " << _uri << std::endl;
-        //     std::cout << "r.get_uri(): " << r.get_uri() << std::endl;
-        //     std::cout << "check location: " << check_location << std::endl;
-        // std::string::size_type index_uri = _uri.find(r.get_uri());
-        // if (r.get_uri() != _uri)
-        // {
-        //     std::string::size_type index__uri = _uri.find(r.get_uri());
-        //     if (index__uri == std::string::npos)
-        //     {
-        //         if (check_location == true && index_uri == std::string::npos)
-        //         {
-        //             std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
-        //             _uri = _uri.substr(0, _uri.find_last_of('/'));
-        //             _uri += r.get_uri();
-        //             r.set_uri(_uri);
-        //             _removed_path = "";
-        //             ft_parse_location(servers, true);
-        //             // check_location = false;
-        //             std::cout << "_uri: " << _uri << std::endl;
-        //         }
-        //         else
-        //         {
-        //             std::cout << "____-_-_1---_-_--_--_--_--_-_" << std::endl;
-        //             _uri += r.get_uri();
-        //             r.set_uri(_uri);
-        //             _removed_path = "";
-        //             ft_parse_location(servers, true);
-        //             std::cout << "_uri: " << _uri << std::endl;
-        //             check_location = true;
-        //         }
-        //     }
-        //     else if (index__uri != std::string::npos)
-        //     {
-        //     std::cout << "____-_-_NONE---_-_--_--_--_--_-_" << std::endl;
-        //     _removed_path = "";
-        //     ft_parse_location(servers, true);
-        //     check_location = true;
-        //     }
-        // }
-        // else if (index_uri == std::string::npos)
-        // {
-        //     std::cout << "____-_-_2---_-_--_--_--_--_-_" << std::endl;
-        //     _uri = _uri.substr(_uri.find_last_of('/'));
-        //     _uri += r.get_uri();
-        //     r.set_uri(_uri);
-        //     _removed_path = "";
-        //     ft_parse_location(servers, true);
-        //     check_location = false;
-        // }
-        // else if (index_uri != std::string::npos)
-        // {
-        //     std::cout << "____-_-_3---_-_--_--_--_--_-_" << std::endl;
-        //     check_location = true;
-        // }
         if (root_location(servers) == 1)
         {
-            // if (_uri != "")
             handle_error_response(404);
             return (rtn_response()); 
         }
     }
-    else
-    {
-       // std::cout << "____-_-_4---_-_--_--_--_--_-_" << std::endl;
-        _uri = r.get_uri();
-        check_location = false;
-    }
+    else if (rtn_location == 2)
+        return (rtn_response());
     // step 2 : check the redirectation
     if (!ft_parse_url_forwarding(servers))
         return (rtn_response());
@@ -204,6 +146,11 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
                 }
             }
         }
+        if (extension == ".php" || extension == ".py")
+        {
+            handle_error_response(403);
+            return (2);
+        }
     }
     return (1);
 }
@@ -227,17 +174,20 @@ int Respond::root_location(std::vector<server> server)
 int Respond::ft_parse_location(std::vector<server> server, bool flag)
 {
     std::string path = "";
+    int rtn_cgi = 0;
     if (flag == false)
         path = r.get_uri();
     else if (flag == true)
         path = _uri;
-  //  std::cout << "___--_-______-_---______--__---____---_____---------__---_------------" << std::endl;
     // exact location body code
     if (exact_location(server, path) == 0)
         return (0);
     // regex location body code
-    if (dynamic_location(server, path) == 0)
+    rtn_cgi = dynamic_location(server, path);
+    if (rtn_cgi == 0)
         return (0);
+    else if (rtn_cgi == 2)
+        return (2);
     _removed_path = "";
     // prefix location body code
     if (prefix_location(server, path) == 0)

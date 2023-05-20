@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   request_utils.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 21:18:13 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/15 20:59:53 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/19 18:11:52 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,7 @@ int ft_check_request_line(std::string method, std::string uri, std::string versi
     // std::cout << "Method: " << method << std::endl;
     if (method != "GET" && method != "POST" && method != "DELETE")
     {
+        std::cout << "Method::: " << method << std::endl;
         if (method != "PUT" || method == "OPTIONS" || method == "TRACE"  || method != "HEAD")
             std::cerr << "Method not implemented" << std::endl;
         return (0);

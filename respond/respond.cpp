@@ -36,6 +36,24 @@ Respond::Respond(request& req, int index_) : r(req)
     _pur_uri = r.get_uri();
 }
 
+Respond::Respond(bool rtn_error, request &req) : _rtn_error(rtn_error), r(req)
+{
+    _http_version = "HTTP/1.1";
+    if (_rtn_error == false)
+    {
+        std::string msg = "400";
+        // i need to set response wuth bad request
+        set_status_code(400);
+        set_status_message(get_response_status(get_status_code()));
+        set_header("Content-Type", "text/html");
+        set_header("Connection", "keep-alive");
+        set_date();
+        _response_body = "<html><head><title>" + msg + " " + _status_message + "</title></head><body><h1>" + msg + " " + _status_message + "</p></body></html>";
+        set_header("Content-Length", std::to_string(_response_body.length()));
+    }
+    return ;
+}
+
 Respond::~Respond()
 {
 }
@@ -131,10 +149,6 @@ std::string Respond::get_document_root()
 int Respond::ft_parse_root_path(std::vector<server> server)
 {
     struct stat file_stats;
-    std::cout << "removed path: " << _removed_path << std::endl;
-    std::cout << "get root: " << server[_server_index]._location[_location_index].get_root() << std::endl;
-    std::cout << "path found: " << _path_found << std::endl;
-    // std::cout << "_uriiii: " << _uri << std::endl;
     // if (check_location == false)
     _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path;
     // if (check_location == true)

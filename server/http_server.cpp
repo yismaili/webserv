@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/19 15:47:19 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/20 00:47:05 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -322,11 +322,17 @@ namespace http{
 
     void http_sever ::unchunk(int sockfd)
     {
+        
+            
         if (header_error == 1)
         {
-            request req(requist_data[sockfd], conf_fd[sockfd]->getContent_length());
-            Respond   res(req, conf_fd[sockfd]->getIndex());
-            requist_data[sockfd] =  res.response_root(conf);
+            std::cout<<"sgdusd"<<std::endl;
+            request req;
+            Respond res(false, req);
+            // std::cout << "rtn response: " << res.rtn_response() << std::endl;
+            requist_data[sockfd] = res.rtn_response();
+            std::cout << requist_data[sockfd] << std::endl;
+            // exit(1);
         }
         else 
         {
@@ -337,9 +343,19 @@ namespace http{
                 // std::size_t header_end = requist_data[sockfd].find("\r\n\r\n");
                 conf_fd[sockfd]->setContent_length(requist_data[sockfd].size() - (header_end + 4));
             }
+            int rtn_error;
             request req(requist_data[sockfd], conf_fd[sockfd]->getContent_length());
-            Respond   res(req, conf_fd[sockfd]->getIndex());
-            requist_data[sockfd] =  res.response_root(conf); 
+            rtn_error = req.parse_request();
+            if (rtn_error == 2)
+            {
+                Respond res(false, req);
+                requist_data[sockfd] = res.rtn_response();
+            }
+            else if (rtn_error == 0)
+            {
+                Respond   res(req, conf_fd[sockfd]->getIndex());
+                requist_data[sockfd] =  res.response_root(conf);
+            }
         }
     }
     
