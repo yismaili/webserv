@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/20 23:10:46 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/20 23:48:59 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,14 @@ namespace http{
    http_sever::http_sever(std::vector<server> conf_) :sock()
    {
         get_server(conf_);
-        for (size_t i = 0; i < conf_.size(); i++)
+        managerOfserver(conf_);
+       /* for (size_t i = 0; i < conf_.size(); i++)
         {
             for (size_t j = 0; j < conf_[i]._listen.size(); j++)
             {
-               // std::cout<<conf_[i].get_server_name()<<std::endl;
                 socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i));
             }
-        }
+        }*/
         conf = conf_;
     }
     
@@ -74,12 +74,42 @@ namespace http{
         return (0);
     }
     
+    int http_sever::managerOfserver(std::vector<server> conf_)
+    {
+        for (size_t i = 0; i < conf_.size(); i++)
+        {
+            for (size_t j = 0; j < conf_[i]._listen.size(); j++)
+            {
+               if (!ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && !ifserver_dup(conf_[i]._server_name[j]))
+                {
+                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
+                }
+                else if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && !ifserver_dup(conf_[i]._server_name[j]))
+                {
+                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
+                }
+                else if (ifhost_dup(conf_[i].get_host()) && ifport_dup(conf_[i]._listen[j]) && !ifserver_dup(conf_[i]._server_name[j]))
+                {
+                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
+                }
+                else if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && ifserver_dup(conf_[i]._server_name[j]))
+                {
+                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
+                }
+                /*std::cout<<ifhost_dup(conf_[i].get_host())<<std::endl;
+                 std::cout<<ifport_dup(conf_[i]._listen[j])<<std::endl;
+                  std::cout<<ifserver_dup(conf_[i]._server_name[j])<<std::endl;*/
+            }
+        }
+        return (0);
+    }
+    
     int http_sever::ifport_dup(int port_)
     {
         std::vector<int>::iterator it;
         int check = 0;
-        for (it = port.begin(); it != port.end(); ++it) {
-            std::cout << *it << std::endl;
+        for (it = port.begin(); it != port.end(); ++it) 
+        {
             if (port_ == (*it))
             {
                 check++;
@@ -96,8 +126,8 @@ namespace http{
     {
         std::vector<std::string>::iterator it;
         int check = 0;
-        for (it = servers_names.begin(); it != servers_names.end(); ++it) {
-            std::cout << *it << std::endl;
+        for (it = servers_names.begin(); it != servers_names.end(); ++it) 
+        {
             if (server_name == (*it))
             {
                 check++;
@@ -115,8 +145,8 @@ namespace http{
         std::vector<std::string>::iterator it;
         int check = 0;
         
-        for (it = host.begin(); it != host.end(); ++it) {
-            std::cout << *it << std::endl;
+        for (it = host.begin(); it != host.end(); ++it) 
+        {
             if (host_ == (*it))
             {
                 check++;
