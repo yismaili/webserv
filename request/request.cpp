@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/19 22:36:15 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/20 15:04:38 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -132,13 +132,7 @@ int request::parse_request()
             break;
         lines.push_back(line);
     }
-    if (lines[0].empty())
-    {
-        std::cout << "HAHAHAHAHAH REQUEST KHAAAAAAWWIIIIIIII" << std::endl;
-        std::cout << "request: " << request << std::endl;
-    }
     // Parse the request line
-    std::cout << lines[0] << std::endl;
     std::istringstream request_line(lines[0]);
     request_line >> this->_method >> this->_uri >> this->_version;
     // i need to call a function to check if the request line content is suitable or not

@@ -149,10 +149,6 @@ std::string Respond::get_document_root()
 int Respond::ft_parse_root_path(std::vector<server> server)
 {
     struct stat file_stats;
-    std::cout << "removed path: " << _removed_path << std::endl;
-    std::cout << "get root: " << server[_server_index]._location[_location_index].get_root() << std::endl;
-    std::cout << "path found: " << _path_found << std::endl;
-    // std::cout << "_uriiii: " << _uri << std::endl;
     // if (check_location == false)
     _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path;
     // if (check_location == true)

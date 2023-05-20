@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/20 00:23:12 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/20 15:03:32 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,7 +147,6 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
         }
         if (extension == ".php" || extension == ".py")
         {
-            std::cout << "HIOIIIIHHOOOOO" << std::endl;
             handle_error_response(403);
             return (2);
         }
@@ -179,7 +178,6 @@ int Respond::ft_parse_location(std::vector<server> server, bool flag)
         path = r.get_uri();
     else if (flag == true)
         path = _uri;
-  //  std::cout << "___--_-______-_---______--__---____---_____---------__---_------------" << std::endl;
     // exact location body code
     if (exact_location(server, path) == 0)
         return (0);
@@ -225,7 +223,6 @@ int Respond::ft_parse_url_forwarding(std::vector<server> server)
 
 int Respond::ft_check_allowed_methods(std::vector<server> server)
 {
-    std::cout << "method :" << r.get_method() << std::endl;
     if (_path_found == server[_server_index]._location[_location_index].location_name)
     {
         // get the autoindex
