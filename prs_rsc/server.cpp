@@ -258,7 +258,7 @@ server::server(Data_config data, bool check_location)
         std::istringstream iss(line);
         iss >> key >> value;
         key = toLower(key);
-        if (key == "server_name")
+        if (key == "server_name" && check_location)
         {
             if(c_server_name)
                 ft_error(line, "Duplicated");
@@ -268,7 +268,7 @@ server::server(Data_config data, bool check_location)
             c_server_name++;
             _server_name.push_back(value);
         }
-        else if (key == "host")
+        else if (key == "host" && check_location)
         {
             if(c_host)
                 ft_error(line, "Duplicated");
@@ -278,7 +278,7 @@ server::server(Data_config data, bool check_location)
             c_host++;
             _host = value;
         }
-        else if (key == "listen")
+        else if (key == "listen" && check_location)
         {
             is_empty_value(value, line);
             int port = ft_number(value, line);
@@ -453,12 +453,9 @@ server::server(Data_config data, bool check_location)
         _host = "127.0.0.1";
     if(!c_error_page && check_location)
     {
-        _error_page[400] = "/400.html";
-        _error_page[401] = "/401.html";
-        _error_page[403] = "/403.html";
-        _error_page[404] = "/404.html";
-        _error_page[405] = "/405.html";
-        _error_page[500] = "/500.html";
+        _error_page[403] = "www/html/error_pages/403.html";
+        _error_page[404] = "www/html/error_pages/404.html";
+        _error_page[500] = "www/html/error_pages/500.html";
     }
     
     if(data.location.size())

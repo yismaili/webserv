@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   respond.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/19 15:32:37 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/19 23:02:16 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,13 @@
 
 class server;
 class location;
+class request;
 
 class Respond
 {
     public:
         Respond();
+        Respond(bool rtn_error, request &req);
         Respond(request& req, int index_);
         ~Respond();
 
@@ -128,6 +130,7 @@ class Respond
         static std::string _uri;
         std::string _pur_uri;
         static bool check_location;
+        bool        _rtn_error;
 
         bool        _is_cgi;
         bool        _is_allowed_method;

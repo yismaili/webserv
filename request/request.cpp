@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   request.cpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/19 15:19:56 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/20 15:04:38 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,8 +21,10 @@ request::request() : _method(""), _uri(""), _version(""),
 request::request(std::string request, size_t content_len) : _method(""), _uri(""), _version(""),
     _body(""), _port(80), _query(""), _content_len(content_len)
 {
+    this->_init_request = request;
+    // std::cout << request << std::endl;
     add_header("Content-Length", std::to_string(_content_len));
-    this->parse_request(request);
+    // this->parse_request();
     return ;
 }
 
@@ -116,11 +118,9 @@ size_t  request::get_content_length() const
     return (this->_content_len);
 }
 
-void request::parse_request(std::string request)
+int request::parse_request()
 {
-    // std::cout << "___________33______" << std::endl;
-    // std::cout << request << std::endl;
-    //     std::cout << "________55_________" << std::endl;
+    std::string request = this->_init_request;
     // Split the request into lines
     std::vector<std::string> lines;
     std::istringstream iss(request);
@@ -133,14 +133,13 @@ void request::parse_request(std::string request)
         lines.push_back(line);
     }
     // Parse the request line
-    // std::cout << lines[0] << std::endl;
     std::istringstream request_line(lines[0]);
     request_line >> this->_method >> this->_uri >> this->_version;
     // i need to call a function to check if the request line content is suitable or not
     if (!ft_check_request_line(this->_method, this->_uri, this->_version))
     {
         std::cerr << "Invalid request line" << std::endl;
-        exit(1);
+        return (2);
     }
     ft_find_query();
     // Parse the headers
@@ -159,7 +158,7 @@ void request::parse_request(std::string request)
     if (ft_check_content_length() == false || ft_check_content_type() == false)
     {
         std::cerr << "Invalid Content-Length or Content-Type" << std::endl;
-        exit(1);
+        return (2);
     }
     // function that checks if the header `connexion` exists or not
     int rtn = ft_check_connexion();
@@ -169,7 +168,7 @@ void request::parse_request(std::string request)
             std::cerr << "Invalid Connexion header" << std::endl;
         else
             std::cerr << "Missing Connexion header" << std::endl;
-        exit(1);
+        return (2);
     }
 
     // function that will parse the port from the host 
@@ -177,7 +176,7 @@ void request::parse_request(std::string request)
     if (this->get_header("Host") == "")
     {
         std::cerr << "Invalid Host header" << std::endl;
-        exit(1);
+        return (2);
     }
     ft_parse_port(this->get_header("Host"));
     // ft_parse_language_charset();
@@ -190,7 +189,7 @@ void request::parse_request(std::string request)
         if (content_len > request.size())
         {
             std::cerr << "Invalid Content-Length" << std::endl;
-            exit(1);
+            return (2);
         }
         this->_body = request.substr(request.size() - content_len);
         // std::cout << "S T A R T     O F     REQUEST     B O D Y" << std::endl;
@@ -200,12 +199,10 @@ void request::parse_request(std::string request)
     else
     {
         if (content_len_str == "" || this->_method == "POST")
-            {
-                set_body("");
-                return ;
-            }
+                return (2);
         
     }
+    return (0);
 }
 
 void    request::print_request()
