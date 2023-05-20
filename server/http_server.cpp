@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/19 15:55:06 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/20 01:29:32 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ namespace http{
             //Check for events on server socket
             while (i < clients.size())
             {
-                if (!is_server(clients[i].fd) && requist_data[clients[i].fd].size() > 0)
+                if (!is_server(clients[i].fd) && requist_data[clients[i].fd].size() > 0 && conf_fd[clients[i].fd]->data_issending == 0)
                 {
                     if (getTime() - conf_fd[clients[i].fd]->getTime_out() >= 10000)
                     {
@@ -130,6 +130,15 @@ namespace http{
                         {
                             unchunk(clients[i].fd);
                             clients[i].events = POLLOUT;
+                        }
+                        else if (recv_ret == -3)
+                        {
+                            std::map<int, std::string>::iterator it_ = requist_data.find(clients[i].fd);
+                            requist_data.erase(it_);
+                            close(clients[i].fd);
+                            std::vector<pollfd>::iterator it = clients.begin() + i;
+                            clients.erase(it);
+                            i--;
                         }
                     }
                 }
@@ -250,11 +259,11 @@ namespace http{
         content_len = 0;
         conf_fd[sockfd]->setContent_length(0);
         conf_fd[sockfd]->setTime_out(getTime());
+        conf_fd[sockfd]->data_issending = 0;
         bytes_received = recv(sockfd, buffer, sizeof(buffer) - 1, 0);
         if (bytes_received <= 0)
         {
-            close(sockfd);
-            return (-2);
+            return (-3);
         }
         requist_data[sockfd].append(std::string(buffer, bytes_received));
         header_end = requist_data[sockfd].find("\r\n\r\n");
@@ -408,6 +417,7 @@ namespace http{
         else
         {
             // Update the amount of data that has been sent to the socket
+            conf_fd[socket]->data_issending = 1;
             sent_data[socket] += bytes_sent;
             // If all data has been sent, erase the request information and return 0
             if (sent_data[socket] >= requist_data[socket].size())
@@ -433,7 +443,6 @@ namespace http{
         if (sockfd_client < 0) 
         {
            std::cout << "\033[31mError: accepting connection\033[0m\n";
-           exit(1);
         }
         return (sockfd_client);
     }

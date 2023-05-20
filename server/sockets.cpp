@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/19 15:55:43 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/20 01:09:33 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,8 @@ namespace http{
             index = 0;
             content_length = 0;
             time_out = 0;
-            header_error = 0; 
+            header_error = 0;
+            data_issending = 0;
         }
         
         sockets::~sockets()
