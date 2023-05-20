@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
 /*   Updated: 2023/05/20 23:10:46 by yismaili         ###   ########.fr       */
@@ -192,6 +192,7 @@ namespace http{
                     else
                     {   
                         header_error = 0;
+
                         recv_ret = recv_data(clients[i].fd);
                         if (recv_ret == -2)
                         {
@@ -383,6 +384,8 @@ namespace http{
 
     void http_sever ::unchunk(int sockfd)
     {
+        
+            
         if (header_error == 1)
         {
             //std::cout<<"i am in header\n";
