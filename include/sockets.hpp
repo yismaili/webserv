@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/19 14:18:40 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/20 01:10:30 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ namespace http{
             void setContent_length(int const &content);
             unsigned int const &getTime_out() const;
             void    setTime_out(unsigned int time);
+            int data_issending;
         private:
             struct addrinfo hints;
             struct addrinfo *result, *rp;
