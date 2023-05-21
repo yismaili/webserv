@@ -176,23 +176,22 @@ int Respond::ft_parse_location(std::vector<server> server, bool flag)
 
 int Respond::ft_parse_url_forwarding(std::vector<server> server)
 {
-    for (size_t j = 0;  j < server[_server_index]._location.size(); j++)
-    {
-        if (_path_found == server[_server_index]._location[j].location_name)
+            std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
+        if (_path_found == server[_server_index]._location[_location_index].location_name)
         {
             if (!server[_server_index]._location[j].get_redirection().second.empty())
             {
-                size_t status_code = server[_server_index]._location[j].get_redirection().first;
+                std::cout << server[_server_index]._location[_location_index].get_redirection().second << "\n";
+                size_t status_code = server[_server_index]._location[_location_index].get_redirection().first;
                 // search for message of the status_code
                 set_status_code(status_code);
                 set_status_message(get_response_status(status_code));
-                set_header("Location", server[_server_index]._location[j].get_redirection().second);
+                set_header("Location", server[_server_index]._location[_location_index].get_redirection().second);
                 set_cache_control("no cache");
                 _is_redirection = true;
                 return (0);
             }
         }
-    }
     return (1);
 }
 

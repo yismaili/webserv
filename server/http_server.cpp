@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
 /*   Updated: 2023/05/21 19:14:06 by aoumad           ###   ########.fr       */
