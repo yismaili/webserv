@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/20 22:51:00 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/21 15:28:05 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -183,7 +183,6 @@ int request::parse_request()
 
     // Parse the request body
     std::string content_len_str = this->get_header("Content-Length");
-    std::cout << "content len: " << content_len_str << std::endl;
     if (content_len_str != "")
     {
         size_t content_len = std::stoi(content_len_str);

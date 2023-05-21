@@ -4,49 +4,25 @@ std::map<std::string, std::string>get_env(char *file, request req)
 
     std::map<std::string, std::string> env;
 
-    // env["SERVER_SOFTWARE"] = "MyServer/1.0";
-    // env["SERVER_NAME"] = "localhost";
-    // env["GATEWAY_INTERFACE"] = "CGI/1.1";
-    // env["SERVER_PROTOCOL"] = "HTTP/1.1";
-    // env["SERVER_PORT"] = "80";
     env["REQUEST_METHOD"] = req.get_method();
-    // env["SCRIPT_NAME"] = "/cgi-bin/mycgi";
     env["CONTENT_TYPE"] = req.get_header("Content-Type");
     env["CONTENT_LENGTH"] = std::to_string(req.get_body().size());
     env["QUERY_STRING"] = req.get_query();
-    // env["REMOTE_ADDR"] = "127.0.0.1";
-    // env["REMOTE_HOST"] = "localhost";
     env["REDIRECT_STATUS"] = "200";
     env["HTTP_COOKIE"] = req.get_header("Cookie");
     env["SCRIPT_FILENAME"] = file;
     return env;
 }
 
-void put_cookie(std::string output, Respond &res)
-{
-    std::string token;
-    std::size_t pos = output.find("Set-Cookie:");
-    if (pos != std::string::npos)
-    {
-        pos += 12;
-        std::size_t end = output.find(";", pos);
-        if (end != std::string::npos) {
-            token = output.substr(pos);
-        } else {
-            token = output.substr(pos);
-        }
-        res.set_header("Set-Cookie", token);
-    }
-}
 
-void set_headers_cgi(std::string output, Respond &res) {
+void set_headers_cgi(std::string output, Respond &res)
+{
     std::stringstream ss(output);
     std::string line;
     std::string body;
     bool headers_finished = false;
 
-    put_cookie(output, res);
-    body =+ "<!DOCTYPE html>";
+    body =+ "<!DOCTYPE html>\n";
     while (std::getline(ss, line)) {
         if (line == "\r") {
             headers_finished = true;
@@ -54,11 +30,11 @@ void set_headers_cgi(std::string output, Respond &res) {
         }
         if (!headers_finished) {
             std::size_t pos = line.find(": ");
-            if (pos != std::string::npos) {
+            if (pos != std::string::npos)
+            {
                 std::string key = line.substr(0, pos);
                 std::string value = line.substr(pos + 2);
-                if(key != "Set-Cookie")
-                    res.set_header(key, value);
+                res.set_header(key, value);
             }
         } 
         else 
@@ -67,9 +43,13 @@ void set_headers_cgi(std::string output, Respond &res) {
     res.set_response_body(body);
 }
 
-void free_all()
+void free_all(char *file, char *path, char **env, int size)
 {
-
+    for (int i = 0; i < size; i++) 
+        free(env[i]);
+    free (env);
+    free (file);
+    free (path);
 }
 
 std::string run_cgi(request &r,  Respond &res)
@@ -155,8 +135,7 @@ std::string run_cgi(request &r,  Respond &res)
     }
     close(fdtemp);
     close(fdtemp1);
-    free (file);
-    free (path);
+    free_all(file, path,envp, env.size());
     set_headers_cgi(content, res);
     return (content);
 }

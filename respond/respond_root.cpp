@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/20 23:51:51 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/21 15:45:15 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,20 +15,8 @@
 std::string Respond::response_root(std::vector<server> servers)
 {
     int rtn_location = 0;
-    // std::cout << "method: " << r.get_method() << std::endl;
-    // std::cout << "boundary: " << r.get_boundary() << std::endl;
-    // std::cout << "content type: " << r.get_header("Content-Type") << std::endl;
-    // std::cout << "content length: " << r.get_header("Content-Length") << std::endl;
-    // std::cout << "request body: " << r.get_body() << std::endl;
-    // std::cout << "r method: " << r.get_method() << std::endl;
-    // std::cout << "uri: " << r.get_uri() << std::endl;
     init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
-
-    
-    // if(_uri != "")
-    // r.set_uri(_uri + r.get_uri());
-    // _uri = "";
     rtn_location = ft_parse_location(servers, false);
     if (rtn_location)
     {
@@ -49,7 +37,6 @@ std::string Respond::response_root(std::vector<server> servers)
         handle_error_response(servers, _status_code);
         return (rtn_response());
     }
-    // std::cout << "our new uri: " << _uri << std::endl;
     // step 4 : check the allowed methods
     if (ft_check_allowed_methods(servers))
     {
@@ -64,7 +51,7 @@ std::string Respond::response_root(std::vector<server> servers)
     else if (r.get_method() == "POST")
         handle_post_response(servers);
     else if (r.get_method() == "DELETE")
-        handle_delete_response();
+        handle_delete_response(servers);
     else // unsupported http method
         handle_error_response(servers, 405);
 
@@ -74,18 +61,15 @@ std::string Respond::response_root(std::vector<server> servers)
 
 int Respond::exact_location(std::vector<server> server, std::string path)
 {
-        for (size_t j = 0; j < server[_server_index]._location.size(); j++)
+    for (size_t j = 0; j < server[_server_index]._location.size(); j++)
+    {
+        if (server[_server_index]._location[j].location_name == path)
         {
-            if (server[_server_index]._location[j].location_name == path)
-            {
-            //     std::cout << "path :" << path << std::endl;
-            //     std::cout << server[_server_index]._location[j].get_root() << std::endl;
-            //    std::cout << server[_server_index]._location[j].get_index() << std::endl;
-                _location_index = j;
-                _path_found = server[_server_index]._location[j].location_name;
-                return (0);
-            }
+            _location_index = j;
+            _path_found = server[_server_index]._location[j].location_name;
+            return (0);
         }
+    }
     return (1);
 }
 
@@ -124,8 +108,6 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
         std::string extension = path.substr(pos);
         if (!prefix_location(server, path))
         {
-            // std::cout << path << std::endl;
-            //std::cout << "server index: " << _server_index << " and location index: " << _location_index << std::endl;
             std::map<std::string, std::string> path_info = server[_server_index]._location[_location_index].get_path_info();
             for (std::map<std::string, std::string>::const_iterator it = path_info.begin();
                 it != path_info.end(); ++it)
@@ -162,8 +144,6 @@ int Respond::root_location(std::vector<server> server)
         {
             _location_index = j;
             _path_found = server[_server_index]._location[j].location_name;
-            // std::cout << "path found: " << _path_found << std::endl;
-            // std::cout << "root: " << server[_server_index]._location[j].get_root() << std::endl;
             return (0);
         }
     }
@@ -200,11 +180,6 @@ int Respond::ft_parse_url_forwarding(std::vector<server> server)
     {
         if (_path_found == server[_server_index]._location[j].location_name)
         {
-            // check for redirection ===== where redirection is make_pair
-            // std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
-            // std::cout << server[i]._location[j].get_redirection().first << std::endl;
-            // std::cout << server[i]._location[j].get_redirection().second << std::endl;
-            // std::cout << "___________________-----_______---________----_____--___--__-_-_-_--_--" << std::endl;
             if (!server[_server_index]._location[j].get_redirection().second.empty())
             {
                 size_t status_code = server[_server_index]._location[j].get_redirection().first;
@@ -225,8 +200,6 @@ int Respond::ft_check_allowed_methods(std::vector<server> server)
 {
     if (_path_found == server[_server_index]._location[_location_index].location_name)
     {
-        // get the autoindex
-        // _autoindex = server[i]._location[j].autoindex;
         // check for allowed methods
         std::vector<std::string> allowed_methods = server[_server_index]._location[_location_index].get_allow_methods();
         for (size_t k = 0; k < allowed_methods.size(); k++)

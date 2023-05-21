@@ -6,6 +6,7 @@
 #include <vector>
 #include <utility>
 #include <map>
+#include <fcntl.h> 
 
 class location;
 class server
@@ -60,7 +61,7 @@ int is_world(std::string word, std::string str);
 int search_char(std::string str, char c);
 std::string trimString(const std::string& str);
 int skip_spaces(std::string str);
-std::vector<server> ft_fill_servers(char **av);
+std::vector<server> ft_fill_servers(char **av, int ac);
 std::vector<int> get_all_ports(std::vector<server> servers);
 
 #endif

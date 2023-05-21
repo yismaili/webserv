@@ -391,6 +391,9 @@ server::server(Data_config data, bool check_location)
         }
         else if (key == "path_info" && !check_location)
         {
+            std::map<std::string, std::string>::const_iterator it = _path_info.find(value);
+             if (it != _path_info.end())
+                ft_error(line, "Error");
             is_empty_value(value, line);
            std::string cgi = toLower(value);
             if (value != ".py" && value != ".php")

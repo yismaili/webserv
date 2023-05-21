@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/20 23:48:26 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/21 15:45:35 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,19 +20,12 @@ void    Respond::handle_get_response(std::vector<server> servers)
         run_cgi(r, *this);
         return ;
     }
-    // std::cout << "___---222222__________@@@@@-______-" << std::endl;
     // step 3: check if it's a file or not
     if (ft_check_file() == true)
     {
         ft_handle_file(servers);
         return ;
     }
-    // else
-    // {
-    //     std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
-    //     handle_error_response(404);
-    //     return ;
-    // }
     // step 4 : check the index in the configuration file and render it
     int rtn_index = ft_handle_index(servers);
     if (rtn_index == 0)
@@ -59,7 +52,7 @@ void    Respond::handle_post_response(std::vector<server> server)
     // step 1: check if the request body is empty or not
     if (r.get_body().empty())
     {
-        set_response_body("Body request is missing");
+        handle_error_response(server, 400);
         return ;
     }
     if (_is_cgi == false && (server[_server_index]._location[_location_index].get_upload_store().empty() && server[_server_index]._location[_location_index].get_upload() == false))
@@ -76,22 +69,21 @@ void    Respond::handle_post_response(std::vector<server> server)
     {
         if (_is_cgi == true)
         {
-            // khasni n7t query homa request body
             run_cgi(r, *this);
+            return ;
         }
         else
         {
-            // need to create a file that has `Key` as it's name and the content of it as `value`
             handle_urlencoded();
             create_decode_files();
+            return ;
         }
     }
     if (check_post_type() == "form-data")
     {
         handle_form_data(server);
-        
+        return ;
     }
-
 }
 
 void    Respond::handle_urlencoded()
@@ -304,7 +296,7 @@ std::string Respond::check_post_type()
         return ("regular");
 }
 
-void    Respond::handle_delete_response()
+void    Respond::handle_delete_response(std::vector<server> server)
 {
         std::cout << "DKHLAAAAAAAAAAT" << std::endl;
         std::cout << "rooted path:" << _rooted_path << std::endl;
@@ -318,11 +310,6 @@ void    Respond::handle_delete_response()
     }
     else
     {
-        _status_code = 500;
-        _status_message = get_response_status(_status_code);
-        set_response_body("<html><body><h1>Error deleting file: the folder is not empty</h1></body></html>");
-        set_header("Content-Type", r.get_header("Content-Type"));
-        set_header("Content-Length", std::to_string(_response_body.length()));
-        set_header("Connection", "keep-alive");
+        handle_error_response(server, 409);
     }
 }

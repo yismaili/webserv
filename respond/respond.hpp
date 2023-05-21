@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/21 00:21:18 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/21 15:45:48 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,12 +147,10 @@ class Respond
         void        create_decode_files();
 
         // DELETE RESPONSE
-        void        handle_delete_response();
+        void        handle_delete_response(std::vector<server> server);
         // ERROR RESPONSE
         void        handle_error_response(std::vector<server> server, int error_code);
         void        ft_handle_error(int error_code);
-
-        // DELETE RESPONSE
 
         // void        cout_respond();
 

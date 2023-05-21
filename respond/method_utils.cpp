@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/21 00:16:58 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/21 16:07:20 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -140,7 +140,6 @@ int Respond::ft_handle_index_2(std::vector<server> server, std::string index)
             set_status_code(200);
             set_status_message(get_response_status(200));
             set_header("Content-Type", get_mime_type(_mime_string));
-           // std::cout << "mime _type in index: " << get_mime_type(_mime_string) << std::endl;
             _headers["Content-Length"] = std::to_string(_response_body.length());
             _headers["Connection"] = "keep-alive";
             set_date();
@@ -190,8 +189,6 @@ void    Respond::ft_handle_error(int error_code)
 
 void    Respond::ft_show_autoindex(std::vector<server> server)
 {
-    // if(!check_location)
-        // _uri = _uri + r.get_uri();
     std::string index_html = "<!DOCTYPE html>\n<html>\n<head>\n";
     index_html += "<meta charset=\"UTF-8\">\n";
     index_html += "<title>Index of " + _rooted_path + "</title>\n";
@@ -250,27 +247,6 @@ void    Respond::ft_show_autoindex(std::vector<server> server)
             index_html += "\t\t <b><i><font size=\"5\">" + file_size + "\t\t" + fileTime + "</font></i></b></p>\n";
         }
     }
-    // std::cout << index_html << std::endl;
-    // while ((entry = readdir(dir)) != NULL)
-    // {
-    //     if (entry->d_name[0] != '.')
-    //     {
-    //         file_name = std::string(entry->d_name);
-    //         std::string file_path = _rooted_path + "/" + file_name;
-            
-    //         if (stat(file_path.c_str(), &file_stat) < 0)
-    //         {
-    //             handle_error_response(403);
-    //             continue ;
-    //         }
-            
-    //         file_size = std::to_string(file_stat.st_size);
-    //         index_html += "<tr>";
-    //         index_html += "<td><a href=\"" + file_name + "\">" + file_name + "</a></td>";
-    //         index_html += "<td>" + file_size + "</td>";
-    //         index_html += "</tr>\n";
-    //     }
-    // }
     closedir(dir);
     index_html += "</tbody>\n</table>\n</body>\n</html>\n";
     _response_body = index_html;
@@ -282,7 +258,6 @@ void    Respond::handle_error_response(std::vector<server> server, int error_cod
     error_page = server[_server_index].get_error_page();
     if (error_page.find(error_code) != error_page.end())
     {
-        std::cout << "WIIIIWIIIIIIIIK A FATIMA\n";
         std::string error_path = error_page[error_code];
         std::ifstream file;
         file.open(error_path.c_str());
