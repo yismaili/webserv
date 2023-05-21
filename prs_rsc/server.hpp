@@ -33,7 +33,6 @@ public:
     std::map<std::string ,std::string> _path_info; 
 public:
     std::string _host; /*s*/
-    std::vector<std::string> _server_name; /*s*/
     std::vector<int> _listen; /*s*/
     std::vector<location> _location;
     server(Data_config data, bool check_location);
