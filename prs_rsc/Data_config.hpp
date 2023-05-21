@@ -15,8 +15,6 @@ struct Data_config
     std::map<std::string, std::string> location;
 };
 
-
-
 struct compters
 {
     int c_server_name;
