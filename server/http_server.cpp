@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/21 22:29:34 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/21 22:43:16 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -527,6 +527,7 @@ namespace http{
         static std::map<int, std::size_t> sent_data;
         std::string data_to_send;
         long bytes_sent;
+        static int check = 0;
 
         data_to_send = requist_data[socket].substr(sent_data[socket], 100024);
         bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
@@ -547,14 +548,17 @@ namespace http{
             if (sent_data[socket] >= requist_data[socket].size())
             {
                 sent_data[socket] = 0;
-                std::cout << "\n\033[33mRESPONSE SENDED TO [" << conf_fd[socket]->getPort() << "]...\033[0m" << std::endl;
+                std::cout << "\n\033[33mRESPONSE SENDED TO [" << conf_fd[socket]->getPort() << "]\033[0m" << std::endl;
                 std::map<int, std::string>::iterator it = requist_data.find(socket);
                 requist_data.erase(it);
                 return (0);
             }
             else
             {
+                if (check == 0)
+                    std::cout << "\n\033[33mRESPONSE SENDING TO [" << conf_fd[socket]->getPort() << "]...\033[0m" << std::endl;
                 // If there is still data to send, return 1
+                check = 1;
                 return (1);
             }
         }
