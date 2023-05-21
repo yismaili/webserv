@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/21 00:30:18 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/21 01:35:50 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,6 @@ namespace http{
    {
         get_server(conf_);
         managerOfserver(conf_);
-       /* for (size_t i = 0; i < conf_.size(); i++)
-        {
-            for (size_t j = 0; j < conf_[i]._listen.size(); j++)
-            {
-                socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i));
-            }
-        }*/
         conf = conf_;
     }
     
@@ -76,34 +69,32 @@ namespace http{
     
     int http_sever::managerOfserver(std::vector<server> conf_)
     {
+        int k_flag = 0;
         for (size_t i = 0; i < conf_.size(); i++)
         {
-            
-            for (size_t j = 0; j < conf_[i]._listen.size(); j++)
+           for (size_t j = 0; j < conf_[i]._listen.size(); j++)
             {
-               if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && ifserver_dup(conf_[i]._server_name[j]))
+                if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && ifserver_dup(conf_[i]._server_name[j]))
                 {
-                    std::cout<<"1\n";
                     socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
                 }
                 else if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && !ifserver_dup(conf_[i]._server_name[j]))
                 {
+                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
+                }
+                else if (!ifhost_dup(conf_[i].get_host()) && ifport_dup(conf_[i]._listen[j]))
+                {
                     std::cout<<"2\n";
                     socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
                 }
-                else if (ifhost_dup(conf_[i].get_host()) && ifport_dup(conf_[i]._listen[j]) && ifport_dup(conf_[i]._listen[j]))
+                else if (ifhost_dup(conf_[i].get_host()) && ifport_dup(conf_[i]._listen[j]) &&  k_flag == 0)
                 {
-                    std::cout<<"3\n";
-                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i));
-                    i++;
+                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
+                    if (ifport_dup(conf_[i + 1]._listen[j]))
+                        k_flag = 1;
+                    else
+                        k_flag = 0;
                 }
-                // else if (!ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && !ifserver_dup(conf_[i]._server_name[j]))
-                // {
-                //     socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
-                // }
-                /*std::cout<<ifhost_dup(conf_[i].get_host())<<std::endl;
-                 std::cout<<ifport_dup(conf_[i]._listen[j])<<std::endl;
-                  std::cout<<ifserver_dup(conf_[i]._server_name[j])<<std::endl;*/
             }
         }
         return (0);
