@@ -11,7 +11,7 @@
 class location;
 class server
 {
-protected:
+public:
     std::vector<std::string> _server_name; /*s*/
     std::string _index;
     std::string _host; /*s*/

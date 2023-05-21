@@ -6,7 +6,6 @@ form = cgi.FieldStorage()
 
 first_name = form.getvalue('first_name')
 last_name  = form.getvalue('last_name')
-while(1);
 print ("Content-type:text/html\r\n")
 print ("\r\n")
 print ("<html>")

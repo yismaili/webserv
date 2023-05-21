@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/21 15:28:05 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/21 19:11:02 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ int request::parse_request()
         return (2);
     }
     ft_find_query();
-    ft_handle_space_uri();
+    handleSpecialCharacters(this->_uri);
     // Parse the headers
     for (std::vector<std::string>::const_iterator it = lines.begin() + 1; it != lines.end(); ++it)
     {
@@ -222,14 +222,19 @@ std::string request::get_boundary() const
 }
 
 // change the "%20" with a space
-void    request::ft_handle_space_uri()
-{
-    std::string uri = this->_uri;
-    std::string::size_type n = 0;
-    while ((n = uri.find("%20", n)) != std::string::npos)
-    {
-        uri.replace(n, 3, " ");
-        n += 1;
+void request::handleSpecialCharacters(std::string& uri) {
+    std::string encodedChars[] = {"%20", "%21", "%22", "%23", "%24", "%25", "%26", "%27", "%28", "%29", "%2A", "%2B", "%2C",
+                                  "%2D", "%2E", "%2F", "%3A", "%3B", "%3C", "%3D", "%3E", "%3F", "%40", "%5B", "%5C", "%5D",
+                                  "%5E", "%5F", "%60", "%7B", "%7C", "%7D", "%7E"};
+
+    std::string specialChars[] = {" ", "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", ":", ";", "<",
+                                  "=", ">", "?", "@", "[", "\\", "]", "^", "_", "`", "{", "|", "}", "~"};
+
+    for (size_t i = 0; i < sizeof(encodedChars) / sizeof(encodedChars[0]); i++) {
+        std::string::size_type n = 0;
+        while ((n = uri.find(encodedChars[i], n)) != std::string::npos) {
+            uri.replace(n, encodedChars[i].length(), specialChars[i]);
+            n += 1;
+        }
     }
-    this->_uri = uri;
 }

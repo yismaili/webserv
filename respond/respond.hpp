@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/21 15:45:48 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/21 16:14:59 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -157,3 +157,39 @@ class Respond
 };
 
 #endif
+
+    // void http_sever ::unchunk(int sockfd)
+    // {
+        
+            
+    //     if (header_error == 1)
+    //     {
+    //         request req;
+    //         header_error = 0;
+    //         Respond res(conf, conf_fd[sockfd]->getIndex() ,false, req);
+    //         requist_data[sockfd] = res.rtn_response();
+    //        // std::cout<<requist_data[sockfd]<<std::endl;
+    //         read_info[sockfd] = true;
+    //     }
+    //     else 
+    //     {
+    //         if (transfer_encoding != std::string::npos && transfer_encoding < header_end)
+    //         {
+    //             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
+    //             conf_fd[sockfd]->setContent_length(requist_data[sockfd].size() - (header_end + 4));
+    //         }
+    //         int rtn_error;
+    //         request req(requist_data[sockfd], conf_fd[sockfd]->getContent_length());
+    //         rtn_error = req.parse_request();
+    //         if (rtn_error == 2)
+    //         {
+    //             Respond res(conf, conf_fd[sockfd]->getIndex() ,false, req);
+    //             requist_data[sockfd] = res.rtn_response();
+    //         }
+    //         else if (rtn_error == 0)
+    //         {
+    //             Respond   res(req, conf_fd[sockfd]->getIndex());
+    //             requist_data[sockfd] =  res.response_root(conf);
+    //         }
+    //     }
+    // }

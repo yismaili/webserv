@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 18:00:51 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/21 00:03:30 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/21 19:11:36 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ class request
         void    ft_parse_language_charset();
         void    print_request();
         void    init_parse();
-        void    ft_handle_space_uri();
+        void    handleSpecialCharacters(std::string& uri);
 };
 
 int     ft_check_request_line(std::string method, std::string uri, std::string version);
