@@ -8,6 +8,11 @@
 #include <map>
 #include <string>
 #include "../request/request.hpp"
-std::string run_cgi(char *file, char *path);
+#include "../respond/respond.hpp"
+
+class Respond;
+class request;
+
+std::string run_cgi(request &r,  Respond &res);
 
 #endif

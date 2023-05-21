@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 21:18:13 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/05 02:29:07 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 18:11:52 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,11 @@
 
 int ft_check_request_line(std::string method, std::string uri, std::string version)
 {
-    if (method != "GET" && method != "POST" && method != "HEAD" && method != "PUT")
+    // std::cout << "Method: " << method << std::endl;
+    if (method != "GET" && method != "POST" && method != "DELETE")
     {
-        if (method == "DELETE" || method == "OPTIONS" || method == "TRACE")
+        std::cout << "Method::: " << method << std::endl;
+        if (method != "PUT" || method == "OPTIONS" || method == "TRACE"  || method != "HEAD")
             std::cerr << "Method not implemented" << std::endl;
         return (0);
     }
@@ -45,7 +47,7 @@ void    request::ft_parse_port(std::string host)
 
 int request::ft_check_content_length()
 {
-    if (this->_method == "POST" || this->_method == "PUT")
+    if (this->_method == "POST")
     {
         if (this->_headers.find("Content-Length") == this->_headers.end())
             return (0);
@@ -55,10 +57,27 @@ int request::ft_check_content_length()
 
 int request::ft_check_content_type()
 {
-    if (this->_method == "POST" || this->_method == "PUT")
+    if (this->_method == "POST")
     {
         if (this->_headers.find("Content-Type") == this->_headers.end())
             return (0);
+        else
+        {
+            std::string content_type = this->_headers["Content-Type"];
+            if (content_type.find("multipart/form-data") != std::string::npos)
+            {
+                std::string::size_type pos;
+                pos = content_type.find("boundary=");
+                if (pos == std::string::npos)
+                    return (0);
+                this->_boundary = content_type.substr(pos + 9);
+                std::string::size_type end_pos;
+                end_pos = content_type.find(";");
+                content_type = content_type.substr(0, end_pos);
+                add_header("Content-Type", content_type);
+                return (1);
+            }
+        }
     }
     return (1);
 }

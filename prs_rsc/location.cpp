@@ -42,8 +42,9 @@ std::string extract_path(std::string location_name)
 
 location::location(Data_config data, std::string location_name) : server(data, 0)
 {
+	//std::cout << location_name << "\n";
     this->location_name = extract_path(location_name);
-    std::cout <<"|"<<this->location_name<<"|"<<std::endl;
+    //std::cout <<"|||||||||||||"<<this->location_name<<"|"<<std::endl;
 }
 
 location::~location()
@@ -52,8 +53,8 @@ location::~location()
 
 void location::fill_rest(server &s)
 {
-    if (_index.empty())
-        _index = s.get_index();
+    // if (_index.empty())
+    //     _index = s.get_index();
     if (_root.empty())
         _root = s.get_root();
     if(_error_page.empty())

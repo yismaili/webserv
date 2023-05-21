@@ -25,17 +25,20 @@ const std::pair<std::string , std::string> mime_type[] =
     std::pair<std::string, std::string>("exe", "application/x-msdownload"),
     std::pair<std::string, std::string>("msi", "application/x-msdownload"),
     std::pair<std::string, std::string>("cab", "application/vnd.ms-cab-compressed"),
-    std::pair<std::string, std::string>("", "application/octet-stream")
+    std::pair<std::string, std::string>("c", "text/x-c"),
+    std::pair<std::string, std::string>("cpp", "text/x-c++"),
+    std::pair<std::string, std::string>("", "text/html")
 };
 
 std::string Respond::get_mime_type(std::string file_extension)
 {
-    for (int i = 0; i < sizeof(mime_type); i++)
+    size_t mime_type_size = sizeof(mime_type) / sizeof(mime_type[0]);
+    for (size_t i = 0; i < mime_type_size; i++)
     {
         if (mime_type[i].first == file_extension)
             return (mime_type[i].second);
     }
-    return (mime_type[sizeof(mime_type) - 1].second);
+    return (mime_type[mime_type_size - 1].second);
 }
 
 const std::pair<int, std::string> response_status[] =
@@ -107,10 +110,11 @@ const std::pair<int, std::string> response_status[] =
 
 std::string Respond::get_response_status(int status_code)
 {
-    for (int i = 0; i < sizeof(response_status); i++)
+    size_t status_size = sizeof(response_status) / sizeof(response_status[0]);
+    for (size_t i = 0; i < status_size; i++)
     {
         if (response_status[i].first == status_code)
             return (response_status[i].second);
     }
-    return (response_status[sizeof(response_status) - 1].second);
+    return (response_status[status_size - 1].second);
 }

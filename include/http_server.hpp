@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/02 13:14:43 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/20 01:10:16 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,12 +33,11 @@
 #include <ctime>
 #include <chrono>
 #include <iomanip>
-# include "../request/request.hpp"
+#include "../request/request.hpp"
+#include "../respond/respond.hpp"
+#include <csignal>
 
 
-
-
-#define BUFFER_SIZE 1024
 namespace http{
     class http_sever{
         public:
@@ -58,15 +57,24 @@ namespace http{
             int transfer_encoding_chunked(int sockfd);
             std::string generate_cookie_value(int length);
             std::vector<http::sockets>::iterator find_conf(int sockfd);
+            int parse_header(std::string header, int sockfd);
+            unsigned int getTime(void);
         public:
-            int clint;
             http::sockets sock;  
             std::vector<http::sockets> socket_id;
-            std::map<int, std::vector<http::sockets>::iterator> conf_fd;
+            std::map<int, std::vector<http::sockets>::iterator>conf_fd;
             std::vector<pollfd> clients;
             std::map<int, std::string> requist_data;
             std::map<int, bool> read_info;
-            std::map<int, bool> write_info;
+            std::vector<server> conf;
+            std::size_t content_length ;
+            std::size_t transfer_encoding;
+            std::size_t post_method;
+            std::size_t content_len;
+            std::size_t header_end;
+            std::size_t body_end;
+            int         header_error;
+            std::size_t transfer_encoding_gzip;
     };
 }
 #endif

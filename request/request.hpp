@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 18:00:51 by aoumad            #+#    #+#             */
-/*   Updated: 2023/04/05 02:28:47 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/19 22:36:20 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,14 @@
 # include <sys/socket.h>
 # include <zlib.h>
 
+# include "../respond/respond.hpp"
+
+class Respond;
 
 class request
 {
     private:
+        std::string _init_request;
         std::string _method; // stores http method of the request (e.g "GET", "POST"..etc)
         std::string _uri; // stores the URI of the request  (e.g "/index.html")
         std::string _version; // stores the http version of the request (e.g "HTTP/1.1")
@@ -40,10 +44,12 @@ class request
         std::map<std::string, std::string> _charset;
         int         _port;
         std::string _query;
+        std::string _boundary;
+        size_t _content_len;
 
     public:
         request();
-        request(std::string request);
+        request(std::string request, size_t content_len);
         request(const request &src);
         ~request();
         
@@ -54,6 +60,8 @@ class request
         std::string get_version() const;
         std::string get_body() const;
         std::string get_query() const;
+        std::string get_boundary() const;
+        size_t      get_content_length() const;
         // int     ft_get_port() const;
 
         void set_method(std::string method);
@@ -64,7 +72,7 @@ class request
         void add_header(std::string key, std::string value);
         std::string get_header(std::string key) const;
         std::map<std::string, std::string> get_headers() const;
-        void parse_request(std::string request);
+        int parse_request();
 
         typedef void (request::*encoding_handler)(std::string &body);
 
@@ -78,6 +86,8 @@ class request
         int     ft_check_content_type();
         void    ft_find_query();
         void    ft_parse_language_charset();
+        void    print_request();
+        void    init_parse();
 };
 
 int     ft_check_request_line(std::string method, std::string uri, std::string version);

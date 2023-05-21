@@ -15,34 +15,73 @@ int skip_spaces(std::string str)
 }
 
 
+// std::string trimString(const std::string& str)
+// {
+//   std::string trimmedStr = str;
+
+//   std::string::iterator it = trimmedStr.begin();
+//   while (it != trimmedStr.end() && std::isspace(*it)) 
+//     ++it;
+//   trimmedStr.erase(trimmedStr.begin(), it);
+//   it = trimmedStr.end();
+//   while (it != trimmedStr.begin() && std::isspace(*(it - 1)))
+//     --it;
+//   trimmedStr.erase(it, trimmedStr.end());
+//   return trimmedStr;
+// }
 std::string trimString(const std::string& str)
 {
   std::string trimmedStr = str;
 
-  std::string::iterator it = trimmedStr.begin();
-  while (it != trimmedStr.end() && std::isspace(*it)) 
-    ++it;
-  trimmedStr.erase(trimmedStr.begin(), it);
-  it = trimmedStr.end();
-  while (it != trimmedStr.begin() && std::isspace(*(it - 1)))
-    --it;
-  trimmedStr.erase(it, trimmedStr.end());
+  // Trim leading whitespace
+  size_t pos = 0;
+  while (pos < trimmedStr.size() && std::isspace(trimmedStr[pos]))
+    ++pos;
+  trimmedStr.erase(0, pos);
+
+  // Trim trailing whitespace
+  size_t end = trimmedStr.size();
+  while (end > 0 && std::isspace(trimmedStr[end - 1]))
+    --end;
+  trimmedStr.erase(end);
+
   return trimmedStr;
 }
+// std::string trimString(const std::string& str)
+// {
+//   std::string trimmedStr = str;
 
-std::vector<server> ft_fill_servers(char **av)
+//   // Trim leading whitespace
+//   size_t startPos = trimmedStr.find_first_not_of(" \t\r");
+//   if (startPos != std::string::npos)
+//     trimmedStr.erase(0, startPos);
+
+//   // Trim trailing whitespace
+//   size_t endPos = trimmedStr.find_last_not_of(" \t\r");
+//   if (endPos != std::string::npos)
+//     trimmedStr.erase(endPos + 1);
+
+//   return trimmedStr;
+// }
+
+std::vector<server> ft_fill_servers(char **av, int ac)
 {
     std::vector<server> servers;
     std::string config_file;
     std::ifstream file;
     std::string line;
     std::string map;
+    std::string previousLine;
     Data_config data;
     std::vector<Data_config> v;
     int c = 0;
     size_t i = 0, j = 0;
     int flag = 0;
-    config_file = av[1];
+    int kws = 0;
+    if (ac == 2)
+        config_file = av[1];
+    else
+        config_file = "./config/server.conf";
     file.open(config_file);
     if(file.is_open())
     {
@@ -52,12 +91,38 @@ std::vector<server> ft_fill_servers(char **av)
             line = trimString(line);
             if(line.empty() || line[0] == '#')
                 continue;
-            c  += search_char(line, '{');
+            c += search_char(line, '{');
+            if (!is_world(&line[i], "location"))
+                kws += search_char(line, '{');
             c -= search_char(line, '}');
-            i = skip_spaces(line);
-
              if (is_world(&line[i], "server"))
-                 j = 1;
+             {
+                j = 1;
+                if (!search_char(line, '{'))
+                {
+                    while (!file.eof())
+                    {
+                        std::getline(file, line);
+                        line = trimString(line);
+                        if(line.empty() || line[0] == '#')
+                            continue;
+                        else
+                            break ;
+                    }
+                    if (!search_char(line, '{'))
+                    {
+                        std::cerr << "error something outside of server\n";
+                        exit (1);
+                    }
+                    c  += search_char(line, '{');
+                    kws += search_char(line, '{');
+                }
+             }
+            if (kws >  1)
+            {
+                std::cerr << "error \n";
+                exit (1);
+            }
             if (is_world(&line[i], "location"))
             {
                 if(!j)
@@ -65,7 +130,8 @@ std::vector<server> ft_fill_servers(char **av)
                     std::cerr << "error something outside of server\n";
                     exit (1);
                 }
-                line = trimString(line);
+                kws = 0;
+                kws = search_char(line, '{');             
                 std::string key = line + '\n';
                 while (!file.eof())
                 {
@@ -73,17 +139,17 @@ std::vector<server> ft_fill_servers(char **av)
                     line = trimString(line);
                     if(line.empty() || line[0] == '#')
                         continue;
+                    kws +=  search_char(line, '{');
+                    if (kws >  1)
+                    {
+                        std::cerr << "error \n";
+                        exit (1);
+                    }
                     c  += search_char(line, '{');
                     map += line + '\n';
                     if (search_char (line, '}'))
                     {
                         c -= search_char(line, '}'); 
-                        std::map<std::string, std::string>::const_iterator it = data.location.find(key);
-                        if (it != data.location.end())
-                        {
-                            std::cerr << "Error dupplicate location\n";
-                            exit (1);
-                        }
                         data.location.insert(std::make_pair(key, map));
                         map.clear();
                         break;
@@ -92,27 +158,24 @@ std::vector<server> ft_fill_servers(char **av)
             }
             else if (!j)
             {
-                i = skip_spaces(line);
-                if (i != line.size())
+                if (!line.empty())
                 {
                     std::cerr << "error something outside of server\n";
                     exit (1);
                 }
             }
-            else if (i != line.size())
-            {
-                line = trimString(line);
+            else if (!line.empty())
                 data.data_server += line + "\n";
-            }
             if (!c && j)
             {
                 j = 0;
+                kws = 0;
                 v.push_back(data);
                 data.data_server.clear();
                 data.location.clear();
             }
             flag++;
-        }        
+        }
     }
     else
     {
@@ -124,12 +187,25 @@ std::vector<server> ft_fill_servers(char **av)
         std::cerr << "Error : not closed" << std::endl;
         exit (1);
     }
-
+    
     for (size_t i = 0; i < v.size(); i++)
     {
-        server *s = new server(v[i], 1);
-        servers.push_back(*s);
-        delete (s);
+        c = 0;
+        server s = server(v[i], 1);
+        for (size_t i = 0; i < s._location.size(); i++)
+        {
+            if (s._location[i].location_name == "/")
+            {
+                c = 1;
+                break ;
+            }
+        }
+        if (c != 1)
+        {
+            std::cerr << "Error : missing location root\n";
+            exit (1);
+        }
+        servers.push_back(s);
     }
     return (servers);
 }
