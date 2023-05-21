@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/21 15:48:23 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/21 21:01:11 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,15 @@ namespace http{
     
    http_sever::http_sever(std::vector<server> conf_) :sock()
    {
-        get_server(conf_);
-        managerOfserver(conf_);
+        // get_server(conf_);
+        // managerOfserver(conf_);
+        for (size_t i = 0; i < conf_.size(); i++)
+        {
+           for (size_t j = 0; j < conf_[i]._listen.size(); j++)
+            {
+                socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
+            }
+        }
         conf = conf_;
     }
     
@@ -76,7 +83,7 @@ namespace http{
             {
                 if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && ifserver_dup(conf_[i]._server_name[j]))
                 {
-                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
+                     socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
                 }
                 else if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && !ifserver_dup(conf_[i]._server_name[j]))
                 {
@@ -456,7 +463,7 @@ namespace http{
 
         result.append(data.substr(0, header_end));
         result.append("\r\n\r\n");
-        chunks = data.substr(data.find("\r\n\r\n") + 4, data.size() - 1);
+        chunks = data.substr(header_end + 4, data.size() - 1);
         subchunk = chunks.substr(0, 9);
         sizeof_chunk =  std::strtol(subchunk.c_str(), NULL, 16);
         pos = 0;

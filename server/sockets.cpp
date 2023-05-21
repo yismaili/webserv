@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/20 01:09:33 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/21 20:31:34 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -121,9 +121,13 @@ namespace http{
 
             //bind a socket with a specific address and port number
             // bind a socket with a specific address and port number
-            if (bind(sockfd, result->ai_addr, result->ai_addrlen) < 0) {
-               std::cout << "\033[31mBind System failed\033[0m\n";
-                return false;
+            if (bind(sockfd, result->ai_addr, result->ai_addrlen) == 0)
+            {
+                std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
+            }
+            else
+            {
+                std::cout << "\nwebsevr: conflicting server name  on 0.0.0.0:["<<port<<"], ignored\n";
             }
           //  Set socket to listen
             if (listen(sockfd, SOMAXCONN) < 0){
@@ -131,7 +135,7 @@ namespace http{
                 std::cout << "\033[31mSocket listen failed\033[0m\n";
                 exit(1);
             }
-            std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
+            // std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
             freeaddrinfo(result);           /* No longer needed */  
             return true;
         }
