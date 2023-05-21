@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/20 15:04:38 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/21 19:11:02 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,9 +22,7 @@ request::request(std::string request, size_t content_len) : _method(""), _uri(""
     _body(""), _port(80), _query(""), _content_len(content_len)
 {
     this->_init_request = request;
-    // std::cout << request << std::endl;
     add_header("Content-Length", std::to_string(_content_len));
-    // this->parse_request();
     return ;
 }
 
@@ -126,6 +124,8 @@ int request::parse_request()
     std::istringstream iss(request);
     std::string line;
 
+    if (request.empty())
+        return (2);
     while (std::getline(iss, line))
     {
         if (line.empty())
@@ -142,6 +142,7 @@ int request::parse_request()
         return (2);
     }
     ft_find_query();
+    handleSpecialCharacters(this->_uri);
     // Parse the headers
     for (std::vector<std::string>::const_iterator it = lines.begin() + 1; it != lines.end(); ++it)
     {
@@ -153,7 +154,6 @@ int request::parse_request()
         if (this->_headers.find(key) == this->_headers.end())
             this->_headers[key] = value;
     }
-
     // function that checks if the request is POST or PUT to see if there is no content-length to return error
     if (ft_check_content_length() == false || ft_check_content_type() == false)
     {
@@ -219,4 +219,22 @@ void    request::print_request()
 std::string request::get_boundary() const
 {
     return (this->_boundary);
+}
+
+// change the "%20" with a space
+void request::handleSpecialCharacters(std::string& uri) {
+    std::string encodedChars[] = {"%20", "%21", "%22", "%23", "%24", "%25", "%26", "%27", "%28", "%29", "%2A", "%2B", "%2C",
+                                  "%2D", "%2E", "%2F", "%3A", "%3B", "%3C", "%3D", "%3E", "%3F", "%40", "%5B", "%5C", "%5D",
+                                  "%5E", "%5F", "%60", "%7B", "%7C", "%7D", "%7E"};
+
+    std::string specialChars[] = {" ", "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", ":", ";", "<",
+                                  "=", ">", "?", "@", "[", "\\", "]", "^", "_", "`", "{", "|", "}", "~"};
+
+    for (size_t i = 0; i < sizeof(encodedChars) / sizeof(encodedChars[0]); i++) {
+        std::string::size_type n = 0;
+        while ((n = uri.find(encodedChars[i], n)) != std::string::npos) {
+            uri.replace(n, encodedChars[i].length(), specialChars[i]);
+            n += 1;
+        }
+    }
 }

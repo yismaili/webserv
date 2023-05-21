@@ -6,7 +6,11 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
+<<<<<<< HEAD
 /*   Updated: 2023/05/21 21:01:11 by yismaili         ###   ########.fr       */
+=======
+/*   Updated: 2023/05/21 19:14:06 by aoumad           ###   ########.fr       */
+>>>>>>> 2a93798d2b10cfd5ae5ed69ff54bfb644ae91af3
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +101,7 @@ namespace http{
                 else if (ifhost_dup(conf_[i].get_host()) && ifport_dup(conf_[i]._listen[j]) &&  k_flag == 0)
                 {
                     socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
-                    if (ifport_dup(conf_[i + 1]._listen[j]))
+                    if (conf_.size() < i + 1 && ifport_dup(conf_[i + 1]._listen[j]))
                         k_flag = 1;
                     else
                         k_flag = 0;
@@ -424,7 +428,7 @@ namespace http{
             //std::cout<<"i am in header\n";
             request req;
             header_error = 0;
-            Respond res(false, req);
+            Respond res(conf, conf_fd[sockfd]->getIndex() ,false, req);
             requist_data[sockfd] = res.rtn_response();
            // std::cout<<requist_data[sockfd]<<std::endl;
             read_info[sockfd] = true;
@@ -441,7 +445,7 @@ namespace http{
             rtn_error = req.parse_request();
             if (rtn_error == 2)
             {
-                Respond res(false, req);
+                Respond res(conf, conf_fd[sockfd]->getIndex() ,false, req);
                 requist_data[sockfd] = res.rtn_response();
             }
             else if (rtn_error == 0)
