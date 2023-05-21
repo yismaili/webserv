@@ -79,7 +79,7 @@ const std::pair<int, std::string> response_status[] =
     std::make_pair<int, std::string>(410, "Gone"),
     std::make_pair<int, std::string>(411, "Length Required"),
     std::make_pair<int, std::string>(412, "Precondition Failed"),
-    std::make_pair<int, std::string>(413, "Payload Too Large"),
+    std::make_pair<int, std::string>(413, "File Too Large"),
     std::make_pair<int, std::string>(414, "URI Too Long"),
     std::make_pair<int, std::string>(415, "Unsupported Media Type"),
     std::make_pair<int, std::string>(416, "Range Not Satisfiable"),

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Error - Conflict</title>
+    <style>
+        /* Center the content */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f1f1f1;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Style the error container */
+        .error-container {
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* Style the error code */
+        .error-code {
+            font-size: 48px;
+            color: #FF3838;
+            margin-bottom: 20px;
+        }
+
+        /* Style the error message */
+        .error-message {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+
+        /* Style the home link */
+        .home-link {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+        /* Change the color of the home link on hover */
+        .home-link:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="error-container">
+        <div class="error-code">409</div>
+        <div class="error-message">Conflict: Unable to delete folder due to existing files or subfolders</div>
+        <p>Please go back to the homepage and try a different resource name.</p>
+        <a href="/" class="home-link">Go to Homepage</a>
+    </div>
+</body>
+</html>

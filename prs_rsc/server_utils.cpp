@@ -15,22 +15,56 @@ int skip_spaces(std::string str)
 }
 
 
+// std::string trimString(const std::string& str)
+// {
+//   std::string trimmedStr = str;
+
+//   std::string::iterator it = trimmedStr.begin();
+//   while (it != trimmedStr.end() && std::isspace(*it)) 
+//     ++it;
+//   trimmedStr.erase(trimmedStr.begin(), it);
+//   it = trimmedStr.end();
+//   while (it != trimmedStr.begin() && std::isspace(*(it - 1)))
+//     --it;
+//   trimmedStr.erase(it, trimmedStr.end());
+//   return trimmedStr;
+// }
 std::string trimString(const std::string& str)
 {
   std::string trimmedStr = str;
 
-  std::string::iterator it = trimmedStr.begin();
-  while (it != trimmedStr.end() && std::isspace(*it)) 
-    ++it;
-  trimmedStr.erase(trimmedStr.begin(), it);
-  it = trimmedStr.end();
-  while (it != trimmedStr.begin() && std::isspace(*(it - 1)))
-    --it;
-  trimmedStr.erase(it, trimmedStr.end());
+  // Trim leading whitespace
+  size_t pos = 0;
+  while (pos < trimmedStr.size() && std::isspace(trimmedStr[pos]))
+    ++pos;
+  trimmedStr.erase(0, pos);
+
+  // Trim trailing whitespace
+  size_t end = trimmedStr.size();
+  while (end > 0 && std::isspace(trimmedStr[end - 1]))
+    --end;
+  trimmedStr.erase(end);
+
   return trimmedStr;
 }
+// std::string trimString(const std::string& str)
+// {
+//   std::string trimmedStr = str;
 
-std::vector<server> ft_fill_servers(char **av)
+//   // Trim leading whitespace
+//   size_t startPos = trimmedStr.find_first_not_of(" \t\r");
+//   if (startPos != std::string::npos)
+//     trimmedStr.erase(0, startPos);
+
+//   // Trim trailing whitespace
+//   size_t endPos = trimmedStr.find_last_not_of(" \t\r");
+//   if (endPos != std::string::npos)
+//     trimmedStr.erase(endPos + 1);
+
+//   return trimmedStr;
+// }
+
+std::vector<server> ft_fill_servers(char **av, int ac)
 {
     std::vector<server> servers;
     std::string config_file;
@@ -44,7 +78,10 @@ std::vector<server> ft_fill_servers(char **av)
     size_t i = 0, j = 0;
     int flag = 0;
     int kws = 0;
-    config_file = av[1];
+    if (ac == 2)
+        config_file = av[1];
+    else
+        config_file = "./config/server.conf";
     file.open(config_file);
     if(file.is_open())
     {
@@ -57,7 +94,7 @@ std::vector<server> ft_fill_servers(char **av)
             c += search_char(line, '{');
             if (!is_world(&line[i], "location"))
                 kws += search_char(line, '{');
-                c -= search_char(line, '}');
+            c -= search_char(line, '}');
              if (is_world(&line[i], "server"))
              {
                 j = 1;
@@ -138,7 +175,7 @@ std::vector<server> ft_fill_servers(char **av)
                 data.location.clear();
             }
             flag++;
-        }        
+        }
     }
     else
     {
@@ -154,10 +191,10 @@ std::vector<server> ft_fill_servers(char **av)
     for (size_t i = 0; i < v.size(); i++)
     {
         c = 0;
-        server *s = new server(v[i], 1);
-        for (size_t i = 0; i < s->_location.size(); i++)
+        server s = server(v[i], 1);
+        for (size_t i = 0; i < s._location.size(); i++)
         {
-            if (s->_location[i].location_name == "/")
+            if (s._location[i].location_name == "/")
             {
                 c = 1;
                 break ;
@@ -166,11 +203,9 @@ std::vector<server> ft_fill_servers(char **av)
         if (c != 1)
         {
             std::cerr << "Error : missing location root\n";
-            delete (s);
             exit (1);
         }
-        servers.push_back(*s);
-        delete (s);
+        servers.push_back(s);
     }
     return (servers);
 }
