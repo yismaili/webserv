@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/21 22:43:16 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 00:23:47 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,12 +18,11 @@ namespace http{
    http_sever::http_sever(std::vector<server> conf_) :sock()
    {
         // get_server(conf_);
-        // managerOfserver(conf_);
         for (size_t i = 0; i < conf_.size(); i++)
         {
            for (size_t j = 0; j < conf_[i]._listen.size(); j++)
             {
-                socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
+                socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), conf_[i]._server_name[j], i)); 
             }
         }
         conf = conf_;
@@ -73,40 +72,7 @@ namespace http{
         }
         return (0);
     }
-    
-    int http_sever::managerOfserver(std::vector<server> conf_)
-    {
-        int k_flag = 0;
-        for (size_t i = 0; i < conf_.size(); i++)
-        {
-           for (size_t j = 0; j < conf_[i]._listen.size(); j++)
-            {
-                if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && ifserver_dup(conf_[i]._server_name[j]))
-                {
-                     socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
-                }
-                else if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && !ifserver_dup(conf_[i]._server_name[j]))
-                {
-                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
-                }
-                else if (!ifhost_dup(conf_[i].get_host()) && ifport_dup(conf_[i]._listen[j]))
-                {
-                    std::cout<<"2\n";
-                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
-                }
-                else if (ifhost_dup(conf_[i].get_host()) && ifport_dup(conf_[i]._listen[j]) &&  k_flag == 0)
-                {
-                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
-                    if (conf_.size() < i + 1 && ifport_dup(conf_[i + 1]._listen[j]))
-                        k_flag = 1;
-                    else
-                        k_flag = 0;
-                }
-            }
-        }
-        return (0);
-    }
-    
+        
     int http_sever::ifport_dup(int port_)
     {
         std::vector<int>::iterator it;
@@ -210,8 +176,7 @@ namespace http{
                     {
                         // Accept incoming connection
                         new_socket = accept_connection(clients[i].fd);
-                        int val = fcntl(new_socket, F_GETFL, 0);
-                        fcntl(new_socket, F_SETFL, val | O_NONBLOCK);
+                        fcntl(new_socket, F_SETFL, O_NONBLOCK);
                         conf_fd.insert(std::make_pair(new_socket, find_conf(clients[i].fd)));
                         std::cout <<"\n\033[32mCONNECTION TO ["<<conf_fd[new_socket]->getPort()<<"] "<<"ACCEPTED...\033[0m\n";
                         // Add new socket to poll list

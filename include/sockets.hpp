@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/20 01:10:30 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 00:15:16 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ namespace http{
         public: 
             sockets();
             ~sockets();
-            sockets &init_data(int port_, std::string ip_add,int index_);
+            sockets &init_data(int port_, std::string ip_add, std::string server_name_, int index_);
             int const &getSockfd()const;
             unsigned int getSock_addr_len()const;
             sockaddr_in &getServ_addr()const;
@@ -45,8 +45,9 @@ namespace http{
             unsigned int const &getTime_out() const;
             void    setTime_out(unsigned int time);
             int data_issending;
+            
         private:
-            struct addrinfo hints;
+            struct addrinfo hints; //provides information about a network address, such as the host name, port number, and address family.
             struct addrinfo *result, *rp;
             unsigned int    sock_addr_len;
             std::string     ip_addr;
@@ -55,7 +56,8 @@ namespace http{
             int             sockfd;
             int             port;
             unsigned int    time_out;
-            int           header_error; 
+            int           header_error;
+            std::string  server_name;
     };
 }
 #endif
