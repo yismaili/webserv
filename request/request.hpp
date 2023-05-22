@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   request.hpp                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 18:00:51 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/14 16:01:47 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/21 19:11:36 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,10 +27,14 @@
 # include <sys/socket.h>
 # include <zlib.h>
 
+# include "../respond/respond.hpp"
+
+class Respond;
 
 class request
 {
     private:
+        std::string _init_request;
         std::string _method; // stores http method of the request (e.g "GET", "POST"..etc)
         std::string _uri; // stores the URI of the request  (e.g "/index.html")
         std::string _version; // stores the http version of the request (e.g "HTTP/1.1")
@@ -68,7 +72,7 @@ class request
         void add_header(std::string key, std::string value);
         std::string get_header(std::string key) const;
         std::map<std::string, std::string> get_headers() const;
-        void parse_request(std::string request);
+        int parse_request();
 
         typedef void (request::*encoding_handler)(std::string &body);
 
@@ -84,6 +88,7 @@ class request
         void    ft_parse_language_charset();
         void    print_request();
         void    init_parse();
+        void    handleSpecialCharacters(std::string& uri);
 };
 
 int     ft_check_request_line(std::string method, std::string uri, std::string version);

@@ -9,7 +9,7 @@ class FormData
         std::string file_name;
         bool isValid() const
         {
-            return (!name.empty() && !data.empty());
+            return (!name.empty() && !data.empty() && !file_name.empty());
         }
         // getters
         std::string get_name() const

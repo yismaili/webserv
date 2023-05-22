@@ -5,7 +5,7 @@
 
 int main(int ac, char **av)
 {
-    if (ac != 2)
+    if (ac > 2)
     {
         std::cerr << "Error: could not open config file.\n";
         return (1);
@@ -13,7 +13,7 @@ int main(int ac, char **av)
     // Register a custom signal handler for demonstration
     std::vector<server> servers;
     std::vector<int> all_ports;
-    servers = ft_fill_servers(av);
+    servers = ft_fill_servers(av, ac);
     all_ports = get_all_ports(servers);
 //    for (size_t i = 0; i < servers.size(); i++)
 //    {

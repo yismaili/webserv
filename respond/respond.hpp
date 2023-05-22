@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/18 12:59:53 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/22 18:40:32 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,11 +33,13 @@
 
 class server;
 class location;
+class request;
 
 class Respond
 {
     public:
         Respond();
+        Respond(std::vector<server> server, int _index, bool rtn_error, request &req);
         Respond(request& req, int index_);
         ~Respond();
 
@@ -49,7 +51,6 @@ class Respond
         void set_response_body(std::string body);
         std::string get_status_line(const std::string &status_code);
         void    set_date();
-        void    set_last_modified();
         void    set_cache_control(std::string control);
 
         std::string get_http_version();
@@ -85,20 +86,20 @@ class Respond
 
         // GET RESPONSE
         void        ft_handle_cgi();
-        void        ft_handle_file();
+        void        ft_handle_file(std::vector<server> server);
         int         ft_handle_autoindex(std::vector<server> servers);
         void        ft_check_cgi();
         int         ft_check_file();
-        int         ft_handle_index(std::vector<server> servers);
-        int         ft_handle_index_2(std::string index);
-        void        ft_show_autoindex();
+        int         ft_handle_index(std::vector<server> server);
+        int         ft_handle_index_2(std::vector<server> server, std::string index);
+        void        ft_show_autoindex(std::vector<server> server);
 
         // POST RESPONSE
         std::string check_post_type();
         void        handle_post_response(std::vector<server> server);
-        void        handle_form_data();
+        void        handle_form_data(std::vector<server> server);
         size_t      find_boundary(size_t pos);
-        FormData    read_form_data(size_t pos);
+        FormData    read_form_data(std::vector<server> servers, size_t pos);
         void        handle_urlencoded();
         void        create_form_data();
 
@@ -128,6 +129,8 @@ class Respond
         static std::string _uri;
         std::string _pur_uri;
         static bool check_location;
+        bool        _rtn_error;
+        bool        _file_too_large;
 
         bool        _is_cgi;
         bool        _is_allowed_method;
@@ -137,21 +140,55 @@ class Respond
 
         void        handle_get_response(std::vector<server> servers);
         void        print_response();
-        void        init_response_body(std::string file, std::string _root);
+        void        init_response_body(std::vector<server> server ,std::string file, std::string _root);
 
         request& r;
         void        create_decode_files();
 
         // DELETE RESPONSE
-        void        handle_delete_response();
+        void        handle_delete_response(std::vector<server> server);
         // ERROR RESPONSE
-        void        handle_error_response(int error_code);
+        void        handle_error_response(std::vector<server> server, int error_code);
         void        ft_handle_error(int error_code);
-
-        // DELETE RESPONSE
 
         // void        cout_respond();
 
 };
 
 #endif
+
+    // void http_sever ::unchunk(int sockfd)
+    // {
+        
+            
+    //     if (header_error == 1)
+    //     {
+    //         request req;
+    //         header_error = 0;
+    //         Respond res(conf, conf_fd[sockfd]->getIndex() ,false, req);
+    //         requist_data[sockfd] = res.rtn_response();
+    //        // std::cout<<requist_data[sockfd]<<std::endl;
+    //         read_info[sockfd] = true;
+    //     }
+    //     else 
+    //     {
+    //         if (transfer_encoding != std::string::npos && transfer_encoding < header_end)
+    //         {
+    //             requist_data[sockfd] = join_chunked(requist_data[sockfd], sockfd);
+    //             conf_fd[sockfd]->setContent_length(requist_data[sockfd].size() - (header_end + 4));
+    //         }
+    //         int rtn_error;
+    //         request req(requist_data[sockfd], conf_fd[sockfd]->getContent_length());
+    //         rtn_error = req.parse_request();
+    //         if (rtn_error == 2)
+    //         {
+    //             Respond res(conf, conf_fd[sockfd]->getIndex() ,false, req);
+    //             requist_data[sockfd] = res.rtn_response();
+    //         }
+    //         else if (rtn_error == 0)
+    //         {
+    //             Respond   res(req, conf_fd[sockfd]->getIndex());
+    //             requist_data[sockfd] =  res.response_root(conf);
+    //         }
+    //     }
+    // }

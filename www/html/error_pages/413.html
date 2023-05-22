@@ -1,58 +1,67 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Error 413 - Request Entity Too Large</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        /* Center the content */
         body {
-            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             height: 100vh;
-            font-family: Tahoma, Verdana, Arial, sans-serif;
+            background-color: #f1f1f1;
+            font-family: Arial, sans-serif;
+        }
+
+        /* Style the error container */
+        .error-container {
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             text-align: center;
-            padding: 250px 0;
-            background:  #f4efef;
-        }
-        
-        .main {
-            margin: 0 auto;
-            width: 850px;
-            background-color: #ffffff;
-            padding: 15px;
-            border: 10px solid #beb5b5;
         }
 
-        .main img {
-            margin-top: 40px;
-            width: 100%;
+        /* Style the error code */
+        .error-code {
+            font-size: 48px;
+            color: #FF3838;
+            margin-bottom: 20px;
         }
 
-        .status {
-            font-size: 50px;
-            color: #ff0000;
-        }
-        .message {
-            font-size: 45px;
-            color: #000000;
+        /* Style the error message */
+        .error-message {
+            font-size: 24px;
+            margin-bottom: 20px;
         }
 
+        /* Style the home link */
+        .home-link {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background-color 0.3s ease;
+            text-decoration: none;
+        }
+
+        /* Change the color of the home link on hover */
+        .home-link:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
-<body dir="rtl">
-    <div class="main">
-        <h1 class="message"> Content Too Large
-            <span class="status">413</span>
-        </h1>
-        <div>
-            <img src="https://scontent.fcmn1-2.fna.fbcdn.net/v/t1.6435-9/160103634_110599234434022_1227344727310226467_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=e3f864&_nc_eui2=AeEQ1raNf8KJ_k-YLJa5sG6ALutD50MKaMEu60PnQwpowTltpgLzay1JIH_shXqixW5OgCsiwI-eMaBoWAQymENt&_nc_ohc=oBQ5bPOzyp4AX_vG_rN&_nc_ht=scontent.fcmn1-2.fna&oh=00_AfBA22apsGIIKrV4e4KcBTZtjvSOmZUPxwyLyaUTHmdq6g&oe=64555303" width="360px" height="600px">
-        </div>
+<body>
+    <div class="error-container">
+        <div class="error-code">413</div>
+        <div class="error-message">Oops! Request Entity Too Large</div>
+        <p>Sorry, the request entity sent to the server is too large. Please go back to the homepage and try again with a smaller file or content.</p>
+        <a href="/" class="home-link">Go to Homepage</a>
     </div>
 </body>
 </html>

@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/19 14:18:40 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 22:13:50 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,7 @@ namespace http{
         public: 
             sockets();
             ~sockets();
-            sockets &init_data(int port_, std::string ip_add,int index_);
+            sockets &init_data(int port_, std::string ip_add, std::vector<std::string> server_name_, int index_);
             int const &getSockfd()const;
             unsigned int getSock_addr_len()const;
             sockaddr_in &getServ_addr()const;
@@ -44,17 +44,23 @@ namespace http{
             void setContent_length(int const &content);
             unsigned int const &getTime_out() const;
             void    setTime_out(unsigned int time);
-        private:
-            struct addrinfo hints;
+            void setIndex(int const index_);
+            int const &getIndex_tmp() const;
+            int data_issending;
+            
+         public:
+            struct addrinfo hints; //provides information about a network address, such as the host name, port number, and address family.
             struct addrinfo *result, *rp;
             unsigned int    sock_addr_len;
             std::string     ip_addr;
+            int             index_tmp;
             int             index;
             std::size_t     content_length;
             int             sockfd;
             int             port;
             unsigned int    time_out;
-            int           header_error; 
+            int           header_error;
+            std::vector<std::string> server_name;
     };
 }
 #endif

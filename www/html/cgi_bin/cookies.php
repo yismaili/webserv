@@ -1,27 +1,13 @@
 <?php
-$cookies = array(
-    "lang" => "en",
-    "USER" => "ADMIN"
-);
-foreach ($cookies as $name => $value) {
-    setcookie($name, $value, time() + (86400 * 30), "/");
+// Check if the username cookie is set
+if(isset($_COOKIE["username"])) {
+    $username = $_COOKIE["username"];
+    echo "Welcome back, $username!";
+} else {
+    // Set the username cookie
+    $username = "webserver";
+    setcookie("username", $username, time() + 1); 
+    echo "Hello, $username we've set a cookie for you!";
 }
-
 ?>
 
-<html>
-
-<body>
-	<?php
-	foreach ($cookies as $name => $value) {
-		if (!isset($_COOKIE[$name]))
-			echo "<h3>Cookie = '" . $name . "' is not  set!</h3><br>";
-		else {
-			echo "<h3>Cookie = '" . $name . "' is set!</h3><br>";
-			echo "<h4>Value is: " . $_COOKIE[$name] . "</h4>";
-		}
-	}
-	?>
-</body>
-
-</html>

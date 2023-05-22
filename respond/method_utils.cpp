@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_utils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
+/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/19 12:36:58 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 13:44:24 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int    Respond::ft_check_file()
     return (0);
 }
 
-void Respond::ft_handle_file()
+void Respond::ft_handle_file(std::vector<server> server)
 {
     std::string::size_type mime_index = _rooted_path.find_last_of('.');
     if (mime_index != std::string::npos)
@@ -33,7 +33,7 @@ void Respond::ft_handle_file()
     std::ifstream file;
     if (!strcmp(_rooted_path.c_str(), ""))
     {
-        handle_error_response(404);
+        handle_error_response(server, 404);
         return;
     }
     file.open(_rooted_path.c_str());
@@ -45,14 +45,14 @@ void Respond::ft_handle_file()
         set_status_message(get_response_status(200));
         set_header("Content-Type", get_mime_type(_mime_string));
         // std::cout << "mime _type: " << get_mime_type(_mime_string) << std::endl;
-         _headers["Content-Length"] = std::to_string(_response_body.length());
+        _headers["Content-Length"] = std::to_string(_response_body.length());
         //  std::cout << std::to_string(_response_body.length()) << std::endl;
         _headers["Connection"] = "keep-alive";
         set_date();
-        set_cache_control("cache");
+        set_cache_control("no cache");
     }
     else
-        handle_error_response(403);
+        handle_error_response(server, 403);
 }
 /*
 Here's how it works:
@@ -65,34 +65,6 @@ In other words, the std::string constructor reads the entire contents of the fil
 int Respond::ft_handle_index(std::vector<server> server)
 {
     std::string index;
-    // if (server[_server_index]._location[_location_index].get_index().empty())
-    // {
-    //     if (server[_server_index].get_index().empty())
-    //     {
-    //         handle_error_response(403);
-    //         return (1);
-    //     }
-    //     else
-    //     {
-    //         index = server[_server_index].get_index();
-    //         std::string file = server[_server_index].get_root() + "/" + index;
-    //         _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
-    //         if (ft_handle_index_2(file))
-    //             return (1);
-    //     }
-    // }
-    // else
-    // {
-    //     index = server[_server_index]._location[_location_index].get_index();
-
-    //     std::string::size_type _mime_index= index.find_last_of('.');
-    //     if (_mime_index != std::string::npos)
-    //         _mime_string = index.substr(_mime_index + 1);
-    //     std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
-    //     _rooted_path = server[_location_index].get_root() + _removed_path + index;
-    //     if (ft_handle_index_2(file))
-    //         return (1);
-    // }
     if (server[_server_index]._location[_location_index].location_name == "/")
     {
         if (ft_check_location_index(server))
@@ -107,7 +79,7 @@ int Respond::ft_handle_index(std::vector<server> server)
                     _mime_string = index.substr(_mime_index + 1);
                 std::string file = server[_server_index].get_root() + "/" + index;
                 _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
-                if (ft_handle_index_2(file))
+                if (ft_handle_index_2(server, file))
                     return (1);
             }
         }
@@ -118,8 +90,8 @@ int Respond::ft_handle_index(std::vector<server> server)
             if (_mime_index != std::string::npos)
                 _mime_string = index.substr(_mime_index + 1);
             std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
-            _rooted_path = server[_location_index].get_root() + _removed_path + index;
-            if (ft_handle_index_2(file))
+            _rooted_path = server[_server_index].get_root() + _removed_path + index;
+            if (ft_handle_index_2(server, file))
                 return (2);
         }
     }
@@ -134,8 +106,8 @@ int Respond::ft_handle_index(std::vector<server> server)
             if (_mime_index != std::string::npos)
                 _mime_string = index.substr(_mime_index + 1);
             std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
-            _rooted_path = server[_location_index].get_root() + _removed_path + index;
-            if (ft_handle_index_2(file))
+            _rooted_path = server[_server_index].get_root() + _removed_path + index;
+            if (ft_handle_index_2(server, file))
                 return (2);
         }
     }
@@ -156,7 +128,7 @@ int Respond::ft_check_server_index(std::vector<server> server)
     return (0);
 }
 
-int Respond::ft_handle_index_2(std::string index)
+int Respond::ft_handle_index_2(std::vector<server> server, std::string index)
 {
     std::ifstream file;
     if (index != "")
@@ -168,7 +140,6 @@ int Respond::ft_handle_index_2(std::string index)
             set_status_code(200);
             set_status_message(get_response_status(200));
             set_header("Content-Type", get_mime_type(_mime_string));
-           // std::cout << "mime _type in index: " << get_mime_type(_mime_string) << std::endl;
             _headers["Content-Length"] = std::to_string(_response_body.length());
             _headers["Connection"] = "keep-alive";
             set_date();
@@ -177,14 +148,13 @@ int Respond::ft_handle_index_2(std::string index)
         }
         else
         {
-    //std::cout << "____WWWWW_--------______" << std::endl;
-            handle_error_response(404);
+            handle_error_response(server, 404);
             return (1);
         }
     }
     else
     {
-        handle_error_response(404);
+        handle_error_response(server, 404);
         return (1);
     }
     return (0);
@@ -194,14 +164,11 @@ int     Respond::ft_handle_autoindex(std::vector<server> server)
 {
     if (_path_found == server[_server_index]._location[_location_index].location_name)
     {
-        // std::cout << "path found: " << _path_found << std::endl;
         if (!server[_server_index]._location[_location_index].get_autoindex())
             return (1);
         else
         {
-        // std::cout << "___--_------__------_-_-_--_-__-_-_-_-HEREEEEE_--_-_-_--_-_-_-_-" << std::endl;
-        // std::cout << "rooted path: " << _rooted_path << std::endl;
-            ft_show_autoindex();
+            ft_show_autoindex(server);
             return (0);
         }
     }
@@ -220,10 +187,8 @@ void    Respond::ft_handle_error(int error_code)
     set_cache_control("no cache");
 }
 
-void    Respond::ft_show_autoindex()
+void    Respond::ft_show_autoindex(std::vector<server> server)
 {
-    // if(!check_location)
-        // _uri = _uri + r.get_uri();
     std::string index_html = "<!DOCTYPE html>\n<html>\n<head>\n";
     index_html += "<meta charset=\"UTF-8\">\n";
     index_html += "<title>Index of " + _rooted_path + "</title>\n";
@@ -237,7 +202,7 @@ void    Respond::ft_show_autoindex()
     
     if (dir == NULL)
     {
-        handle_error_response(403);
+        handle_error_response(server, 403);
         return ;
     }
     
@@ -251,19 +216,32 @@ void    Respond::ft_show_autoindex()
         if (entry->d_name[0] != '.')
         {
             file_name = std::string(entry->d_name);
-            std::string file_path = _rooted_path + "/" + file_name;
+            std::string file_path;
+            if (_path_found[_path_found.size() - 1] == '/')
+                file_path = _path_found + file_name;
+            else
+                file_path = _path_found + "/" + file_name;
+            std::string match_path;
+            if (_rooted_path[_rooted_path.size() - 1] == '/')
+                match_path = _rooted_path + file_name;
+            else
+                match_path = _rooted_path + "/" + file_name;
             
-            if (stat(file_path.c_str(), &file_stat) < 0)
+            if (stat(match_path.c_str(), &file_stat) < 0)
             {
-                handle_error_response(403);
+                handle_error_response(server, 403);
                 continue ;
             }
-            
             file_size = std::to_string(file_stat.st_size);
-            index_html += "<tr>";
-            index_html += "<td><a href=\"" + file_name + "\">" + file_name + "</a></td>";
-            index_html += "<td>" + file_size + "</td>";
-            index_html += "</tr>\n";
+            time_t entryTime = file_stat.st_mtime;  // Assuming 'time' is of type 'time_t'
+            std::tm* timeInfo = std::localtime(&entryTime);
+            char buffer[80];
+            std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);
+            std::string fileTime(buffer);
+
+            // Now you can use 'fileTime' in your HTML code
+            index_html += "<p><a href=\"http://" + r.get_header("Host") + file_path + "\"><b><i><font size=\"5\">" + file_name + "</font></i></b></a>";
+            index_html += "\t\t <b><i><font size=\"5\">" + file_size + "\t\t" + fileTime + "</font></i></b></p>\n";
         }
     }
     closedir(dir);
@@ -271,18 +249,35 @@ void    Respond::ft_show_autoindex()
     _response_body = index_html;
 }
 
-void    Respond::handle_error_response(int error_code)
+void    Respond::handle_error_response(std::vector<server> server, int error_code)
 {
-    set_status_code(error_code);
-    set_status_message(get_response_status(error_code));
-    set_header("Content-Type", "text/html");
-    set_header("Connection", "keep-alive");
-    set_date();
-    set_last_modified();
-    _response_body = "<html><head><title>" + std::to_string(error_code) + " " + _status_message + "</title></head><body><h1>" + std::to_string(error_code) + " " + _status_message + "</h1><p>You don't have permission to access " + r.get_uri() + " on this server.</p></body></html>";
-    set_header("Content-Length", std::to_string(_response_body.length()));
-
-    print_response();
+    std::map<int, std::string> error_page;
+    error_page = server[_server_index].get_error_page();
+    if (error_page.find(error_code) != error_page.end())
+    {
+        std::string error_path = error_page[error_code];
+        std::ifstream file;
+        file.open(error_path.c_str());
+        if (file.is_open())
+        {
+            _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+            set_header("Content-Type", get_mime_type("html"));
+            set_header("Content-Length", std::to_string(_response_body.length()));
+            set_cache_control("no cache");
+        }
+        // file.close();
+    }
+    else
+    {
+        set_status_code(error_code);
+        set_status_message(get_response_status(error_code));
+        set_header("Content-Type", "text/html");
+        set_header("Connection", "keep-alive");
+        set_date();
+        _response_body = "<html><head><title>" + std::to_string(error_code) + " " + _status_message + "</title></head><body><h1>" + std::to_string(error_code) + " " + _status_message + "</h1><p>You don't have permission to access " + r.get_uri() + " on this server.</p></body></html>";
+        set_header("Content-Length", std::to_string(_response_body.length()));
+        set_cache_control("no cache");
+    }
 }
 
 void    Respond::print_response()

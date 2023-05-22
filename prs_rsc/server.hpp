@@ -6,12 +6,12 @@
 #include <vector>
 #include <utility>
 #include <map>
+#include <fcntl.h> 
 
 class location;
 class server
 {
 protected:
-    std::vector<std::string> _server_name; /*s*/
     std::string _index;
     std::string _host; /*s*/
     std::string _root; 
@@ -32,6 +32,7 @@ protected:
     // std::string _ssl_ciphers;
     std::map<std::string ,std::string> _path_info; 
 public:
+    std::vector<std::string> _server_name; /*s*/
     std::vector<int> _listen; /*s*/
     std::vector<location> _location;
     server(Data_config data, bool check_location);
@@ -60,7 +61,7 @@ int is_world(std::string word, std::string str);
 int search_char(std::string str, char c);
 std::string trimString(const std::string& str);
 int skip_spaces(std::string str);
-std::vector<server> ft_fill_servers(char **av);
+std::vector<server> ft_fill_servers(char **av, int ac);
 std::vector<int> get_all_ports(std::vector<server> servers);
 
 #endif

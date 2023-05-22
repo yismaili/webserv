@@ -1,17 +1,2 @@
-User-Agent
-Date
-Cache-Control
-Server
-Location (if snouae didn't handle it)
-Accept
-
-// respond headers
-Content-Type
-Content-Length
-Date
-Location
-Cache-Control
-Connection
-Content-Disposition
-Allow
-Server ==> webserv 1.1
+/*********************************/
+1- std::cout << "Unable to open file" << std::endl; in init_response_body
