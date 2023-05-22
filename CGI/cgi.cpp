@@ -1,7 +1,6 @@
 #include "cgi.hpp"
 std::map<std::string, std::string>get_env(char *file, request req)
 {
-
     std::map<std::string, std::string> env;
 
     env["REQUEST_METHOD"] = req.get_method();
@@ -105,7 +104,6 @@ std::string run_cgi(request &r,  Respond &res)
                 return res.get_response_status(res.get_status_code());
             }
             write(fdtemp1, r.get_body().c_str(), r.get_body().size());
-            //std::fprintf(temp1, "%s", r.get_body().c_str());
             std::rewind(temp1);
         }
         if (dup2(fdtemp, STDOUT_FILENO) == -1)
