@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 20:12:36 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 22:51:03 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,13 +21,18 @@ namespace http{
         {
             for (size_t j = 0; j < conf_[i]._listen.size(); j++)
             {
-                socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), conf_[i]._server_name[j], i));
+                socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), conf_[i].get_server_name(), i));
                 port.push_back(conf_[i]._listen[j]);
                 host.push_back(conf_[i].get_host());
-                servers_names.push_back(conf_[i]._server_name[j]);
+                std::vector<std::string>::iterator it = conf_[i]._server_name.begin();
+                while (it != conf_[i]._server_name.end())
+                {
+                    servers_names.push_back(*it);
+                    it++;
+                }
             }
         }
-        conf = conf_;
+        conf = conf_;   
         flag = false;
     }
     
@@ -385,25 +390,30 @@ namespace http{
     
     void http_sever ::setIndexOfserver(int sockfd)
     {
-        if (ifhost_dup(conf_fd[sockfd]->ip_addr) && ifport_dup(conf_fd[sockfd]->getPort()) && !ifserver_dup(conf_fd[sockfd]->server_name))
-        {
-            int host_index = requist_data[sockfd].find("Host") + 6;
-            int host_end = requist_data[sockfd].find("\r\n", host_index);
-            std::string cleint_host = requist_data[sockfd].substr(0, host_end);
-            host_index = cleint_host.find("Host") + 6;
-            cleint_host = cleint_host.substr(host_index, cleint_host.size());
-            for (size_t i = 0; i < conf.size(); i++)
+        std::vector<std::string>::iterator it = conf_fd[sockfd]->server_name.begin();
+        while (it != conf_fd[sockfd]->server_name.end())
+        { 
+            if (ifhost_dup(conf_fd[sockfd]->ip_addr) && ifport_dup(conf_fd[sockfd]->getPort()) && !ifserver_dup(*it))
             {
-                for (size_t j = 0; j < conf[i]._listen.size(); j++)
+                int host_index = requist_data[sockfd].find("Host") + 6;
+                int host_end = requist_data[sockfd].find("\r\n", host_index);
+                std::string cleint_host = requist_data[sockfd].substr(0, host_end);
+                host_index = cleint_host.find("Host") + 6;
+                cleint_host = cleint_host.substr(host_index, cleint_host.size());
+                for (size_t i = 0; i < conf.size(); i++)
                 {
-                    if (!std::strcmp(cleint_host.c_str(), conf[i]._server_name[j].c_str()))
+                    for (size_t j = 0; j < conf[i]._listen.size(); j++)
                     {
-                        conf_fd[sockfd]->setIndex(i);
-                        flag = true;
+                        if (!std::strcmp(cleint_host.c_str(), conf[i]._server_name[j].c_str()))
+                        {
+                            conf_fd[sockfd]->setIndex(i);
+                            flag = true;
+                        }
                     }
                 }
             }
-       }
+            it++;
+        }
     }
     
     void http_sever ::unchunk(int sockfd)

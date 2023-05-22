@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 19:55:26 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 22:48:44 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ namespace http{
         {
         }
 
-        sockets &sockets::init_data(int port_, std::string ip_add, std::string server_name_, int index_)
+        sockets &sockets::init_data(int port_, std::string ip_add, std::vector<std::string> server_name_, int index_)
         {
             std::string port_str;
             int         ret_getadd;
@@ -47,12 +47,13 @@ namespace http{
             hints.ai_socktype = SOCK_STREAM; // specifies the socket type specifies the socket type
             port_str = std::to_string(port);
             ret_getadd = getaddrinfo(ip_add.c_str(), port_str.c_str(), &hints, &result);
-            if (ret_getadd != 0) {
+            if (ret_getadd != 0) 
+            {
                 std::cout << "\033[31mGetaddrinfo error\033[0m\n";
                 exit(EXIT_FAILURE);
-            }
-            
-            if(start_server() == false){
+            } 
+            if(start_server() == false)
+            {
                 exit(EXIT_FAILURE);
             }
             return (*this);
