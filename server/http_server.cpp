@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 20:01:31 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 20:12:36 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -385,10 +385,6 @@ namespace http{
     
     void http_sever ::setIndexOfserver(int sockfd)
     {
-        std::cout<< ifhost_dup(conf_fd[sockfd]->ip_addr)<<std::endl;
-        std::cout<< ifport_dup(conf_fd[sockfd]->getPort())<<std::endl;
-        std::cout<< ifserver_dup(conf_fd[sockfd]->server_name)<<std::endl;
-        std::cout<<"------"<< conf_fd[sockfd]->getIndex()<<std::endl;
         if (ifhost_dup(conf_fd[sockfd]->ip_addr) && ifport_dup(conf_fd[sockfd]->getPort()) && !ifserver_dup(conf_fd[sockfd]->server_name))
         {
             int host_index = requist_data[sockfd].find("Host") + 6;
@@ -396,18 +392,14 @@ namespace http{
             std::string cleint_host = requist_data[sockfd].substr(0, host_end);
             host_index = cleint_host.find("Host") + 6;
             cleint_host = cleint_host.substr(host_index, cleint_host.size());
-            print(cleint_host);
             for (size_t i = 0; i < conf.size(); i++)
             {
                 for (size_t j = 0; j < conf[i]._listen.size(); j++)
                 {
                     if (!std::strcmp(cleint_host.c_str(), conf[i]._server_name[j].c_str()))
                     {
-                        std::cout<<i<<std::endl;
-                        std::cout<< conf_fd[sockfd]->getIndex()<<std::endl;
                         conf_fd[sockfd]->setIndex(i);
                         flag = true;
-                        std::cout<<"------"<< conf_fd[sockfd]->getIndex()<<std::endl;
                     }
                 }
             }
