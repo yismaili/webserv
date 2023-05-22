@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 00:23:47 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 18:35:09 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,12 +17,15 @@ namespace http{
     
    http_sever::http_sever(std::vector<server> conf_) :sock()
    {
-        // get_server(conf_);
+        get_server(conf);
         for (size_t i = 0; i < conf_.size(); i++)
         {
-           for (size_t j = 0; j < conf_[i]._listen.size(); j++)
+            for (size_t j = 0; j < conf_[i]._listen.size(); j++)
             {
-                socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), conf_[i]._server_name[j], i)); 
+                // if (ifhost_dup(conf_[i].get_host()) && ifport_dup(conf_[i]._listen[j]) && ifserver_dup(conf_[i]._server_name[j]))
+                // {
+                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), conf_[i]._server_name[j], i));  
+                // }
             }
         }
         conf = conf_;
@@ -379,11 +382,39 @@ namespace http{
         }
         return (1);
     }
-
+    
+    void print(std::string str)
+    {
+        for(std::string::iterator it = str.begin(); it != str.end(); it++)
+        {
+            if (*it == '\r')
+                std::cout << "\\r";
+            else if (*it == '\n')
+                std::cout << "\\n" << std::endl;
+            else
+                std::cout  << *it;
+        }
+    }
+    
     void http_sever ::unchunk(int sockfd)
     {
         
-            
+        int host_index = requist_data[sockfd].find("Host") + 6;
+        int host_end = requist_data[sockfd].find("\r\n", host_index);
+        std::string cleint_host = requist_data[sockfd].substr(0, host_end);
+        host_index = cleint_host.find("Host") + 6;
+        cleint_host = cleint_host.substr(host_index, cleint_host.size());
+        print(cleint_host);
+        for (size_t i = 0; i < conf.size(); i++)
+        {
+            for (size_t j = 0; j < conf[i]._listen.size(); j++)
+            {
+                if (!std::strcmp(cleint_host.c_str(), conf[i]._server_name[j].c_str()))
+                {
+                     conf_fd[sockfd]->setIndex(i);
+                }
+            }
+        }
         if (header_error == 1)
         {
             //std::cout<<"i am in header\n";

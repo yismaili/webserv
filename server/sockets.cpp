@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 13:40:58 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 18:37:26 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,7 +45,7 @@ namespace http{
             hints.ai_family = AF_UNSPEC; // the address family IPv4 and IPv6 addresses for the given hostname
             hints.ai_socktype = SOCK_STREAM; // specifies the socket type specifies the socket type
             port_str = std::to_string(port);
-            ret_getadd = getaddrinfo(server_name.c_str(), port_str.c_str(), &hints, &result);
+            ret_getadd = getaddrinfo(ip_add.c_str(), port_str.c_str(), &hints, &result);
             if (ret_getadd != 0) {
                 std::cout << "\033[31mGetaddrinfo error\033[0m\n";
                 exit(EXIT_FAILURE);
@@ -90,7 +90,7 @@ namespace http{
         {
             int optval;
             
-            optval = 1;
+            optval = 1; //enabling the SO_REUSEADDR socket option.
             // Creates a TCP socket
             sockfd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
             if (sockfd < 0)
@@ -98,26 +98,23 @@ namespace http{
                 std::cout << "\033[31mCreate sockopt failed\033[0m\n";
                 return (false);
             }
-            // set options for a socket
+            // set socket option on a socket file descriptor
             if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
             {
-                //SOL_SOCKET: manipulate the socket-level options
+                //SOL_SOCKET: represents the socket level option
                 //SO_REUSEADDR: the option name. It is used to enable reuse of local addresses.
                 //&optval: a pointer to the buffer that contains the value of the option you want to set
                 std::cout << "\033[31mSet sockopt failed\033[0m\n";
                 return (false);
             }
-            // set the O_NONBLOCK flag for the socket file descriptor
+            // set the O_NONBLOCK flag for the socket file descriptor  to enable non-blocking mode.
             fcntl(sockfd, F_SETFL, O_NONBLOCK);
 
             //bind a socket with a specific address and port number
             if (bind(sockfd, result->ai_addr, result->ai_addrlen) == 0)
             {
+                // F_SETFL: This flag indicates that we want to set the file status flags.
                 std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
-            }
-            else
-            {
-                std::cout << "\nwebsevr: conflicting server name  on 0.0.0.0:["<<port<<"], ignored\n";
             }
           //  Set socket to listen
             if (listen(sockfd, SOMAXCONN) < 0){
@@ -137,6 +134,10 @@ namespace http{
         void sockets::setTime_out(unsigned int time)
         {
             this->time_out = time;
+        }
+        void sockets::setIndex(int const index_)
+        {
+            this->index = index_;
         }
     }
     
