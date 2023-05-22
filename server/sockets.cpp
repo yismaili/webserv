@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 18:37:26 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 19:55:26 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,6 +40,7 @@ namespace http{
             port = port_;
             ip_addr = ip_add;
             index = index_;
+            index_tmp = index_;
             server_name = server_name_;
             memset(&hints, 0, sizeof(hints)); // initializes the struct addrinfo variable hints with zeros
             hints.ai_family = AF_UNSPEC; // the address family IPv4 and IPv6 addresses for the given hostname
@@ -65,6 +66,11 @@ namespace http{
         int const &sockets::getIndex() const
         {
             return (index);
+        }
+        
+        int const &sockets::getIndex_tmp() const
+        {
+            return (index_tmp);
         }
         
         unsigned int sockets::getSock_addr_len()const

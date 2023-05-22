@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/27 15:29:15 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 18:37:36 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 19:51:44 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,13 +45,15 @@ namespace http{
             unsigned int const &getTime_out() const;
             void    setTime_out(unsigned int time);
             void setIndex(int const index_);
+            int const &getIndex_tmp() const;
             int data_issending;
             
-        private:
+         public:
             struct addrinfo hints; //provides information about a network address, such as the host name, port number, and address family.
             struct addrinfo *result, *rp;
             unsigned int    sock_addr_len;
             std::string     ip_addr;
+            int             index_tmp;
             int             index;
             std::size_t     content_length;
             int             sockfd;
