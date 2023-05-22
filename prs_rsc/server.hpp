@@ -12,7 +12,6 @@ class location;
 class server
 {
 protected:
-    std::vector<std::string> _server_name; /*s*/
     std::string _index;
     std::string _host; /*s*/
     std::string _root; 
@@ -33,6 +32,7 @@ protected:
     // std::string _ssl_ciphers;
     std::map<std::string ,std::string> _path_info; 
 public:
+    std::vector<std::string> _server_name; /*s*/
     std::vector<int> _listen; /*s*/
     std::vector<location> _location;
     server(Data_config data, bool check_location);

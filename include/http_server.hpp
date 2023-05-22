@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/20 01:10:16 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 00:16:15 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,10 @@ namespace http{
             std::vector<http::sockets>::iterator find_conf(int sockfd);
             int parse_header(std::string header, int sockfd);
             unsigned int getTime(void);
+            int ifport_dup(int port_);
+            int ifhost_dup(std::string host_);
+            int get_server(std::vector<server> conf_);
+            int ifserver_dup(std::string server_name);
         public:
             http::sockets sock;  
             std::vector<http::sockets> socket_id;
@@ -75,6 +79,9 @@ namespace http{
             std::size_t body_end;
             int         header_error;
             std::size_t transfer_encoding_gzip;
+            std::vector<std::string> servers_names;
+            std::vector<int> port;
+            std::vector<std::string> host;
     };
 }
 #endif

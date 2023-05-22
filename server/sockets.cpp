@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/20 01:09:33 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 13:40:58 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,26 +30,22 @@ namespace http{
         sockets::~sockets()
         {
         }
-         //Assign a port to socket
-        sockets &sockets::init_data(int port_, std::string ip_add, int index_)
+
+        sockets &sockets::init_data(int port_, std::string ip_add, std::string server_name_, int index_)
         {
             std::string port_str;
-            int ret_getadd;
+            int         ret_getadd;
 
             sockfd =  -1;
             port = port_;
-            sock_addr_len = 0;
             ip_addr = ip_add;
             index = index_;
-            
-            memset(&hints, 0, sizeof(hints));
-            hints.ai_family = AF_UNSPEC;
-            hints.ai_socktype = SOCK_STREAM;
-            hints.ai_flags = 0;
-            hints.ai_protocol = 0;
+            server_name = server_name_;
+            memset(&hints, 0, sizeof(hints)); // initializes the struct addrinfo variable hints with zeros
+            hints.ai_family = AF_UNSPEC; // the address family IPv4 and IPv6 addresses for the given hostname
+            hints.ai_socktype = SOCK_STREAM; // specifies the socket type specifies the socket type
             port_str = std::to_string(port);
-            ret_getadd = getaddrinfo(ip_add.c_str(), port_str.c_str(), &hints, &result);
-            
+            ret_getadd = getaddrinfo(server_name.c_str(), port_str.c_str(), &hints, &result);
             if (ret_getadd != 0) {
                 std::cout << "\033[31mGetaddrinfo error\033[0m\n";
                 exit(EXIT_FAILURE);
@@ -96,15 +92,12 @@ namespace http{
             
             optval = 1;
             // Creates a TCP socket
-           for (rp = result; rp != NULL; rp = rp->ai_next) 
-           {
-                sockfd = socket(rp->ai_family, rp->ai_socktype,rp->ai_protocol);
-                if (sockfd < 0){
-                    std::cout << "\033[31mCreate sockopt failed\033[0m\n";
-                    return (false);
-                }
-           }
-            
+            sockfd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+            if (sockfd < 0)
+            {
+                std::cout << "\033[31mCreate sockopt failed\033[0m\n";
+                return (false);
+            }
             // set options for a socket
             if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
             {
@@ -114,25 +107,25 @@ namespace http{
                 std::cout << "\033[31mSet sockopt failed\033[0m\n";
                 return (false);
             }
-            // sock_addr_len = sizeof(hints);
             // set the O_NONBLOCK flag for the socket file descriptor
-            int val = fcntl(sockfd, F_GETFL, 0);
-            fcntl(sockfd, F_SETFL, val | O_NONBLOCK);
+            fcntl(sockfd, F_SETFL, O_NONBLOCK);
 
             //bind a socket with a specific address and port number
-            // bind a socket with a specific address and port number
-            if (bind(sockfd, result->ai_addr, result->ai_addrlen) < 0) {
-               std::cout << "\033[31mBind System failed\033[0m\n";
-                return false;
+            if (bind(sockfd, result->ai_addr, result->ai_addrlen) == 0)
+            {
+                std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
+            }
+            else
+            {
+                std::cout << "\nwebsevr: conflicting server name  on 0.0.0.0:["<<port<<"], ignored\n";
             }
           //  Set socket to listen
             if (listen(sockfd, SOMAXCONN) < 0){
                 // The backlog argument defines the maximum length to which the queue of pending connections for sockfd may grow
                 std::cout << "\033[31mSocket listen failed\033[0m\n";
-                exit(1);
             }
-            std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
-            freeaddrinfo(result);           /* No longer needed */  
+            // std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
+            freeaddrinfo(result);
             return true;
         }
         

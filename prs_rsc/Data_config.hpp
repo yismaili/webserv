@@ -15,15 +15,4 @@ struct Data_config
     std::map<std::string, std::string> location;
 };
 
-
-
-struct compters
-{
-    int c_server_name;
-    int c_host;
-    int c_root;
-    int c_client_max_body_size;
-};
-
-
 #endif
