@@ -41,25 +41,22 @@ bool isIpAddress(const std::string& ip) {
     return 1;
 }
 
-int isDomainName(const std::string& domainName)
+bool isValidServerName(const std::string Name)
 {
-
-    if (domainName.empty())
-        return 0;
-    int i = 0;
-    while (domainName[i]) 
+    if (Name.empty())
+        return false;
+    if (Name.length() > 255)
+        return false;
+    if (Name.front() == '.' || Name.front() == '-' || Name.back() == '.' || Name.back() == '-')
+        return false;
+    if (Name.find("..") != std::string::npos || Name.find("--") != std::string::npos) 
+        return false;
+    for (size_t i = 0 ; i < Name.size(); i++)
     {
-        char c =  domainName[i];
-        if (!std::isalnum(c) && c != '-' && c != '.') 
-            return 0;
-        i++;
+        if (!std::isalnum(Name[i]) && Name[i] != '-' && Name[i] != '.') 
+            return false;
     }
-
-    if (domainName.front() == '-' || domainName.back() == '-')
-        return 0;
-    if (domainName.find('.') == std::string::npos) 
-        return 0;
-    return 1;
+    return true;
 }
 
 int search_char(std::string str, char c)
@@ -164,17 +161,6 @@ int ft_non_alphabetic(std::string value)
     return (0);
 }
 
-// void ft_check_index(std::string index_file, std::string line)
-// {
-//     int i = index_file.find_last_of(".");
-//     if (i == -1)
-//         ft_error(line, "Error");
-//     std::string filedot = index_file.substr(i + 1);
-//     if (filedot != "html" && filedot != "php" && filedot != "htm" && filedot != "css"
-//         && filedot != "js" && filedot != "jpg" && filedot != "jpeg" && filedot != "png" && filedot != "gif"
-//         && filedot != "txt" && filedot != "xml" && filedot != "json") 
-//             ft_error(line, "Error");
-// }
 
 void check_methods(std::string method, std::string line)
 {
@@ -260,11 +246,14 @@ server::server(Data_config data, bool check_location)
         key = toLower(key);
         if (key == "server_name" && check_location)
         {
-            if(c_server_name)
-                ft_error(line, "Duplicated");
+            // if(c_server_name)
+            //     ft_error(line, "Duplicated");
             is_empty_value(value, line);
-            if (ft_numbers_value(iss) || ft_non_alphabetic(value))
+            if (ft_numbers_value(iss) || !isValidServerName(value))
                 ft_error(line, "Error");
+            std::vector<std::string>::iterator it = std::find(_server_name.begin(), _server_name.end(), value);
+            if(it != _server_name.end())
+                ft_error(line, "duplicate server_name");
             c_server_name++;
             _server_name.push_back(value);
         }
@@ -339,7 +328,6 @@ server::server(Data_config data, bool check_location)
             if (c_index)
                 ft_error(line, "Error duplicated");
             is_empty_value(value, line);
-            //ft_check_index(value, line);
             _index = value;
             if (ft_numbers_value(iss))
                 ft_error(line, "Error");
@@ -435,17 +423,11 @@ server::server(Data_config data, bool check_location)
             if (line.size() > 1)
             {
                 if (!is_world(line, "server"))
-                {
-
-                    std::cout << check_location << std::endl;
                     ft_error(line, "Error");
-                }
             }
         }
         else
-        {
             ft_error(line, "Error");
-        }
     }
 
     if(!c_allow_method && !check_location)
@@ -459,7 +441,13 @@ server::server(Data_config data, bool check_location)
         _error_page[403] = "www/html/error_pages/403.html";
         _error_page[404] = "www/html/error_pages/404.html";
         _error_page[500] = "www/html/error_pages/500.html";
+        _error_page[400] = "www/html/error_pages/400.html";
+        _error_page[405] = "www/html/error_pages/405.html";
+        _error_page[409] = "www/html/error_pages/409.html";
+        _error_page[413] = "www/html/error_pages/413.html";
     }
+    if (!c_server_name && check_location)
+        _server_name.push_back("hostname");
     
     if(data.location.size())
     {

@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/21 16:07:20 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/22 13:44:24 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ int Respond::ft_handle_index(std::vector<server> server)
             if (_mime_index != std::string::npos)
                 _mime_string = index.substr(_mime_index + 1);
             std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
-            _rooted_path = server[_location_index].get_root() + _removed_path + index;
+            _rooted_path = server[_server_index].get_root() + _removed_path + index;
             if (ft_handle_index_2(server, file))
                 return (2);
         }
@@ -106,7 +106,7 @@ int Respond::ft_handle_index(std::vector<server> server)
             if (_mime_index != std::string::npos)
                 _mime_string = index.substr(_mime_index + 1);
             std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
-            _rooted_path = server[_location_index].get_root() + _removed_path + index;
+            _rooted_path = server[_server_index].get_root() + _removed_path + index;
             if (ft_handle_index_2(server, file))
                 return (2);
         }
@@ -215,7 +215,6 @@ void    Respond::ft_show_autoindex(std::vector<server> server)
     {
         if (entry->d_name[0] != '.')
         {
-            std::cout << "file name:" << file_name << std::endl;
             file_name = std::string(entry->d_name);
             std::string file_path;
             if (_path_found[_path_found.size() - 1] == '/')
@@ -227,8 +226,6 @@ void    Respond::ft_show_autoindex(std::vector<server> server)
                 match_path = _rooted_path + file_name;
             else
                 match_path = _rooted_path + "/" + file_name;
-            std::cout << "match path: " << match_path << std::endl;
-            std::cout << "file path:" << file_path << std::endl;
             
             if (stat(match_path.c_str(), &file_stat) < 0)
             {
@@ -277,7 +274,6 @@ void    Respond::handle_error_response(std::vector<server> server, int error_cod
         set_header("Content-Type", "text/html");
         set_header("Connection", "keep-alive");
         set_date();
-        set_last_modified();
         _response_body = "<html><head><title>" + std::to_string(error_code) + " " + _status_message + "</title></head><body><h1>" + std::to_string(error_code) + " " + _status_message + "</h1><p>You don't have permission to access " + r.get_uri() + " on this server.</p></body></html>";
         set_header("Content-Length", std::to_string(_response_body.length()));
         set_cache_control("no cache");

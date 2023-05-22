@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/26 23:05:21 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/21 19:11:02 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/22 20:41:03 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,10 +137,7 @@ int request::parse_request()
     request_line >> this->_method >> this->_uri >> this->_version;
     // i need to call a function to check if the request line content is suitable or not
     if (!ft_check_request_line(this->_method, this->_uri, this->_version))
-    {
-        std::cerr << "Invalid request line" << std::endl;
         return (2);
-    }
     ft_find_query();
     handleSpecialCharacters(this->_uri);
     // Parse the headers
@@ -156,30 +153,17 @@ int request::parse_request()
     }
     // function that checks if the request is POST or PUT to see if there is no content-length to return error
     if (ft_check_content_length() == false || ft_check_content_type() == false)
-    {
-        std::cerr << "Invalid Content-Length or Content-Type" << std::endl;
         return (2);
-    }
     // function that checks if the header `connexion` exists or not
     int rtn = ft_check_connexion();
     if (rtn != 1)
-    {
-        if (rtn == 2)
-            std::cerr << "Invalid Connexion header" << std::endl;
-        else
-            std::cerr << "Missing Connexion header" << std::endl;
         return (2);
-    }
 
     // function that will parse the port from the host 
     // and check if the host is valid or not
     if (this->get_header("Host") == "")
-    {
-        std::cerr << "Invalid Host header" << std::endl;
         return (2);
-    }
     ft_parse_port(this->get_header("Host"));
-    // ft_parse_language_charset();
 
     // Parse the request body
     std::string content_len_str = this->get_header("Content-Length");
@@ -187,14 +171,8 @@ int request::parse_request()
     {
         size_t content_len = std::stoi(content_len_str);
         if (content_len > request.size())
-        {
-            std::cerr << "Invalid Content-Length" << std::endl;
             return (2);
-        }
         this->_body = request.substr(request.size() - content_len);
-        // std::cout << "S T A R T     O F     REQUEST     B O D Y" << std::endl;
-        // std::cout << this->_body << std::endl;
-        // std::cout << "E N D     O F     REQUEST     B O D Y" << std::endl;
     }
     else
     {
@@ -205,17 +183,6 @@ int request::parse_request()
     return (0);
 }
 
-void    request::print_request()
-{
-    std::cout << "Method: " << this->_method << std::endl;
-    std::cout << "URI: " << this->_uri << std::endl;
-    std::cout << "Version: " << this->_version << std::endl;
-    std::cout << "Headers:" << std::endl;
-    for (std::map<std::string, std::string>::const_iterator it = this->_headers.begin(); it != this->_headers.end(); ++it)
-        std::cout << it->first << ": " << it->second << std::endl;
-    std::cout << "Body: " << this->_body << std::endl;
-}
-
 std::string request::get_boundary() const
 {
     return (this->_boundary);
@@ -224,11 +191,11 @@ std::string request::get_boundary() const
 // change the "%20" with a space
 void request::handleSpecialCharacters(std::string& uri) {
     std::string encodedChars[] = {"%20", "%21", "%22", "%23", "%24", "%25", "%26", "%27", "%28", "%29", "%2A", "%2B", "%2C",
-                                  "%2D", "%2E", "%2F", "%3A", "%3B", "%3C", "%3D", "%3E", "%3F", "%40", "%5B", "%5C", "%5D",
-                                  "%5E", "%5F", "%60", "%7B", "%7C", "%7D", "%7E"};
+                                    "%2D", "%2E", "%2F", "%3A", "%3B", "%3C", "%3D", "%3E", "%3F", "%40", "%5B", "%5C", "%5D",
+                                    "%5E", "%5F", "%60", "%7B", "%7C", "%7D", "%7E"};
 
     std::string specialChars[] = {" ", "!", "\"", "#", "$", "%", "&", "'", "(", ")", "*", "+", ",", "-", ".", "/", ":", ";", "<",
-                                  "=", ">", "?", "@", "[", "\\", "]", "^", "_", "`", "{", "|", "}", "~"};
+                                    "=", ">", "?", "@", "[", "\\", "]", "^", "_", "`", "{", "|", "}", "~"};
 
     for (size_t i = 0; i < sizeof(encodedChars) / sizeof(encodedChars[0]); i++) {
         std::string::size_type n = 0;

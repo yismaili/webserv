@@ -6,11 +6,12 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/21 15:45:35 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/22 19:23:01 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "respond.hpp"
+# include <stdio.h>
 
 void    Respond::handle_get_response(std::vector<server> servers)
 {
@@ -43,7 +44,6 @@ void    Respond::handle_get_response(std::vector<server> servers)
         handle_error_response(servers, 404);
         return ;
     }
-    // step 5: check if the autoindex if on or off
 
 }
 
@@ -58,7 +58,7 @@ void    Respond::handle_post_response(std::vector<server> server)
     if (_is_cgi == false && (server[_server_index]._location[_location_index].get_upload_store().empty() && server[_server_index]._location[_location_index].get_upload() == false))
         return ;
     _upload_store_path = _rooted_path;
-    _upload_store.append(_upload_store);
+    _upload_store = server[_server_index]._location[_location_index].get_upload_store();
     struct stat st;
     if (stat(_upload_store_path.c_str(), &st) != 0)
     {
@@ -76,12 +76,22 @@ void    Respond::handle_post_response(std::vector<server> server)
         {
             handle_urlencoded();
             create_decode_files();
+            std::string path = r.get_uri();
+            std::string::size_type i = r.get_uri().find_last_of('/');
+            if (i != std::string::npos)
+                path = r.get_uri().substr(i);
+            init_response_body(server, path, server[_server_index]._location[_location_index].get_root());
             return ;
         }
     }
     if (check_post_type() == "form-data")
     {
         handle_form_data(server);
+        std::string path = r.get_uri();
+        std::string::size_type i = r.get_uri().find_last_of('/');
+        if (i != std::string::npos)
+            path = r.get_uri().substr(i);
+        init_response_body(server, path, server[_server_index]._location[_location_index].get_root());
         return ;
     }
 }
@@ -92,13 +102,7 @@ void    Respond::handle_urlencoded()
     Url_encoded encoded_form;
     std::string::size_type pos = 0;
     std::string::size_type end_pos = 0;
-    size_t index = 0;
-    while ((index = line.find("%20", index)) != std::string::npos)
-    {
-        std::cout << index << std::endl;
-        line = line.substr(0, index) + " " + line.substr(index + 3);
-        index += 1; // Move past the inserted space
-    }
+    r.handleSpecialCharacters(line);
     while (pos != std::string::npos)
     {
         end_pos = line.find('&', pos);
@@ -119,7 +123,6 @@ void    Respond::handle_urlencoded()
 
 void    Respond::create_decode_files()
 {
-    std::string path = _upload_store_path;
     std::string file_name;
     std::string file_content;
     std::ofstream file;
@@ -127,8 +130,8 @@ void    Respond::create_decode_files()
     
     while (it != _url_decode.end())
     {
-        file_name = path;
-        file_name.append(it->key);
+        file_name = _upload_store;
+        file_name += "/" + it->key;
         file.open(file_name.c_str());
         file << it->value;
         file.close();
@@ -153,7 +156,7 @@ void    Respond::handle_form_data(std::vector<server> server)
 
         // Read the data between the boundaries
         FormData formData = read_form_data(server, pos); // escape /r/n
-        if (_file_too_large == false)
+        if (_file_too_large == true)
         {
             handle_error_response(server, 413);
             return ;
@@ -165,24 +168,11 @@ void    Respond::handle_form_data(std::vector<server> server)
             break;
         pos += _boundary.length() + 2;
     }
-    // iterat over formData class and print it's attributes
-    // std::vector<FormData>::iterator it = _form_data.begin();
-    // while (it != _form_data.end())
-    // {
-    //     std::cout << "name: " << it->get_name() << std::endl;
-    //     std::cout << "filename: " << it->get_file_name() << std::endl;
-    //     std::cout << "content-type: " << it->get_content_type() << std::endl;
-    //     std::cout << "data: " << it->get_data() << " END"<< std::endl;
-    //     it++;
-    //}
-    // }
-    
     create_form_data();
 }
 
 void    Respond::create_form_data()
 {
-    std::string path = _upload_store_path;
     std::string file_name;
     std::string file_content;
     std::ofstream file;
@@ -195,8 +185,8 @@ void    Respond::create_form_data()
             it++;
             continue;
         }
-        file_name = path;
-        file_name.append(it->get_file_name());
+        file_name = _upload_store;
+        file_name += "/" + it->get_file_name();
         file.open(file_name.c_str());
         file << it->get_data();
         file.close();
@@ -224,7 +214,10 @@ FormData Respond::read_form_data(std::vector<server> servers ,size_t pos)
     std::string last_boundary = _boundary + "--";
     size_t end = r.get_body().find(_boundary, start);
     if (end == std::string::npos)
-        return form_data; // Boundary not found
+    {
+        std::cout << form_data.get_data() << std::endl;
+        return (form_data); // Boundary not found
+    }
 
     size_t end_last = r.get_body().find(last_boundary, start);
     if (end_last != std::string::npos && end_last == end)
@@ -257,34 +250,14 @@ FormData Respond::read_form_data(std::vector<server> servers ,size_t pos)
 
     // Process the data content
     std::string data_content = section.substr(header_end + 4); // Skip the CRLF delimiter
+    std::cout << (unsigned int)servers[_server_index].get_client_max_body_size() << std::endl;
+    std::cout << servers[_server_index].get_client_max_body_size() << std::endl;
     if (data_content.length() * 8 >= (unsigned int)servers[_server_index].get_client_max_body_size())
         _file_too_large = true;
     form_data.data = data_content;
 
     return (form_data);
 }
-
-/*
-POST /example HTTP/1.1
-Host: example.com
-Content-Type: multipart/form-data; boundary=--------------------------1234567890
-
-----------------------------1234567890
-Content-Disposition: form-data; name="username"
-
-johndoe
-----------------------------1234567890
-Content-Disposition: form-data; name="profile_pic"; filename="profile.jpg"
-Content-Type: image/jpeg
-
-_root path + path_found + upload_store
-----------------------------1234567890
-Content-Disposition: form-data; name="notes"; filename="notes.txt"
-Content-Type: text/plain
-
-(Here goes the text content of the notes file)
-----------------------------1234567890--
-*/
 
 std::string Respond::check_post_type()
 {

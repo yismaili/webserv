@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/21 15:45:15 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/22 19:18:41 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 std::string Respond::response_root(std::vector<server> servers)
 {
     int rtn_location = 0;
-    init_response_body(servers[_server_index].get_index(), servers[_server_index].get_root());
     // step 1 :check the location
     rtn_location = ft_parse_location(servers, false);
     if (rtn_location)

@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/20 23:23:41 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 22:15:41 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ namespace http{
             int ifhost_dup(std::string host_);
             int get_server(std::vector<server> conf_);
             int ifserver_dup(std::string server_name);
-            int managerOfserver(std::vector<server> conf_);
+            void setIndexOfserver(int sockfd);
         public:
             http::sockets sock;  
             std::vector<http::sockets> socket_id;
@@ -83,6 +83,7 @@ namespace http{
             std::vector<std::string> servers_names;
             std::vector<int> port;
             std::vector<std::string> host;
+            bool    flag;
     };
 }
 #endif

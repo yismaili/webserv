@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   http_server.cpp                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/21 19:14:06 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/22 22:51:03 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,9 +17,23 @@ namespace http{
     
    http_sever::http_sever(std::vector<server> conf_) :sock()
    {
-        get_server(conf_);
-        managerOfserver(conf_);
-        conf = conf_;
+        for (size_t i = 0; i < conf_.size(); i++)
+        {
+            for (size_t j = 0; j < conf_[i]._listen.size(); j++)
+            {
+                socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), conf_[i].get_server_name(), i));
+                port.push_back(conf_[i]._listen[j]);
+                host.push_back(conf_[i].get_host());
+                std::vector<std::string>::iterator it = conf_[i]._server_name.begin();
+                while (it != conf_[i]._server_name.end())
+                {
+                    servers_names.push_back(*it);
+                    it++;
+                }
+            }
+        }
+        conf = conf_;   
+        flag = false;
     }
     
     http_sever::~http_sever()
@@ -52,54 +66,7 @@ namespace http{
         gettimeofday(&current_time, NULL);
         return (current_time.tv_sec * 1000 + current_time.tv_usec / 1000);
     }
-    
-    int http_sever::get_server(std::vector<server> conf_)
-    {
-        for (size_t i = 0; i < conf_.size(); i++)
-        {
-            for (size_t j = 0; j < conf_[i]._server_name.size(); j++)
-            {
-                servers_names.push_back(conf_[i]._server_name[j]);
-                port.push_back(conf_[i]._listen[j]);
-                host.push_back(conf_[i].get_host());
-            }
-        }
-        return (0);
-    }
-    
-    int http_sever::managerOfserver(std::vector<server> conf_)
-    {
-        int k_flag = 0;
-        for (size_t i = 0; i < conf_.size(); i++)
-        {
-           for (size_t j = 0; j < conf_[i]._listen.size(); j++)
-            {
-                if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && ifserver_dup(conf_[i]._server_name[j]))
-                {
-                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
-                }
-                else if (ifhost_dup(conf_[i].get_host()) && !ifport_dup(conf_[i]._listen[j]) && !ifserver_dup(conf_[i]._server_name[j]))
-                {
-                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
-                }
-                else if (!ifhost_dup(conf_[i].get_host()) && ifport_dup(conf_[i]._listen[j]))
-                {
-                    std::cout<<"2\n";
-                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
-                }
-                else if (ifhost_dup(conf_[i].get_host()) && ifport_dup(conf_[i]._listen[j]) &&  k_flag == 0)
-                {
-                    socket_id.push_back(sock.init_data(conf_[i]._listen[j], conf_[i].get_host(), i)); 
-                    if (conf_.size() < i + 1 && ifport_dup(conf_[i + 1]._listen[j]))
-                        k_flag = 1;
-                    else
-                        k_flag = 0;
-                }
-            }
-        }
-        return (0);
-    }
-    
+        
     int http_sever::ifport_dup(int port_)
     {
         std::vector<int>::iterator it;
@@ -111,7 +78,7 @@ namespace http{
                 check++;
             }
         }
-        if (check != 1)
+        if (check != 1 && check != 0)
         {
             return (1);
         }
@@ -122,6 +89,7 @@ namespace http{
     {
         std::vector<std::string>::iterator it;
         int check = 0;
+        it = servers_names.begin();
         for (it = servers_names.begin(); it != servers_names.end(); ++it) 
         {
             if (server_name == (*it))
@@ -129,7 +97,7 @@ namespace http{
                 check++;
             }
         }
-        if (check != 1)
+        if (check != 1 && check != 0)
         {
             return (1);
         }
@@ -148,7 +116,7 @@ namespace http{
                 check++;
             }
         }
-        if (check != 1)
+        if (check != 1 && check != 0)
         {
            return (1);
         }
@@ -203,8 +171,7 @@ namespace http{
                     {
                         // Accept incoming connection
                         new_socket = accept_connection(clients[i].fd);
-                        int val = fcntl(new_socket, F_GETFL, 0);
-                        fcntl(new_socket, F_SETFL, val | O_NONBLOCK);
+                        fcntl(new_socket, F_SETFL, O_NONBLOCK);
                         conf_fd.insert(std::make_pair(new_socket, find_conf(clients[i].fd)));
                         std::cout <<"\n\033[32mCONNECTION TO ["<<conf_fd[new_socket]->getPort()<<"] "<<"ACCEPTED...\033[0m\n";
                         // Add new socket to poll list
@@ -407,19 +374,61 @@ namespace http{
         }
         return (1);
     }
-
-    void http_sever ::unchunk(int sockfd)
+    
+    void print(std::string str)
     {
-        
-            
+        for(std::string::iterator it = str.begin(); it != str.end(); it++)
+        {
+            if (*it == '\r')
+                std::cout << "\\r";
+            else if (*it == '\n')
+                std::cout << "\\n" << std::endl;
+            else
+                std::cout  << *it;
+        }
+    }
+    
+    void http_sever ::setIndexOfserver(int sockfd)
+    {
+        std::vector<std::string>::iterator it = conf_fd[sockfd]->server_name.begin();
+        while (it != conf_fd[sockfd]->server_name.end())
+        { 
+            if (ifhost_dup(conf_fd[sockfd]->ip_addr) && ifport_dup(conf_fd[sockfd]->getPort()) && !ifserver_dup(*it))
+            {
+                int host_index = requist_data[sockfd].find("Host") + 6;
+                int host_end = requist_data[sockfd].find("\r\n", host_index);
+                std::string cleint_host = requist_data[sockfd].substr(0, host_end);
+                host_index = cleint_host.find("Host") + 6;
+                cleint_host = cleint_host.substr(host_index, cleint_host.size());
+                for (size_t i = 0; i < conf.size(); i++)
+                {
+                    for (size_t j = 0; j < conf[i]._listen.size(); j++)
+                    {
+                        if (!std::strcmp(cleint_host.c_str(), conf[i]._server_name[j].c_str()))
+                        {
+                            conf_fd[sockfd]->setIndex(i);
+                            flag = true;
+                        }
+                    }
+                }
+            }
+            it++;
+        }
+    }
+    
+    void http_sever ::unchunk(int sockfd)
+     {
+        if (flag == true)
+        {
+            conf_fd[sockfd]->setIndex(conf_fd[sockfd]->getIndex_tmp());
+        }
+        setIndexOfserver(sockfd);
         if (header_error == 1)
         {
-            //std::cout<<"i am in header\n";
             request req;
             header_error = 0;
             Respond res(conf, conf_fd[sockfd]->getIndex() ,false, req);
             requist_data[sockfd] = res.rtn_response();
-           // std::cout<<requist_data[sockfd]<<std::endl;
             read_info[sockfd] = true;
         }
         else 
@@ -456,7 +465,7 @@ namespace http{
 
         result.append(data.substr(0, header_end));
         result.append("\r\n\r\n");
-        chunks = data.substr(data.find("\r\n\r\n") + 4, data.size() - 1);
+        chunks = data.substr(header_end + 4, data.size() - 1);
         subchunk = chunks.substr(0, 9);
         sizeof_chunk =  std::strtol(subchunk.c_str(), NULL, 16);
         pos = 0;
@@ -520,6 +529,7 @@ namespace http{
         static std::map<int, std::size_t> sent_data;
         std::string data_to_send;
         long bytes_sent;
+        static int check = 0;
 
         data_to_send = requist_data[socket].substr(sent_data[socket], 100024);
         bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
@@ -540,14 +550,18 @@ namespace http{
             if (sent_data[socket] >= requist_data[socket].size())
             {
                 sent_data[socket] = 0;
-                std::cout << "\n\033[33mRESPONSE SENDED TO [" << conf_fd[socket]->getPort() << "]...\033[0m" << std::endl;
+                std::cout << "\n\033[33mRESPONSE SENDED TO [" << conf_fd[socket]->getPort() << "]\033[0m" << std::endl;
                 std::map<int, std::string>::iterator it = requist_data.find(socket);
                 requist_data.erase(it);
+                conf_fd.erase(socket);
                 return (0);
             }
             else
             {
+                if (check == 0)
+                    std::cout << "\n\033[33mRESPONSE SENDING TO [" << conf_fd[socket]->getPort() << "]...\033[0m" << std::endl;
                 // If there is still data to send, return 1
+                check = 1;
                 return (1);
             }
         }
