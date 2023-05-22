@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 12:39:50 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/22 13:40:58 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,17 +92,12 @@ namespace http{
             
             optval = 1;
             // Creates a TCP socket
-        //    for (rp = result; rp != NULL; rp = rp->ai_next) 
-        //    {
-            
-                sockfd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
-                //sockfd = socket(rp->ai_family, rp->ai_socktype,rp->ai_protocol);
-                if (sockfd < 0){
-                    std::cout << "\033[31mCreate sockopt failed\033[0m\n";
-                    return (false);
-                }
-        //    }
-            
+            sockfd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+            if (sockfd < 0)
+            {
+                std::cout << "\033[31mCreate sockopt failed\033[0m\n";
+                return (false);
+            }
             // set options for a socket
             if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(optval)) < 0)
             {
@@ -112,12 +107,10 @@ namespace http{
                 std::cout << "\033[31mSet sockopt failed\033[0m\n";
                 return (false);
             }
-            // sock_addr_len = sizeof(hints);
             // set the O_NONBLOCK flag for the socket file descriptor
             fcntl(sockfd, F_SETFL, O_NONBLOCK);
 
             //bind a socket with a specific address and port number
-            // bind a socket with a specific address and port number
             if (bind(sockfd, result->ai_addr, result->ai_addrlen) == 0)
             {
                 std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
