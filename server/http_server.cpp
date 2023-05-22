@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 22:51:03 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/23 00:28:54 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -392,9 +392,10 @@ namespace http{
     {
         std::vector<std::string>::iterator it = conf_fd[sockfd]->server_name.begin();
         while (it != conf_fd[sockfd]->server_name.end())
-        { 
+        {
             if (ifhost_dup(conf_fd[sockfd]->ip_addr) && ifport_dup(conf_fd[sockfd]->getPort()) && !ifserver_dup(*it))
             {
+              
                 int host_index = requist_data[sockfd].find("Host") + 6;
                 int host_end = requist_data[sockfd].find("\r\n", host_index);
                 std::string cleint_host = requist_data[sockfd].substr(0, host_end);
@@ -402,9 +403,9 @@ namespace http{
                 cleint_host = cleint_host.substr(host_index, cleint_host.size());
                 for (size_t i = 0; i < conf.size(); i++)
                 {
-                    for (size_t j = 0; j < conf[i]._listen.size(); j++)
+                    for (size_t j = 0; j < conf[i]._server_name.size(); j++)
                     {
-                        if (!std::strcmp(cleint_host.c_str(), conf[i]._server_name[j].c_str()))
+                        if (!std::strncmp(cleint_host.c_str(),  conf[i]._server_name[j].c_str(), strlen( conf[i]._server_name[j].c_str())))
                         {
                             conf_fd[sockfd]->setIndex(i);
                             flag = true;
