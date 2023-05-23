@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/22 18:40:32 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/23 14:30:26 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <string>
 # include <map>
+# include <cstring>
 # include <vector>
 # include <iostream>
 # include <sstream>
@@ -105,6 +106,7 @@ class Respond
 
         std::vector<FormData> _form_data;
         std::vector<Url_encoded> _url_decode;
+        void        handle_error_response(std::vector<server> server, int error_code);
     private:
         std::map<std::string, std::string> _headers;
         std::string _response_body;
@@ -148,7 +150,6 @@ class Respond
         // DELETE RESPONSE
         void        handle_delete_response(std::vector<server> server);
         // ERROR RESPONSE
-        void        handle_error_response(std::vector<server> server, int error_code);
         void        ft_handle_error(int error_code);
 
         // void        cout_respond();

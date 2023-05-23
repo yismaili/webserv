@@ -5,7 +5,7 @@ SRCS =  prs_rsc/main.cpp prs_rsc/server.cpp prs_rsc/location.cpp prs_rsc/server_
 		request/request.cpp request/request_utils.cpp respond/respond.cpp respond/respond_root.cpp respond/pairs_def.cpp respond/method_utils.cpp \
 		respond/method_handling.cpp CGI/cgi.cpp server/sockets.cpp server/http_server.cpp 
 HDR = include/http_server.hpp include/sockets.hpp  respond/additional_class.hpp respond/respond.hpp \
-		CGI/cgi.hpp include/http_server.hpp include/sockets.hpp 
+		CGI/cgi.hpp include/http_server.hpp include/sockets.hpp
 OBJS = $(SRCS:.cpp=.o)
 
 all : $(NAME)

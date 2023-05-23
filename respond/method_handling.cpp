@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/22 19:23:01 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/23 15:08:57 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,12 @@ void    Respond::handle_get_response(std::vector<server> servers)
     // step 2: check if it's a CGI or not (like if `index` of the configuration file has .py or .php...etc)
     if (_is_cgi == true)
     {
-        run_cgi(r, *this);
+        if (access(get_file_cgi().c_str(), R_OK) != 0)
+        {
+            handle_error_response(servers, 403);
+            return ;
+        }
+        run_cgi(r, *this, servers);
         return ;
     }
     // step 3: check if it's a file or not
@@ -69,7 +74,7 @@ void    Respond::handle_post_response(std::vector<server> server)
     {
         if (_is_cgi == true)
         {
-            run_cgi(r, *this);
+            run_cgi(r, *this, server);
             return ;
         }
         else
@@ -87,11 +92,6 @@ void    Respond::handle_post_response(std::vector<server> server)
     if (check_post_type() == "form-data")
     {
         handle_form_data(server);
-        std::string path = r.get_uri();
-        std::string::size_type i = r.get_uri().find_last_of('/');
-        if (i != std::string::npos)
-            path = r.get_uri().substr(i);
-        init_response_body(server, path, server[_server_index]._location[_location_index].get_root());
         return ;
     }
 }
@@ -153,14 +153,14 @@ void    Respond::handle_form_data(std::vector<server> server)
         pos = r.get_body().find(_boundary, pos);
         if (pos == std::string::npos)
             break;
-
         // Read the data between the boundaries
         FormData formData = read_form_data(server, pos); // escape /r/n
-        if (_file_too_large == true)
-        {
-            handle_error_response(server, 413);
-            return ;
-        }
+        // if (_file_too_large == true)
+        // {
+        //     std::cout << "hahahahaahah" << std::endl;
+        //     handle_error_response(server, 413);
+        //     return ;
+        // }
         if (formData.isValid())
             _form_data.push_back(formData); // Add the form data to the list
         // std::cout << "pos before: " << pos << std::endl;
@@ -169,6 +169,11 @@ void    Respond::handle_form_data(std::vector<server> server)
         pos += _boundary.length() + 2;
     }
     create_form_data();
+    std::string path = r.get_uri();
+    std::string::size_type i = r.get_uri().find_last_of('/');
+    if (i != std::string::npos)
+        path = r.get_uri().substr(i);
+    init_response_body(server, path, server[_server_index]._location[_location_index].get_root());
 }
 
 void    Respond::create_form_data()
@@ -187,6 +192,7 @@ void    Respond::create_form_data()
         }
         file_name = _upload_store;
         file_name += "/" + it->get_file_name();
+        std::cout << file_name << std::endl;
         file.open(file_name.c_str());
         file << it->get_data();
         file.close();

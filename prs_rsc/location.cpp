@@ -6,7 +6,7 @@ std::string extract_path(std::string location_name)
 	{
 		if (!isspace(location_name[i]))
 			break;
-		pos++;			
+		pos++;
 	}
 	int start = pos;
 	size_t i;

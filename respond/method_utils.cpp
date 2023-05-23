@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/22 13:44:24 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/23 14:54:00 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,6 +36,12 @@ void Respond::ft_handle_file(std::vector<server> server)
         handle_error_response(server, 404);
         return;
     }
+    // Check if you have permission to access the file
+    if (access(_rooted_path.c_str(), R_OK) != 0)
+    {
+        handle_error_response(server, 403);
+        return ;
+    }
     file.open(_rooted_path.c_str());
     if (file.is_open())
     {
@@ -44,9 +50,7 @@ void Respond::ft_handle_file(std::vector<server> server)
         set_status_code(200);
         set_status_message(get_response_status(200));
         set_header("Content-Type", get_mime_type(_mime_string));
-        // std::cout << "mime _type: " << get_mime_type(_mime_string) << std::endl;
         _headers["Content-Length"] = std::to_string(_response_body.length());
-        //  std::cout << std::to_string(_response_body.length()) << std::endl;
         _headers["Connection"] = "keep-alive";
         set_date();
         set_cache_control("no cache");
@@ -79,8 +83,11 @@ int Respond::ft_handle_index(std::vector<server> server)
                     _mime_string = index.substr(_mime_index + 1);
                 std::string file = server[_server_index].get_root() + "/" + index;
                 _rooted_path = server[_server_index]._location[_location_index].get_root() + _removed_path + index;
-                if (ft_handle_index_2(server, file))
+                // Check if you have permission to access the file
+                if (access(file.c_str(), R_OK) != 0)
                     return (1);
+                if (ft_handle_index_2(server, file))
+                    return (2);
             }
         }
         else
@@ -91,6 +98,9 @@ int Respond::ft_handle_index(std::vector<server> server)
                 _mime_string = index.substr(_mime_index + 1);
             std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
             _rooted_path = server[_server_index].get_root() + _removed_path + index;
+                        // Check if you have permission to access the file
+            if (access(file.c_str(), R_OK) != 0)
+                return (1);
             if (ft_handle_index_2(server, file))
                 return (2);
         }
@@ -107,6 +117,9 @@ int Respond::ft_handle_index(std::vector<server> server)
                 _mime_string = index.substr(_mime_index + 1);
             std::string file = server[_server_index]._location[_location_index].get_root() + "/" + index;
             _rooted_path = server[_server_index].get_root() + _removed_path + index;
+            // Check if you have permission to access the file
+            if (access(file.c_str(), R_OK) != 0)
+                return (1);
             if (ft_handle_index_2(server, file))
                 return (2);
         }
