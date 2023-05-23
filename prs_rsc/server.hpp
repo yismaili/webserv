@@ -15,7 +15,7 @@ protected:
     std::string _index;
     std::string _host; /*s*/
     std::string _root; 
-    int _client_max_body_size; /*l*/
+    unsigned int    _client_max_body_size; /*l*/
     std::map<int, std::string> _error_page;
     std::vector<std::string> _allow_methods;
     std::pair <int , std::string> _redirection;

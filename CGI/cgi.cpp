@@ -51,7 +51,7 @@ void free_all(char *file, char *path, char **env, int size)
     free (path);
 }
 
-std::string run_cgi(request &r,  Respond &res)
+std::string run_cgi(request &r,  Respond &res, std::vector<server> server)
 {
     char *file, *path;
     file = strdup(res.get_file_cgi().c_str());
@@ -70,9 +70,9 @@ std::string run_cgi(request &r,  Respond &res)
     char **envp = (char **)malloc(sizeof(char *) * (env.size() + 1));
     if(!envp)
     {
-        res.set_status_code(500);
-        res.set_response_body(res.get_response_status(res.get_status_code()));
-        free_all(file, path,envp, env.size());
+        res.handle_error_response(server, 500);
+        free(file);
+        free(path);
         return res.get_response_status(res.get_status_code());
     }
     int i = 0;
@@ -85,21 +85,18 @@ std::string run_cgi(request &r,  Respond &res)
     int pid = fork();
     if (pid == -1) 
     {
-        res.set_status_code(500);
-        res.set_response_body(res.get_response_status(res.get_status_code()));
+        res.handle_error_response(server, 500);
         free_all(file, path,envp, env.size());
         return NULL;
     }
     else if (pid == 0)
     {
-            std::cout << r.get_body() << "\n";
         if (method == "POST")
         {
 
             if (dup2(fdtemp1, STDIN_FILENO) == -1)
             {
-                res.set_status_code(500);
-                res.set_response_body(res.get_response_status(res.get_status_code()));
+                res.handle_error_response(server, 500);
                 free_all(file, path,envp, env.size());
                 return res.get_response_status(res.get_status_code());
             }
@@ -108,8 +105,7 @@ std::string run_cgi(request &r,  Respond &res)
         }
         if (dup2(fdtemp, STDOUT_FILENO) == -1)
         {
-            res.set_status_code(500);
-            res.set_response_body(res.get_response_status(res.get_status_code()));
+            res.handle_error_response(server, 500);
             free_all(file, path,envp, env.size());
             return res.get_response_status(res.get_status_code());
         }
@@ -122,8 +118,7 @@ std::string run_cgi(request &r,  Respond &res)
     waitpid(pid, &status, 0);
     if (WIFSIGNALED(status) || status != 0)
     {
-        res.set_status_code(500);
-        res.set_response_body(res.get_response_status(res.get_status_code()));
+        res.handle_error_response(server, 500);
         free_all(file, path,envp, env.size());
         return res.get_response_status(res.get_status_code());
     }

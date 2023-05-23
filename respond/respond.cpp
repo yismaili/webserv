@@ -130,7 +130,7 @@ int Respond::ft_parse_root_path(std::vector<server> server)
         _file_cgi = _rooted_path;
         return (0);
     }
-    set_status_code(403);
+    set_status_code(404);
     set_status_message(get_response_status(get_status_code()));
     return (1);
 }

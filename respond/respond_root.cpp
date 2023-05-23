@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/22 19:18:41 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/23 12:59:51 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,8 @@ std::string Respond::response_root(std::vector<server> servers)
     else if (rtn_location == 2)
         return (rtn_response());
     // step 2 : check the redirectation
-    if (!ft_parse_url_forwarding(servers))
+    int rtn_url = ft_parse_url_forwarding(servers);
+    if (!rtn_url || rtn_url == 2)
         return (rtn_response());
     // step 3 : check the validation of rooted path
     if (ft_parse_root_path(servers))
@@ -183,12 +184,20 @@ int Respond::ft_parse_url_forwarding(std::vector<server> server)
             {
                 size_t status_code = server[_server_index]._location[j].get_redirection().first;
                 // search for message of the status_code
-                set_status_code(status_code);
-                set_status_message(get_response_status(status_code));
-                set_header("Location", server[_server_index]._location[j].get_redirection().second);
-                set_cache_control("no cache");
-                _is_redirection = true;
-                return (0);
+                if (status_code >= 301 && status_code <= 308)
+                {
+                    set_status_code(status_code);
+                    set_status_message(get_response_status(status_code));
+                    set_header("Location", server[_server_index]._location[j].get_redirection().second);
+                    set_cache_control("no cache");
+                    _is_redirection = true;
+                    return (0);
+                }
+                else
+                {
+                    handle_error_response(server, 400);
+                    return (2);
+                }
             }
         }
     }
