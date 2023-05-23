@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/22 14:57:52 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 22:15:41 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/23 20:56:47 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@
 #include <iomanip>
 #include "../request/request.hpp"
 #include "../respond/respond.hpp"
+#include "../prs_rsc/server.hpp"
 #include <csignal>
 
 
@@ -83,6 +84,7 @@ namespace http{
             std::vector<std::string> servers_names;
             std::vector<int> port;
             std::vector<std::string> host;
+            std::size_t connection;
             bool    flag;
     };
 }

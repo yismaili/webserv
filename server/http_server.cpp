@@ -6,12 +6,11 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/23 00:28:54 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/23 20:57:32 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/http_server.hpp"
-#include "../prs_rsc/server.hpp"
 
 namespace http{
     
@@ -151,7 +150,6 @@ namespace http{
                 {
                     if (getTime() - conf_fd[clients[i].fd]->getTime_out() >= 10000)
                     {
-                      //  std::cout<<"hey.....i am time out .\n";
                         header_error = 1;
                         conf_fd[clients[i].fd]->data_issending = 1;
                         unchunk(clients[i].fd);
@@ -177,7 +175,7 @@ namespace http{
                         // Add new socket to poll list
                         pollfd new_client_pollfd;
                         new_client_pollfd.fd = new_socket;
-                        new_client_pollfd.events = POLLIN ;
+                        new_client_pollfd.events = POLLIN | POLLOUT;
                         read_info.insert(std::make_pair(new_socket, false));
                         requist_data.insert(std::make_pair(new_socket, ""));
                         clients.push_back(new_client_pollfd);
@@ -211,19 +209,15 @@ namespace http{
                 }
                else if (clients[i].revents & POLLOUT && read_info[clients[i].fd] == true)
                 {
-                    //std::cout<<"hey ... i am in send function\n";
                     std::vector<pollfd>::iterator it = clients.begin() + i;
                     std::map<int, bool>::iterator it_read = read_info.find(clients[i].fd);
                     sent_ret = send_data(clients[i].fd);
-                    if (sent_ret == 1)
-                    {
-                        clients[i].events = POLLOUT;
-                    }
                     if (sent_ret == 0)
-                    {
+                    { 
+                        usleep(1000);
                         close(clients[i].fd);
-                        clients.erase(it);
                         read_info.erase(it_read);
+                        clients.erase(it);   
                         i--;
                     }
                     else if (sent_ret == -2)
@@ -532,7 +526,7 @@ namespace http{
         long bytes_sent;
         static int check = 0;
 
-        data_to_send = requist_data[socket].substr(sent_data[socket], 100024);
+        data_to_send = requist_data[socket].substr(sent_data[socket], 1024);
         bytes_sent = send(socket, data_to_send.c_str(), data_to_send.size(), 0);
         // Check for errors while sending data
         if (bytes_sent == -1)
@@ -540,6 +534,7 @@ namespace http{
             sent_data[socket] = 0;
             std::map<int, std::string>::iterator it = requist_data.find(socket);
             requist_data.erase(it);
+            conf_fd.erase(socket);
             return (-2);
         }
         else

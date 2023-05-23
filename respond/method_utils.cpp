@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   method_utils.cpp                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
+/*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/23 14:54:00 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/23 16:52:46 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,7 +251,6 @@ void    Respond::ft_show_autoindex(std::vector<server> server)
             char buffer[80];
             std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);
             std::string fileTime(buffer);
-
             // Now you can use 'fileTime' in your HTML code
             index_html += "<p><a href=\"http://" + r.get_header("Host") + file_path + "\"><b><i><font size=\"5\">" + file_name + "</font></i></b></a>";
             index_html += "\t\t <b><i><font size=\"5\">" + file_size + "\t\t" + fileTime + "</font></i></b></p>\n";
