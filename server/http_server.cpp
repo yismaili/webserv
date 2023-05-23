@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/23 20:57:32 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/23 21:02:41 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -150,6 +150,7 @@ namespace http{
                 {
                     if (getTime() - conf_fd[clients[i].fd]->getTime_out() >= 10000)
                     {
+                      //  std::cout<<"hey.....i am time out .\n";
                         header_error = 1;
                         conf_fd[clients[i].fd]->data_issending = 1;
                         unchunk(clients[i].fd);
