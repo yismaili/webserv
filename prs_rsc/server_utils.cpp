@@ -15,31 +15,15 @@ int skip_spaces(std::string str)
 }
 
 
-// std::string trimString(const std::string& str)
-// {
-//   std::string trimmedStr = str;
-
-//   std::string::iterator it = trimmedStr.begin();
-//   while (it != trimmedStr.end() && std::isspace(*it)) 
-//     ++it;
-//   trimmedStr.erase(trimmedStr.begin(), it);
-//   it = trimmedStr.end();
-//   while (it != trimmedStr.begin() && std::isspace(*(it - 1)))
-//     --it;
-//   trimmedStr.erase(it, trimmedStr.end());
-//   return trimmedStr;
-// }
 std::string trimString(const std::string& str)
 {
   std::string trimmedStr = str;
 
-  // Trim leading whitespace
   size_t pos = 0;
   while (pos < trimmedStr.size() && std::isspace(trimmedStr[pos]))
     ++pos;
   trimmedStr.erase(0, pos);
 
-  // Trim trailing whitespace
   size_t end = trimmedStr.size();
   while (end > 0 && std::isspace(trimmedStr[end - 1]))
     --end;
@@ -47,37 +31,21 @@ std::string trimString(const std::string& str)
 
   return trimmedStr;
 }
-// std::string trimString(const std::string& str)
-// {
-//   std::string trimmedStr = str;
 
-//   // Trim leading whitespace
-//   size_t startPos = trimmedStr.find_first_not_of(" \t\r");
-//   if (startPos != std::string::npos)
-//     trimmedStr.erase(0, startPos);
-
-//   // Trim trailing whitespace
-//   size_t endPos = trimmedStr.find_last_not_of(" \t\r");
-//   if (endPos != std::string::npos)
-//     trimmedStr.erase(endPos + 1);
-
-//   return trimmedStr;
-// }
 
 std::vector<server> ft_fill_servers(char **av, int ac)
 {
     std::vector<server> servers;
+    std::vector<Data_config> v;
+    Data_config data;
     std::string config_file;
     std::ifstream file;
     std::string line;
     std::string map;
-    std::string previousLine;
-    Data_config data;
-    std::vector<Data_config> v;
     int c = 0;
-    size_t i = 0, j = 0;
     int flag = 0;
     int kws = 0;
+    size_t i = 0, j = 0;
     if (ac == 2)
         config_file = av[1];
     else
@@ -160,7 +128,7 @@ std::vector<server> ft_fill_servers(char **av, int ac)
             {
                 if (!line.empty())
                 {
-                    std::cerr << "error something outside of server\n";
+                    std::cerr << "erraor something outside of server\n";
                     exit (1);
                 }
             }

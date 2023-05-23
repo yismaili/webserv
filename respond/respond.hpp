@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/28 20:49:15 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/21 16:14:59 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/22 18:40:32 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,6 @@ class Respond
         void set_response_body(std::string body);
         std::string get_status_line(const std::string &status_code);
         void    set_date();
-        void    set_last_modified();
         void    set_cache_control(std::string control);
 
         std::string get_http_version();
@@ -141,7 +140,7 @@ class Respond
 
         void        handle_get_response(std::vector<server> servers);
         void        print_response();
-        void        init_response_body(std::string file, std::string _root);
+        void        init_response_body(std::vector<server> server ,std::string file, std::string _root);
 
         request& r;
         void        create_decode_files();

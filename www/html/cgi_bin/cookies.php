@@ -6,8 +6,8 @@ if(isset($_COOKIE["username"])) {
 } else {
     // Set the username cookie
     $username = "webserver";
-    setcookie("username", $username, time() + (86400 * 30)); // Expires in 30 days
-    echo "Hello, we've set a cookie for you!";
+    setcookie("username", $username, time() + 1); 
+    echo "Hello, $username we've set a cookie for you!";
 }
 ?>
 

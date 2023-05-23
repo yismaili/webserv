@@ -1,12 +1,3 @@
-/*
-example of a basic respond
-HTTP/1.1 200 OK\r\n
-Content-Type: text/html\r\n
-Content-Length: 1234\r\n
-\r\n
-<html><body>Hello, world!</body></html>
-*/
-
 #include "respond.hpp"
 #include "../request/request.hpp"
 
@@ -85,16 +76,6 @@ void    Respond::set_date()
     timeinfo = localtime(&rawtime);
     std::strftime(buffer, 80, "%a, %d %b %Y %X %Z", timeinfo);
     _headers["Date"] = buffer;
-}
-
-void    Respond::set_last_modified()
-{
-    struct stat file_stats;
-    char buffer[80];
-
-    stat(_rooted_path.c_str(), &file_stats);
-    std::strftime(buffer, 80, "%a, %d %b %Y %X %Z", localtime(&file_stats.st_mtime));
-    _headers["Last-Modified"] = buffer;
 }
 
 std::string Respond::get_http_version()
@@ -177,7 +158,6 @@ void    Respond::set_cache_control(std::string cache)
 std::string Respond::rtn_response()
 {
     std::string response;
-
     response = _http_version + " " + std::to_string(_status_code) + " " + _status_message + "\r\n";
     for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
         response += it->first + ": " + it->second + "\r\n";
@@ -186,11 +166,12 @@ std::string Respond::rtn_response()
     return (response);
 }
 
-void    Respond::init_response_body(std::string file, std::string _root)
+void    Respond::init_response_body(std::vector<server> server ,std::string file, std::string _root)
 {
     std::ifstream file_;
     std::string line;
 
+    _response_body = "";
     std::string f;
     f = _root + "/" + file;
     file_.open(f);
@@ -201,5 +182,5 @@ void    Respond::init_response_body(std::string file, std::string _root)
         file_.close();
     }
     else
-        std::cout << "Unable to open file" << std::endl;
+        handle_error_response(server, 404);
 }

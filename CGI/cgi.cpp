@@ -1,7 +1,6 @@
 #include "cgi.hpp"
 std::map<std::string, std::string>get_env(char *file, request req)
 {
-
     std::map<std::string, std::string> env;
 
     env["REQUEST_METHOD"] = req.get_method();
@@ -67,44 +66,51 @@ std::string run_cgi(request &r,  Respond &res)
 
     std::map<std::string, std::string> env = get_env(file, r);
     std::string method = env["REQUEST_METHOD"];
-    std::string content_type = env["CONTENT_TYPE"];
-    std::string content_length_str = env["CONTENT_LENGTH"];
-    std::string query_string = env["QUERY_STRING"];
 
     char **envp = (char **)malloc(sizeof(char *) * (env.size() + 1));
-    //char** envp = new char*[env.size() + 1];
+    if(!envp)
+    {
+        res.set_status_code(500);
+        res.set_response_body(res.get_response_status(res.get_status_code()));
+        free_all(file, path,envp, env.size());
+        return res.get_response_status(res.get_status_code());
+    }
     int i = 0;
-    for (std::map<std::string , std::string>::iterator it = env.begin(); it != env.end(); it++, i++) 
+    for (std::map<std::string , std::string>::iterator it = env.begin(); it != env.end(); it++) 
     {
         std::string e = it->first + "=" + it->second;
-        envp[i] = strdup(e.c_str());
+        envp[i++] = strdup(e.c_str());
     }
     envp[i] = NULL;
     int pid = fork();
     if (pid == -1) 
     {
         res.set_status_code(500);
-        res.set_status_message(res.get_response_status(res.get_status_code()));
         res.set_response_body(res.get_response_status(res.get_status_code()));
+        free_all(file, path,envp, env.size());
         return NULL;
     }
     else if (pid == 0)
     {
+            std::cout << r.get_body() << "\n";
         if (method == "POST")
         {
+
             if (dup2(fdtemp1, STDIN_FILENO) == -1)
             {
                 res.set_status_code(500);
                 res.set_response_body(res.get_response_status(res.get_status_code()));
+                free_all(file, path,envp, env.size());
                 return res.get_response_status(res.get_status_code());
             }
-            std::fprintf(temp1, "%s", r.get_body().c_str());
+            write(fdtemp1, r.get_body().c_str(), r.get_body().size());
             std::rewind(temp1);
         }
         if (dup2(fdtemp, STDOUT_FILENO) == -1)
         {
             res.set_status_code(500);
             res.set_response_body(res.get_response_status(res.get_status_code()));
+            free_all(file, path,envp, env.size());
             return res.get_response_status(res.get_status_code());
         }
         alarm(1);
@@ -118,6 +124,7 @@ std::string run_cgi(request &r,  Respond &res)
     {
         res.set_status_code(500);
         res.set_response_body(res.get_response_status(res.get_status_code()));
+        free_all(file, path,envp, env.size());
         return res.get_response_status(res.get_status_code());
     }
     char buf[1];
@@ -131,6 +138,7 @@ std::string run_cgi(request &r,  Respond &res)
     {
         res.set_status_code(500);
         res.set_response_body(res.get_response_status(res.get_status_code()));
+        free_all(file, path,envp, env.size());
         return res.get_response_status(res.get_status_code());
     }
     close(fdtemp);
