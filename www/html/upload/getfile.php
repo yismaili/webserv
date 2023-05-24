@@ -15,7 +15,6 @@ if (is_dir($dir)) {
     closedir($dh);
   }
 }
-
 // Display the files in a table
 echo "<table>";
 foreach ($files as $file) {

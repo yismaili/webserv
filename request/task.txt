@@ -1,2 +1,0 @@
-/*********************************/
-1- std::cout << "Unable to open file" << std::endl; in init_response_body

@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/23 12:59:51 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/24 01:25:32 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,17 @@ std::string Respond::response_root(std::vector<server> servers)
     if (ft_parse_root_path(servers))
     {
         handle_error_response(servers, _status_code);
+        return (rtn_response());
+    }
+    char buff_root[1024];
+    realpath(servers[_server_index].get_root().c_str(), buff_root);
+    char buff_uri[1024];
+    realpath(_rooted_path.c_str(), buff_uri);
+    std::string buf = buff_uri;
+    size_t pos = buf.find(buff_root);
+    if(pos != 0)
+    {
+        handle_error_response(servers, 403);
         return (rtn_response());
     }
     // step 4 : check the allowed methods
@@ -189,7 +200,7 @@ int Respond::ft_parse_url_forwarding(std::vector<server> server)
                     set_status_code(status_code);
                     set_status_message(get_response_status(status_code));
                     set_header("Location", server[_server_index]._location[j].get_redirection().second);
-                    set_cache_control("no cache");
+                    set_cache_control("no-cache");
                     _is_redirection = true;
                     return (0);
                 }
@@ -219,7 +230,7 @@ int Respond::ft_check_allowed_methods(std::vector<server> server)
             }
         }
     }
-    set_status_code(404);
+    set_status_code(405);
     set_status_message(get_response_status(get_status_code()));
     return (1);
 }

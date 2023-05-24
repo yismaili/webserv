@@ -109,7 +109,7 @@ std::string run_cgi(request &r,  Respond &res, std::vector<server> server)
             free_all(file, path,envp, env.size());
             return res.get_response_status(res.get_status_code());
         }
-        alarm(1);
+        alarm(2);
         execve(cmd[0], cmd, envp);
         exit(1);
     }
@@ -123,12 +123,11 @@ std::string run_cgi(request &r,  Respond &res, std::vector<server> server)
         return res.get_response_status(res.get_status_code());
     }
     char buf[1];
-    std::string content;
     int byt;
+    std::string content;
     std::rewind(temp);
-    while ((byt = read(fdtemp, buf, 1)) > 0){
+    while ((byt = read(fdtemp, buf, 1)) > 0)
         content.append(buf, 1);
-    }
     if (byt == -1)
     {
         res.set_status_code(500);

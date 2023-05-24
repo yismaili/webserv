@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/23 15:08:57 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/23 20:21:54 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -155,12 +155,11 @@ void    Respond::handle_form_data(std::vector<server> server)
             break;
         // Read the data between the boundaries
         FormData formData = read_form_data(server, pos); // escape /r/n
-        // if (_file_too_large == true)
-        // {
-        //     std::cout << "hahahahaahah" << std::endl;
-        //     handle_error_response(server, 413);
-        //     return ;
-        // }
+        if (_file_too_large == true)
+        {
+            handle_error_response(server, 413);
+            return ;
+        }
         if (formData.isValid())
             _form_data.push_back(formData); // Add the form data to the list
         // std::cout << "pos before: " << pos << std::endl;
@@ -277,8 +276,8 @@ std::string Respond::check_post_type()
 
 void    Respond::handle_delete_response(std::vector<server> server)
 {
-        std::cout << "DKHLAAAAAAAAAAT" << std::endl;
-        std::cout << "rooted path:" << _rooted_path << std::endl;
+        //std::cout << "DKHLAAAAAAAAAAT" << std::endl;
+        //std::cout << "rooted path:" << _rooted_path << std::endl;
     if (std::remove(_rooted_path.c_str()) == 0)
     {
         _status_code = 200;

@@ -6,7 +6,7 @@ std::string extract_path(std::string location_name)
 	{
 		if (!isspace(location_name[i]))
 			break;
-		pos++;
+		pos++;			
 	}
 	int start = pos;
 	size_t i;
@@ -55,8 +55,8 @@ location::~location()
 
 void location::fill_rest(server &s)
 {
-    // if (_index.empty())
-    //     _index = s.get_index();
+	if (!_client_max_body_size)
+		_client_max_body_size = s.get_client_max_body_size();
     if (_root.empty())
         _root = s.get_root();
     if(_error_page.empty())

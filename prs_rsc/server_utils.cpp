@@ -45,7 +45,7 @@ std::vector<server> ft_fill_servers(char **av, int ac)
     int c = 0;
     int flag = 0;
     int kws = 0;
-    size_t i = 0, j = 0;
+    size_t i = 0, is_server = 0;
     if (ac == 2)
         config_file = av[1];
     else
@@ -65,7 +65,7 @@ std::vector<server> ft_fill_servers(char **av, int ac)
             c -= search_char(line, '}');
              if (is_world(&line[i], "server"))
              {
-                j = 1;
+                is_server = 1;
                 if (!search_char(line, '{'))
                 {
                     while (!file.eof())
@@ -93,7 +93,7 @@ std::vector<server> ft_fill_servers(char **av, int ac)
             }
             if (is_world(&line[i], "location"))
             {
-                if(!j)
+                if(!is_server)
                 {
                     std::cerr << "error something outside of server\n";
                     exit (1);
@@ -124,7 +124,7 @@ std::vector<server> ft_fill_servers(char **av, int ac)
                     }
                 }
             }
-            else if (!j)
+            else if (!is_server)
             {
                 if (!line.empty())
                 {
@@ -134,9 +134,9 @@ std::vector<server> ft_fill_servers(char **av, int ac)
             }
             else if (!line.empty())
                 data.data_server += line + "\n";
-            if (!c && j)
+            if (!c && is_server)
             {
-                j = 0;
+                is_server = 0;
                 kws = 0;
                 v.push_back(data);
                 data.data_server.clear();
@@ -155,7 +155,11 @@ std::vector<server> ft_fill_servers(char **av, int ac)
         std::cerr << "Error : not closed" << std::endl;
         exit (1);
     }
-    
+    if(v.size() == 0)
+    {
+        std::cerr << "Error : config file empty" << std::endl;
+        exit (1);
+    }
     for (size_t i = 0; i < v.size(); i++)
     {
         c = 0;
