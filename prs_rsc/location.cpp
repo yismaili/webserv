@@ -55,8 +55,6 @@ location::~location()
 
 void location::fill_rest(server &s)
 {
-    // if (_index.empty())
-    //     _index = s.get_index();
 	if (!_client_max_body_size)
 		_client_max_body_size = s.get_client_max_body_size();
     if (_root.empty())

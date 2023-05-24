@@ -229,13 +229,22 @@ server::server(Data_config data, bool check_location)
         if (key == "server_name" && check_location)
         {
             is_empty_value(value, line);
-            if (ft_numbers_value(iss) || !isValidServerName(value))
+            if (!isValidServerName(value))
                 ft_error(line, "Error");
             std::vector<std::string>::iterator it = std::find(_server_name.begin(), _server_name.end(), value);
             if(it != _server_name.end())
                 ft_error(line, "duplicate server_name");
-            c_server_name++;
             _server_name.push_back(value);
+             while (iss >> value)
+            {
+                if (!isValidServerName(value))
+                    ft_error(line, "Error");
+                std::vector<std::string>::iterator it = std::find(_server_name.begin(), _server_name.end(), value);
+                if(it != _server_name.end())
+                    ft_error(line, "duplicate server_name");
+                _server_name.push_back(value);
+            }
+            c_server_name++;
         }
         else if (key == "host" && check_location)
         {
