@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/23 20:21:54 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/24 12:16:06 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,6 +75,8 @@ void    Respond::handle_post_response(std::vector<server> server)
         if (_is_cgi == true)
         {
             run_cgi(r, *this, server);
+            set_status_code(201);
+            set_status_message(get_response_status(201));
             return ;
         }
         else
@@ -85,6 +87,8 @@ void    Respond::handle_post_response(std::vector<server> server)
             std::string::size_type i = r.get_uri().find_last_of('/');
             if (i != std::string::npos)
                 path = r.get_uri().substr(i);
+            set_status_code(201);
+            set_status_message(get_response_status(201));
             init_response_body(server, path, server[_server_index]._location[_location_index].get_root());
             return ;
         }
@@ -92,6 +96,8 @@ void    Respond::handle_post_response(std::vector<server> server)
     if (check_post_type() == "form-data")
     {
         handle_form_data(server);
+        set_status_code(201);
+        set_status_message(get_response_status(201));
         return ;
     }
 }
