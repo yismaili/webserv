@@ -200,7 +200,7 @@ int is_world(std::string str, std::string tmp)
 
 
 server::server(Data_config data, bool check_location) 
-     : _root("./www/html"), _client_max_body_size(1048576)
+     : _client_max_body_size(1048576)
 {
     std::istringstream ss(data.data_server);
     std::string line;
@@ -448,6 +448,8 @@ server::server(Data_config data, bool check_location)
     }
     if (!c_server_name && check_location)
         _server_name.push_back("hostname");
+    if (!c_root && check_location)
+        _root = "www/html";
     
     if(data.location.size())
     {

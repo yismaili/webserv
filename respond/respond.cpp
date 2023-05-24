@@ -161,6 +161,8 @@ std::string Respond::rtn_response()
     response = _http_version + " " + std::to_string(_status_code) + " " + _status_message + "\r\n";
     for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
         response += it->first + ": " + it->second + "\r\n";
+    if (_cache_control != "")
+        response += "Cache-Control: " + _cache_control + "\r\n";
     response += "\r\n";
     response += _response_body;
     return (response);

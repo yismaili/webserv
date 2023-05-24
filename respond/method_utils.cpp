@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/23 14:54:00 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/24 01:02:19 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,6 +202,7 @@ void    Respond::ft_handle_error(int error_code)
 
 void    Respond::ft_show_autoindex(std::vector<server> server)
 {
+    std::cout << "rooted path: " << _rooted_path << std::endl;
     std::string index_html = "<!DOCTYPE html>\n<html>\n<head>\n";
     index_html += "<meta charset=\"UTF-8\">\n";
     index_html += "<title>Index of " + _rooted_path + "</title>\n";
@@ -228,18 +229,18 @@ void    Respond::ft_show_autoindex(std::vector<server> server)
     {
         if (entry->d_name[0] != '.')
         {
-            file_name = std::string(entry->d_name);
+            file_name = std::string(entry->d_name); // cgi_bin
             std::string file_path;
             if (_path_found[_path_found.size() - 1] == '/')
-                file_path = _path_found + file_name;
+                file_path = _path_found + file_name; //         /cgi_bin
             else
                 file_path = _path_found + "/" + file_name;
+            // std::cout << "file path: " << file_path << std::endl;
             std::string match_path;
             if (_rooted_path[_rooted_path.size() - 1] == '/')
-                match_path = _rooted_path + file_name;
+                match_path = _rooted_path + file_name; //   www/html/cgi_bin
             else
                 match_path = _rooted_path + "/" + file_name;
-            
             if (stat(match_path.c_str(), &file_stat) < 0)
             {
                 handle_error_response(server, 403);
@@ -252,7 +253,6 @@ void    Respond::ft_show_autoindex(std::vector<server> server)
             std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeInfo);
             std::string fileTime(buffer);
 
-            // Now you can use 'fileTime' in your HTML code
             index_html += "<p><a href=\"http://" + r.get_header("Host") + file_path + "\"><b><i><font size=\"5\">" + file_name + "</font></i></b></a>";
             index_html += "\t\t <b><i><font size=\"5\">" + file_size + "\t\t" + fileTime + "</font></i></b></p>\n";
         }
@@ -273,9 +273,12 @@ void    Respond::handle_error_response(std::vector<server> server, int error_cod
         file.open(error_path.c_str());
         if (file.is_open())
         {
+            set_status_code(error_code);
+            set_status_message(get_response_status(error_code));
             _response_body = std::string((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
             set_header("Content-Type", get_mime_type("html"));
             set_header("Content-Length", std::to_string(_response_body.length()));
+            set_date();
             set_cache_control("no cache");
         }
         // file.close();
@@ -289,6 +292,7 @@ void    Respond::handle_error_response(std::vector<server> server, int error_cod
         set_date();
         _response_body = "<html><head><title>" + std::to_string(error_code) + " " + _status_message + "</title></head><body><h1>" + std::to_string(error_code) + " " + _status_message + "</h1><p>You don't have permission to access " + r.get_uri() + " on this server.</p></body></html>";
         set_header("Content-Length", std::to_string(_response_body.length()));
+        set_date();
         set_cache_control("no cache");
     }
 }
