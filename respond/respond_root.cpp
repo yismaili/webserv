@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/24 15:48:11 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/24 18:02:38 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -117,11 +117,11 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
     if (pos != std::string::npos)
     {
         std::string extension = path.substr(pos);
-        std::map<std::string, std::string> path_info = server[_server_index]._location[_location_index].get_path_info();
+        std::map<std::string, std::string> path_info;
         if (!prefix_location(server, path))
         {
-            for (std::map<std::string, std::string>::const_iterator it = path_info.begin();
-                it != path_info.end(); ++it)
+            path_info = server[_server_index]._location[_location_index].get_path_info();
+            for (std::map<std::string, std::string>::const_iterator it = path_info.begin(); it != path_info.end(); ++it)
             {
                 if (it->first == extension)
                 {
