@@ -41,6 +41,7 @@ std::string extract_path(std::string location_name)
 
 location::location(Data_config data, std::string location_name) : server(data, 0)
 {
+	this->_autoindex = false;
     this->location_name = extract_path(location_name);
 	if(this->location_name.empty())
 	{

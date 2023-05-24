@@ -253,6 +253,8 @@ server::server(Data_config data, bool check_location)
             is_empty_value(value, line);
             if (ft_numbers_value(iss) || (!isip(value) && value != "localhost"))
                 ft_error(line, "Error");
+            if (value == "localhost")
+                value = "127.0.0.1";
             c_host++;
             _host = value;
         }
@@ -272,7 +274,7 @@ server::server(Data_config data, bool check_location)
                 std::vector<int>::iterator it = std::find(_listen.begin(), _listen.end(), port);
                 if(it != _listen.end())
                     ft_error(line, "duplicate port");
-                if (port < 1024 || port > 65535)
+                if (port < 1|| port > 65535)
                     ft_error(line, "Error");
                 _listen.push_back(port);
             }
@@ -448,7 +450,6 @@ server::server(Data_config data, bool check_location)
     {
         Data_config location_data;
         std::string location_name;
-        std::ostringstream oss;
         for (std::map<std::string, std::string>::iterator it = data.location.begin(); it != data.location.end(); ++it) 
         {
             location_data.data_server = it->second;
@@ -463,6 +464,28 @@ server::server(Data_config data, bool check_location)
                     exit (1);
                 }
             }
+            _location.push_back(l);
+        }
+    }
+    if(check_location)
+    {
+        int c = 0;
+        for (size_t i = 0; i < _location.size(); i++)
+        {
+            if (_location[i].location_name == "/")
+            {
+                c = 1;
+                break ;
+            }
+        }
+        if(!c)
+        {
+            Data_config location_data ;
+            std::string location_name = "location /{";
+            location_data.data_server = "}";
+            location l = location(location_data, location_name);
+            l.fill_rest(*this);
+            l._autoindex = true;
             _location.push_back(l);
         }
     }
@@ -524,7 +547,9 @@ std::vector<std::string> server::get_allow_methods() const
 
 bool server::get_autoindex () const
 {
-    return (_autoindex);
+    if(!_autoindex)
+        return (false);
+    return (true);
 }
 
 std::vector<int> &server::get_listen() 

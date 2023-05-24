@@ -117,7 +117,13 @@ std::vector<server> ft_fill_servers(char **av, int ac)
                     map += line + '\n';
                     if (search_char (line, '}'))
                     {
-                        c -= search_char(line, '}'); 
+                        c -= search_char(line, '}');
+                        std::map<std::string, std::string>::const_iterator it = data.location.find(key);
+                        if (it != data.location.end())
+                        {
+                            std::cerr << "Error dupplicate location\n";
+                            exit (1);
+                        }
                         data.location.insert(std::make_pair(key, map));
                         map.clear();
                         break;
@@ -162,21 +168,7 @@ std::vector<server> ft_fill_servers(char **av, int ac)
     }
     for (size_t i = 0; i < v.size(); i++)
     {
-        c = 0;
         server s = server(v[i], 1);
-        for (size_t i = 0; i < s._location.size(); i++)
-        {
-            if (s._location[i].location_name == "/")
-            {
-                c = 1;
-                break ;
-            }
-        }
-        if (c != 1)
-        {
-            std::cerr << "Error : missing location root\n";
-            exit (1);
-        }
         servers.push_back(s);
     }
     return (servers);

@@ -32,7 +32,9 @@ void set_headers_cgi(std::string output, Respond &res)
             if (pos != std::string::npos)
             {
                 std::string key = line.substr(0, pos);
+                std::cout << key << "\n";
                 std::string value = line.substr(pos + 2);
+                std::cout << value << "\n";
                 res.set_header(key, value);
             }
         } 
