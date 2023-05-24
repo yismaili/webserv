@@ -46,6 +46,6 @@ TCP, short for Transmission Control Protocol, a TCP server is a program that lis
 ![1680902384854](https://user-images.githubusercontent.com/69278312/230799535-1c251fed-9171-4cf9-a17e-8b69533985c3.jpg)
 <img width="1152" alt="Screen Shot 2023-03-25 at 10 19 40 PM" src="https://user-images.githubusercontent.com/69278312/236692418-7c7893f9-a8ed-44d4-9247-e61d6d18e7a4.png">
 <img width="848" alt="Screen Shot 2023-03-30 at 10 31 06 PM" src="https://user-images.githubusercontent.com/69278312/236692423-67402497-5418-44aa-8de8-466c5a00ff2a.png">
-<img width="1157" alt="Screen Shot 2023-03-25 at 6 42 08 PM" src="https://user-images.githubusercontent.com/69278312/236692425-9b63421c-fa49-49f9-9d2d-dcbfff074ad9.png">
-![socket-programming-tcp](https://github.com/yismaili/webserv/assets/69278312/b596e68d-c![netlayer](https://github.com/yismaili/webserv/assets/69278312/d5c218a3-8d26-4719-9d2c-7777fcb856b5)
-1de-4437-82bf-0e4ba3dc5c46)
+<img width="1157" alt="Screen Shot 2023-03-25 at 6 42 08 PM" src="https://user-images.githubusercontent.com/69278312/236692425-9b63421c-fa49-49f9-9d2d-dcbfff074ad9.png">![netlayer](https://github.com/yismaili/webserv/assets/69278312/29fe1089-e1d8-4728-9a2e-2b6785302c3a)
+
+![socket-programming-tcp](https://github.com/yismaili/webserv/assets/69278312/a64da603-3a6a-4570-b37e-4cf811bc65ff)
