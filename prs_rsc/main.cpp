@@ -15,7 +15,6 @@ int main(int ac, char **av)
     std::vector<int> all_ports;
     servers = ft_fill_servers(av, ac);
     all_ports = get_all_ports(servers);
-   // std::cout << "khghjgjghjghjgjgjgjgjhhjhjjhhghjg\n";
 //    for (size_t i = 0; i < servers.size(); i++)
 //    {
 //        servers[i].display_sever();

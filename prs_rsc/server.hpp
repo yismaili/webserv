@@ -13,23 +13,15 @@ class server
 {
 protected:
     std::string _index;
-    std::string _host; /*s*/
+    std::string _host;
     std::string _root; 
-    unsigned int    _client_max_body_size; /*l*/
+    unsigned int _client_max_body_size;
     std::map<int, std::string> _error_page;
     std::vector<std::string> _allow_methods;
     std::pair <int , std::string> _redirection;
     std::string _upload_store;
     bool _autoindex;
     bool _upload;
-    // std::vector<std::string> _access_log;
-    // std::vector<std::string> _error_log;
-    //std::vector<std::string> _meme_types;
-    // std::string _gzip;
-    // std::string _ssl_certificate;
-    // std::string _ssl_certificate_key;
-    // std::string _ssl_protocols;
-    // std::string _ssl_ciphers;
     std::map<std::string ,std::string> _path_info; 
 public:
     std::vector<std::string> _server_name; /*s*/
