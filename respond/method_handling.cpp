@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/24 12:16:06 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/24 17:09:46 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,11 @@ void    Respond::handle_post_response(std::vector<server> server)
         else
         {
             handle_urlencoded();
-            create_decode_files();
+            if (create_decode_files() == 2)
+            {
+                handle_error_response(server, 400);
+                return ;
+            }
             std::string path = r.get_uri();
             std::string::size_type i = r.get_uri().find_last_of('/');
             if (i != std::string::npos)
@@ -95,7 +99,11 @@ void    Respond::handle_post_response(std::vector<server> server)
     }
     if (check_post_type() == "form-data")
     {
-        handle_form_data(server);
+        if (handle_form_data(server) == 2)
+        {
+            handle_error_response(server, 400);
+            return ;
+        }
         set_status_code(201);
         set_status_message(get_response_status(201));
         return ;
@@ -127,7 +135,7 @@ void    Respond::handle_urlencoded()
     }
 }
 
-void    Respond::create_decode_files()
+int     Respond::create_decode_files()
 {
     std::string file_name;
     std::string file_content;
@@ -139,19 +147,22 @@ void    Respond::create_decode_files()
         file_name = _upload_store;
         file_name += "/" + it->key;
         file.open(file_name.c_str());
+        // Check if you have permission to access the file
+        if (access(file_name.c_str(), R_OK) != 0)
+            return (2);
         file << it->value;
         file.close();
         it++;
     }
+    return (0);
 }
 
-void    Respond::handle_form_data(std::vector<server> server)
+int Respond::handle_form_data(std::vector<server> server)
 {
-    // std::cout << r.get_body() << std::endl;
     // Find the first boundary
     size_t  pos = r.get_body().find(_boundary);
     if (!pos)
-        return ;
+        return (0);
     // Loop through the form data, locating boundaries and reading data betweem them
     while (true)
     {
@@ -164,24 +175,28 @@ void    Respond::handle_form_data(std::vector<server> server)
         if (_file_too_large == true)
         {
             handle_error_response(server, 413);
-            return ;
+            return (0);
         }
         if (formData.isValid())
             _form_data.push_back(formData); // Add the form data to the list
-        // std::cout << "pos before: " << pos << std::endl;
         if (_last_boundary == true)
             break;
         pos += _boundary.length() + 2;
     }
-    create_form_data();
+    if (create_form_data() == 2)
+    {
+        handle_error_response(server, 400);
+        return (2);
+    }
     std::string path = r.get_uri();
     std::string::size_type i = r.get_uri().find_last_of('/');
     if (i != std::string::npos)
         path = r.get_uri().substr(i);
     init_response_body(server, path, server[_server_index]._location[_location_index].get_root());
+    return (0);
 }
 
-void    Respond::create_form_data()
+int Respond::create_form_data()
 {
     std::string file_name;
     std::string file_content;
@@ -197,12 +212,15 @@ void    Respond::create_form_data()
         }
         file_name = _upload_store;
         file_name += "/" + it->get_file_name();
-        std::cout << file_name << std::endl;
         file.open(file_name.c_str());
+        // Check if you have permission to access the file
+        if (access(file_name.c_str(), R_OK) != 0)
+            return (2);
         file << it->get_data();
         file.close();
         it++;
     }
+    return (0);
 }
 // Helper function to locate the next boundary in the form data
 size_t Respond::find_boundary(size_t pos)
@@ -226,7 +244,6 @@ FormData Respond::read_form_data(std::vector<server> servers ,size_t pos)
     size_t end = r.get_body().find(_boundary, start);
     if (end == std::string::npos)
     {
-        std::cout << form_data.get_data() << std::endl;
         return (form_data); // Boundary not found
     }
 
@@ -261,12 +278,11 @@ FormData Respond::read_form_data(std::vector<server> servers ,size_t pos)
 
     // Process the data content
     std::string data_content = section.substr(header_end + 4); // Skip the CRLF delimiter
-    std::cout << (unsigned int)servers[_server_index].get_client_max_body_size() << std::endl;
-    std::cout << servers[_server_index].get_client_max_body_size() << std::endl;
+    
     if (data_content.length() * 8 >= (unsigned int)servers[_server_index].get_client_max_body_size())
         _file_too_large = true;
+    
     form_data.data = data_content;
-
     return (form_data);
 }
 
@@ -282,8 +298,6 @@ std::string Respond::check_post_type()
 
 void    Respond::handle_delete_response(std::vector<server> server)
 {
-        //std::cout << "DKHLAAAAAAAAAAT" << std::endl;
-        //std::cout << "rooted path:" << _rooted_path << std::endl;
     if (std::remove(_rooted_path.c_str()) == 0)
     {
         _status_code = 200;

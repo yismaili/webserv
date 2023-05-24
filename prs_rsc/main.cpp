@@ -15,8 +15,6 @@ int main(int ac, char **av)
     std::vector<int> all_ports;
     servers = ft_fill_servers(av, ac);
     all_ports = get_all_ports(servers);
-    //     for (size_t i = 0; i < all_ports.size(); i++)
-    //             std::cout << all_ports[i] << "\n";
     http::http_sever server1(servers);
     server1.run();
 return (0);
