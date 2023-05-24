@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/23 21:02:41 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/24 14:55:56 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,6 @@ namespace http{
             clients.push_back(server_pollfd);
             it++;
         }
-        
         while (true)
         {
             i = 0;
