@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/29 14:53:31 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/24 01:25:32 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/24 15:48:11 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@ std::string Respond::response_root(std::vector<server> servers)
     int rtn_location = 0;
     // step 1 :check the location
     rtn_location = ft_parse_location(servers, false);
-    if (rtn_location)
+    if (rtn_location == 1)
     {
         if (root_location(servers) == 1)
         {
@@ -117,9 +117,9 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
     if (pos != std::string::npos)
     {
         std::string extension = path.substr(pos);
+        std::map<std::string, std::string> path_info = server[_server_index]._location[_location_index].get_path_info();
         if (!prefix_location(server, path))
         {
-            std::map<std::string, std::string> path_info = server[_server_index]._location[_location_index].get_path_info();
             for (std::map<std::string, std::string>::const_iterator it = path_info.begin();
                 it != path_info.end(); ++it)
             {
@@ -138,7 +138,7 @@ int Respond::dynamic_location(std::vector<server> server, std::string path)
                 }
             }
         }
-        if (extension == ".php" || extension == ".py")
+        if ((extension == ".php" || extension == ".py") && path_info.empty())
         {
             handle_error_response(server, 403);
             return (2);

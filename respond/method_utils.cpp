@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/11 02:14:39 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/24 01:02:19 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/24 14:24:34 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -202,7 +202,6 @@ void    Respond::ft_handle_error(int error_code)
 
 void    Respond::ft_show_autoindex(std::vector<server> server)
 {
-    //std::cout << "rooted path: " << _rooted_path << std::endl;
     std::string index_html = "<!DOCTYPE html>\n<html>\n<head>\n";
     index_html += "<meta charset=\"UTF-8\">\n";
     index_html += "<title>Index of " + _rooted_path + "</title>\n";
@@ -235,7 +234,6 @@ void    Respond::ft_show_autoindex(std::vector<server> server)
                 file_path = _path_found + file_name; //         /cgi_bin
             else
                 file_path = _path_found + "/" + file_name;
-            // std::cout << "file path: " << file_path << std::endl;
             std::string match_path;
             if (_rooted_path[_rooted_path.size() - 1] == '/')
                 match_path = _rooted_path + file_name; //   www/html/cgi_bin
@@ -295,14 +293,4 @@ void    Respond::handle_error_response(std::vector<server> server, int error_cod
         set_date();
         set_cache_control("no cache");
     }
-}
-
-void    Respond::print_response()
-{
-    // std::cout << "HTTP/1.1 " << get_status_code() << " " << get_status_message() << "\r\n";
-    // for (std::map<std::string, std::string>::iterator it = _headers.begin(); it != _headers.end(); it++)
-    //     std::cout << it->first << ": " << it->second << "\r\n";
-    std::cout << "\r\n";
-//    if (get_response_body() != "")
-//         std::cout << "response body: " << _response_body << std::endl;;
 }
