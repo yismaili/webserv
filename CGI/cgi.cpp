@@ -109,7 +109,7 @@ std::string run_cgi(request &r,  Respond &res, std::vector<server> server)
             free_all(file, path,envp, env.size());
             return res.get_response_status(res.get_status_code());
         }
-        alarm(1);
+        alarm(2);
         execve(cmd[0], cmd, envp);
         exit(1);
     }

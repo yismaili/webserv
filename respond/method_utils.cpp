@@ -202,7 +202,7 @@ void    Respond::ft_handle_error(int error_code)
 
 void    Respond::ft_show_autoindex(std::vector<server> server)
 {
-    std::cout << "rooted path: " << _rooted_path << std::endl;
+    //std::cout << "rooted path: " << _rooted_path << std::endl;
     std::string index_html = "<!DOCTYPE html>\n<html>\n<head>\n";
     index_html += "<meta charset=\"UTF-8\">\n";
     index_html += "<title>Index of " + _rooted_path + "</title>\n";

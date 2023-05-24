@@ -16,18 +16,18 @@ std::string toUpper(std::string str) {
   return str;
 }
 
-bool isIpAddress(const std::string& ip) {
-    int numDots = 0;
+bool isip(const std::string& ip) {
+    int d = 0;
     std::string temp = "";
 
     for (size_t i = 0; i < ip.size(); i++)
     {
         if (ip[i] == '.') 
         {
-            numDots++;
-            if (numDots > 3)
+            d++;
+            if (d > 3)
                 return 0;
-            if (temp.size() == 0 || std::stoi(temp) > 255)
+            if (temp.size() == 0 || std::stod(temp) > 255)
                 return 0;
             temp = "";
         } 
@@ -36,7 +36,7 @@ bool isIpAddress(const std::string& ip) {
         else 
             temp += ip[i];
     }
-    if (temp.size() == 0 || std::stoi(temp) > 255 || numDots != 3) 
+    if (temp.size() == 0 || std::stod(temp) > 255 || d != 3) 
         return 0;
     return 1;
 }
@@ -75,36 +75,18 @@ int search_char(std::string str, char c)
 int is_number(const std::string& str)
 {
     size_t i = 0;
-    int exp = 0;
-    int digit = 0;
-    int flag = 0;
 
     for (i = 0; i < str.size(); i++)
     {
-        if (i == 0 && (str[i] == '+' || str[i] == '-')) {
+        if (i == 0 && (str[i] == '+')) {
             i++;
-            continue;
-        }
-        if (str[i] == 'e' || str[i] == 'E') {
-            if (exp || !digit) {
-                return 0;
-            }
-            exp = 1;
-            if (i + 1 < str.size() && (str[i + 1] == '+' || str[i + 1] == '-')) {
-                if(str[i + 1] == '-')
-                    flag = 1;
-                i++;
-            }
             continue;
         }
         if(!isdigit(str[i]))
             return (0);
-        digit = 1;
     }
-    if(i == 1 && (str[0] == '+' || str[0] == '-'))
+    if(i == 1 && (str[0] == '+'))
         return (0);
-    if(flag)
-        return (-1);
     return (1);
 }
 
@@ -199,8 +181,7 @@ int is_world(std::string str, std::string tmp)
 }
 
 
-server::server(Data_config data, bool check_location) 
-     : _client_max_body_size(1048576)
+server::server(Data_config data, bool check_location)
 {
     std::istringstream ss(data.data_server);
     std::string line;
@@ -216,6 +197,7 @@ server::server(Data_config data, bool check_location)
     int c_redirection = 0;
     int c_upload = 0;
     int c_upload_store = 0;
+     _client_max_body_size = 0;
     while (getline(ss, line))
     {
         if(line.empty() || line[0] == '#')
@@ -246,8 +228,6 @@ server::server(Data_config data, bool check_location)
         key = toLower(key);
         if (key == "server_name" && check_location)
         {
-            // if(c_server_name)
-            //     ft_error(line, "Duplicated");
             is_empty_value(value, line);
             if (ft_numbers_value(iss) || !isValidServerName(value))
                 ft_error(line, "Error");
@@ -262,7 +242,7 @@ server::server(Data_config data, bool check_location)
             if(c_host)
                 ft_error(line, "Duplicated");
             is_empty_value(value, line);
-            if (ft_numbers_value(iss) || (!isIpAddress(value) && value != "localhost"))
+            if (ft_numbers_value(iss) || (!isip(value) && value != "localhost"))
                 ft_error(line, "Error");
             c_host++;
             _host = value;
@@ -280,6 +260,9 @@ server::server(Data_config data, bool check_location)
             while (iss >> value)
             {
                 int port = ft_number(value, line);
+                std::vector<int>::iterator it = std::find(_listen.begin(), _listen.end(), port);
+                if(it != _listen.end())
+                    ft_error(line, "duplicate port");
                 if (port < 1024 || port > 65535)
                     ft_error(line, "Error");
                 _listen.push_back(port);
@@ -433,7 +416,7 @@ server::server(Data_config data, bool check_location)
     if(!c_allow_method && !check_location)
         _allow_methods.push_back("GET");
     if (!c_listen && check_location)
-        _listen.push_back(80);
+        _listen.push_back(8001);
     if (!c_host && check_location)
         _host = "127.0.0.1";
     if(!c_error_page && check_location)
@@ -450,7 +433,8 @@ server::server(Data_config data, bool check_location)
         _server_name.push_back("hostname");
     if (!c_root && check_location)
         _root = "www/html";
-    
+    if (!c_client_max_body_size && check_location)
+        _client_max_body_size = 1048576;
     if(data.location.size())
     {
         Data_config location_data;

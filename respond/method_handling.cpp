@@ -276,8 +276,8 @@ std::string Respond::check_post_type()
 
 void    Respond::handle_delete_response(std::vector<server> server)
 {
-        std::cout << "DKHLAAAAAAAAAAT" << std::endl;
-        std::cout << "rooted path:" << _rooted_path << std::endl;
+        //std::cout << "DKHLAAAAAAAAAAT" << std::endl;
+        //std::cout << "rooted path:" << _rooted_path << std::endl;
     if (std::remove(_rooted_path.c_str()) == 0)
     {
         _status_code = 200;

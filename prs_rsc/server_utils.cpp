@@ -155,7 +155,11 @@ std::vector<server> ft_fill_servers(char **av, int ac)
         std::cerr << "Error : not closed" << std::endl;
         exit (1);
     }
-    
+    if(v.size() == 0)
+    {
+        std::cerr << "Error : config file empty" << std::endl;
+        exit (1);
+    }
     for (size_t i = 0; i < v.size(); i++)
     {
         c = 0;
