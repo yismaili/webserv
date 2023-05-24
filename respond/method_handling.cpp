@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/09 17:52:50 by aoumad            #+#    #+#             */
-/*   Updated: 2023/05/24 16:07:00 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/24 17:09:46 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -100,7 +100,10 @@ void    Respond::handle_post_response(std::vector<server> server)
     if (check_post_type() == "form-data")
     {
         if (handle_form_data(server) == 2)
+        {
             handle_error_response(server, 400);
+            return ;
+        }
         set_status_code(201);
         set_status_message(get_response_status(201));
         return ;
@@ -143,10 +146,10 @@ int     Respond::create_decode_files()
     {
         file_name = _upload_store;
         file_name += "/" + it->key;
+        file.open(file_name.c_str());
         // Check if you have permission to access the file
         if (access(file_name.c_str(), R_OK) != 0)
             return (2);
-        file.open(file_name.c_str());
         file << it->value;
         file.close();
         it++;
@@ -159,7 +162,7 @@ int Respond::handle_form_data(std::vector<server> server)
     // Find the first boundary
     size_t  pos = r.get_body().find(_boundary);
     if (!pos)
-        return (2);
+        return (0);
     // Loop through the form data, locating boundaries and reading data betweem them
     while (true)
     {
@@ -172,7 +175,7 @@ int Respond::handle_form_data(std::vector<server> server)
         if (_file_too_large == true)
         {
             handle_error_response(server, 413);
-            return (2);
+            return (0);
         }
         if (formData.isValid())
             _form_data.push_back(formData); // Add the form data to the list
@@ -209,10 +212,10 @@ int Respond::create_form_data()
         }
         file_name = _upload_store;
         file_name += "/" + it->get_file_name();
+        file.open(file_name.c_str());
         // Check if you have permission to access the file
         if (access(file_name.c_str(), R_OK) != 0)
             return (2);
-        file.open(file_name.c_str());
         file << it->get_data();
         file.close();
         it++;
