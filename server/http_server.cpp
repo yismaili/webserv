@@ -6,7 +6,7 @@
 /*   By: aoumad <aoumad@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:23 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/24 15:59:43 by aoumad           ###   ########.fr       */
+/*   Updated: 2023/05/24 16:07:27 by aoumad           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,7 +137,6 @@ namespace http{
             clients.push_back(server_pollfd);
             it++;
         }
-        
         while (true)
         {
             i = 0;

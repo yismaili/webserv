@@ -6,7 +6,7 @@
 /*   By: yismaili <yismaili@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/04/04 18:41:42 by yismaili          #+#    #+#             */
-/*   Updated: 2023/05/22 22:48:44 by yismaili         ###   ########.fr       */
+/*   Updated: 2023/05/24 14:56:46 by yismaili         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ namespace http{
         bool sockets::start_server() 
         {
             int optval;
+            static int    check_port = 0;
             
             optval = 1; //enabling the SO_REUSEADDR socket option.
             // Creates a TCP socket
@@ -118,10 +119,15 @@ namespace http{
             fcntl(sockfd, F_SETFL, O_NONBLOCK);
 
             //bind a socket with a specific address and port number
-            if (bind(sockfd, result->ai_addr, result->ai_addrlen) == 0)
+            int ret_bind = bind(sockfd, result->ai_addr, result->ai_addrlen);
+            if (ret_bind == 0)
             {
                 // F_SETFL: This flag indicates that we want to set the file status flags.
+               check_port++;
                 std::cout << "\n\033[32mLISTENING ON ["<<port<<"]...\033[0m\n";
+            }
+            else if (ret_bind == -1 &&  check_port == 0){
+                std::cout << "\033[31mthis ["<<port<<"] port is used\033[0m\n";
             }
           //  Set socket to listen
             if (listen(sockfd, SOMAXCONN) < 0){
