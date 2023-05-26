@@ -2,13 +2,6 @@
 Webserv is a C++ 98 HTTP server that implements the Hypertext Transfer Protocol (HTTP) standards. It allows storing, processing, and delivering web pages to clients while adhering to the specified requirements. The server is designed to be non-blocking, ensuring optimal performance and compatibility with web browsers. In addition to the mandatory features, there is also an opportunity to implement bonus features such as cookies and session management.
 
 # Requirements
-# Mandatory Part
-  - The program should be named webserv.
-  - The following files should be included for submission: Makefile, *.{h, hpp, cpp, tpp, ipp}, and configuration files.
-  - The Makefile should include the rules NAME, all, clean, fclean, and re.
-  - The program should only use functions compatible with C++ 98.
-  - External functions such as execve, dup, dup2, pipe, strerror, gai_strerror, errno, fork, htons, htonl, ntohs, ntohl, select, poll, epoll, kqueue, socket, accept, listen, send, recv, bind, connect, getaddrinfo, freeaddrinfo, setsockopt, getsockname, getprotobyname, fcntl, close, read, write, waitpid, kill, signal, access, stat, opendir, readdir, and closedir are allowed.
-  - The Libft library is not authorized.
       
 # Description
    - The server should be a fully functional HTTP server implemented in C++ 98.
